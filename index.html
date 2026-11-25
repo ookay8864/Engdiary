@@ -115,7 +115,7 @@ input.t,select.t{width:100%;min-height:52px;border-radius:14px;border:2px solid 
 .pen{font:21px/2.1 ui-rounded,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}
 .pen .mk{border:0;background:var(--yelS);border-radius:8px;padding:0 5px;font:inherit;line-height:1.5;color:inherit}
 .pen .mk.sel{outline:3px solid var(--yel)}
-.pen del{color:var(--red);text-decoration:line-through 2px}.pen ins{color:var(--ok);font-weight:800;text-decoration:none;margin-left:4px}
+.pen del{color:var(--red);text-decoration:line-through 2px}.pen ins{color:var(--ok);font-weight:800;text-decoration:none}.pen .arr{color:var(--mut);margin:0 4px;font-size:.8em}.pen .up{color:var(--ok);font-weight:800;font-size:1.2em}.pen .cap{font:800 12px system-ui,sans-serif;color:var(--ok);background:var(--okS);border-radius:6px;padding:2px 5px;margin-left:5px;vertical-align:middle}
 .why{background:var(--card);border-radius:16px;padding:12px 14px;margin-top:4px;min-height:56px}
 .ra p{font:21px/1.55 ui-rounded,sans-serif;margin:0 0 8px;padding:10px 14px;border-radius:14px;color:var(--mut);overflow-wrap:anywhere}
 .ra p.cur{background:var(--blueS);color:var(--ink);font-weight:700;font-size:25px}.ra p.done{color:var(--ink)}
@@ -212,6 +212,7 @@ function pickVoice(){if(!canSpeak)return;const vs=speechSynthesis.getVoices().fi
 if(canSpeak){pickVoice();try{speechSynthesis.addEventListener('voiceschanged',pickVoice)}catch(e){}}
 function say(list,done,rate=.8){if(!canSpeak){if(done)done();return}try{speechSynthesis.cancel();const arr=Array.isArray(list)?list:[list];let fired=false;const fin=()=>{if(!fired){fired=true;if(done)done()}};arr.forEach((t,i)=>{const u=new SpeechSynthesisUtterance(t);u.lang=VOICE?VOICE.lang:'en-US';if(VOICE)u.voice=VOICE;u.rate=rate;if(i===arr.length-1){u.onend=fin;u.onerror=fin}speechSynthesis.speak(u)});if(done)setTimeout(fin,2500+arr.join(' ').length*120)}catch(e){if(done)done()}}
 const speak=t=>say(t);
+const spellSay=w=>say([...w.toUpperCase().replace(/[^A-Z]/g,'')].join(', ')+'. '+w+'.',null,.7);
 const TYPES={spelling:['Spelling','拼字'],tense:['Tense','時態'],capital:['Capital','大寫'],punctuation:['Full stop','標點'],grammar:['Grammar','文法']};
 
 /* ---------- state & storage ---------- */
@@ -429,11 +430,29 @@ async function saveDraft(){
 
 /* ---------- review ---------- */
 const splitS=t=>String(t||'').split(/(?<=[.!?])\s+/).map(x=>x.trim()).filter(Boolean);
+function fixHTML(w,r){
+ if(w.toLowerCase()===r.toLowerCase()&&w.length===r.length)return [...r].map((c,i)=>c!==w[i]?`<span class="up">${esc(c)}</span>`:esc(c)).join('')+'<span class="cap">大寫</span>';
+ if(r.startsWith(w)&&r.length>w.length)return esc(w)+`<span class="up">${esc(r.slice(w.length))}</span>`;
+ if(r.toLowerCase().startsWith(w.toLowerCase())&&r.length>w.length)return fixHTML(w,r.slice(0,w.length))+`<span class="up">${esc(r.slice(w.length))}</span>`;
+ return `<del>${esc(w)}</del><span class="arr">→</span><ins>${esc(r)}</ins>`;
+}
+function core(w,r){
+ const W=w.split(' '),Rt=r.split(' ');let p=0;while(p<W.length&&p<Rt.length&&W[p]===Rt[p])p++;
+ let q=0;while(q<W.length-p&&q<Rt.length-p&&W[W.length-1-q]===Rt[Rt.length-1-q])q++;
+ const off=W.slice(0,p).join(' ').length+(p?1:0);const cw=W.slice(p,W.length-q).join(' '),cr=Rt.slice(p,Rt.length-q).join(' ');
+ return {off,cw,cr};
+}
 function penHTML(text,issues,sel){
- const rg=[];issues.forEach((x,i)=>{if(!x.wrong)return;let p=text.indexOf(x.wrong);if(p<0)p=text.toLowerCase().indexOf(x.wrong.toLowerCase());while(p>=0&&rg.some(r=>p<r.e&&p+x.wrong.length>r.s))p=text.indexOf(x.wrong,p+1);if(p<0)return;rg.push({s:p,e:p+x.wrong.length,i})});
- rg.sort((a,b)=>a.s-b.s);let o='',c=0;
- for(const r of rg){const x=issues[r.i];o+=esc(text.slice(c,r.s))+`<button class="mk ${r.i===sel?'sel':''}" data-a="why" data-v="${r.i}"><del>${esc(text.slice(r.s,r.e))}</del><ins>${esc(x.right)}</ins></button>`;c=r.e}
- return o+esc(text.slice(c));
+ const rg=[],lt=text.toLowerCase();
+ issues.forEach((x,i)=>{if(!x.wrong)return;const c=core(x.wrong,x.right);
+  let p=text.indexOf(x.wrong);if(p<0)p=lt.indexOf(x.wrong.toLowerCase());
+  while(p>=0){const s0=p+c.off,e0=s0+c.cw.length;if(!rg.some(r=>c.cw?(s0<r.e&&e0>r.s):(s0>r.s&&s0<r.e)))break;p=text.indexOf(x.wrong,p+1)}
+  if(p<0||!c.cr&&!c.cw)return;const s0=p+c.off;rg.push({s:s0,e:s0+c.cw.length,i,cw:c.cw,cr:c.cr})});
+ rg.sort((a,b)=>a.s-b.s||a.e-b.e);let o='',c=0;
+ for(const r of rg){if(r.s<c)continue;const inner=r.cw?fixHTML(text.slice(r.s,r.e),r.cr):`<span class="up">${esc(r.cr)}</span>`;
+  o+=esc(text.slice(c,r.s))+`<button class="mk ${r.i===sel?'sel':''}" data-a="why" data-v="${r.i}">${inner}</button>${r.cw?'':' '}`;c=r.e}
+ const miss=issues.map((_,i)=>i).filter(i=>!rg.some(r=>r.i===i));
+ return {html:o+esc(text.slice(c)),miss};
 }
 const STARB='<svg viewBox="0 0 24 24" width="110" height="110"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.2 1.3-6.6L2.5 9.3l6.6-.8z" fill="#ffc21a" stroke="#d99a00"/></svg>';
 function overlay(inner){$('#sheet').innerHTML=`<div class="rv" role="dialog" aria-modal="true"><button class="ib x" style="background:var(--card);color:var(--mut)" data-a="rvclose" aria-label="Close">✕</button><div class="in">${inner}</div></div>`}
@@ -441,9 +460,9 @@ function renderReview(){
  const r=st.rv;if(!r){closeSheet();return}
  const fb=st.fb;
  if(r.mode==='pen'){
-  const n=fb.issues.length,x=fb.issues[r.sel];
-  overlay(`<h2 style="margin-top:14px">${n?'Teacher’s red pen 老師批改':'No mistakes! 全對！'}</h2><div class="zh">${n?`${n} thing${n>1?'s':''} to fix. Tap a yellow word to see why. 點黃色的字看說明。`:'Great job, no mistakes at all! 很棒，一個錯都沒有！'}</div>
-  <div class="card" style="margin-top:14px"><div class="pen">${n?penHTML(fb.text,fb.issues,r.sel):esc(fb.text)}</div></div>
+  const n=fb.issues.length,x=fb.issues[r.sel],P=n?penHTML(fb.text,fb.issues,r.sel):null;
+  overlay(`<h2 style="margin-top:14px">${n?'Let’s fix it! 一起改改看':'Perfect! 全對！'}</h2><div class="zh">${n?`${n} thing${n>1?'s':''} to fix. Tap a yellow word to see why. 點黃色的字看說明。`:'Great job, no mistakes at all! 很棒，一個錯都沒有！'}</div>
+  <div class="card" style="margin-top:14px"><div class="pen">${n?P.html:esc(fb.text)}</div>${n&&P.miss.length?`<div class="lab" style="margin:12px 0 6px">Other fixes 其他修改</div><div class="pen" style="font-size:18px">${P.miss.map(i=>`<button class="mk ${i===r.sel?'sel':''}" data-a="why" data-v="${i}">${fixHTML(fb.issues[i].wrong,fb.issues[i].right)}</button>`).join(' ')}</div>`:''}</div>
   ${n?`<div class="why">${x?`<div><b style="font-size:18px"><span style="color:var(--red)">${esc(x.wrong)}</span> → <span style="color:var(--ok)">${esc(x.right)}</span></b> <span class="tag ${x.type==='tense'?'y':''}">${TYPES[x.type][0]} ${TYPES[x.type][1]}</span></div><div class="mut" style="margin-top:4px">${esc(x.tipZh||'')}${x.tipZh&&x.tip?' · ':''}${esc(x.tip||'')}</div>`:'<span class="mut">Tap a yellow word above. 點上面黃色的字，看看為什麼要這樣改。</span>'}</div>`:''}
   <div class="grow"></div><div class="acts"><button class="btn pri big" data-a="raStart">Read along 跟著念 ›</button></div>`);
   return;
@@ -482,7 +501,7 @@ function renderBot(){
  } else if(b.phase==='show'){
   const w=b.res.word;
   h=`<div class="bub" style="text-align:center"><div class="zh">Remember this word! 把這個字記起來！</div><div class="spell">${esc(w.toUpperCase().split('').join(' '))}</div><div style="font:700 24px ui-rounded,sans-serif">${esc(w)} · ${esc(b.res.zh)}</div>${b.res.example?`<div class="mut" style="margin-top:6px">${esc(b.res.example)}</div>`:''}</div>
-  <div class="grow"></div><div class="acts"><button class="btn sec" data-a="botSpell">Hear the spelling 聽拼法</button><button class="btn pri big" data-a="botMem">✓ I remember it 我記住了</button></div>`;
+  <div class="grow"></div><div class="acts"><button class="btn sec" data-a="botSpell">Listen again 再聽一次</button><button class="btn pri big" data-a="botMem">✓ I remember it 我記住了</button></div>`;
  } else if(b.phase==='spell'){
   const w=b.res.word;
   h=`<div class="bub" style="text-align:center"><b style="font-size:20px">Now spell it yourself! 現在自己拼拼看</b><div class="zh" style="margin:4px 0 10px">${esc(b.res.zh)}</div><div class="blanks">${w.split('').map(c=>c===' '?'&nbsp;':'_').join(' ')}</div>
@@ -502,7 +521,7 @@ async function botAsk(){
  if(!settings.apiKey){toast(AIERR.nokey);return}
  b.q=q;b.phase='loading';renderBot();
  try{const kid=kidBy(st.kid);const r=await aiJson(botPrompt(kid,q));const w=typeof r.word==='string'?r.word.trim():'';
-  if(r.type==='word'&&/^[A-Za-z][A-Za-z' -]{0,30}$/.test(w)){b.res={word:w,zh:String(r.zh||''),example:String(r.example||'')};b.phase='show';b.tries=0;renderBot();say([...w.toUpperCase().replace(/[^A-Z]/g,'')].concat(w))}
+  if(r.type==='word'&&/^[A-Za-z][A-Za-z' -]{0,30}$/.test(w)){b.res={word:w,zh:String(r.zh||''),example:String(r.example||'')};b.phase='show';b.tries=0;renderBot();spellSay(w)}
   else{b.res={message:String(r.message||''),messageZh:String(r.messageZh||'')};b.phase='msg';renderBot()}}
  catch(e){b.phase='ask';renderBot();toast(AIERR[e&&e.code]||'Robo could not answer. Try again. 機器人沒回應，再試一次。')}
 }
@@ -594,7 +613,7 @@ async function act(a,v){
  case 'raBetter':st.rv={mode:'ra',ss:splitS(st.fb.better),i:0,better:true};raPlay();break;
  case 'bot':st.bot={phase:'ask',q:'',tries:0};renderBot();break;
  case 'botAsk':botAsk();break;
- case 'botSpell':{const w=st.bot.res.word;say([...w.toUpperCase().replace(/[^A-Z]/g,'')].concat(w));break}
+ case 'botSpell':spellSay(st.bot.res.word);break;
  case 'botWord':say(st.bot.res.word);break;
  case 'botMem':st.bot.phase='spell';st.bot.tries=0;renderBot();break;
  case 'botLook':st.bot.phase='show';renderBot();break;
