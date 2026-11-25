@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Little Writers Diary</title>
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Diary"><meta name="theme-color" content="#2f5bea"><link rel="apple-touch-icon" href="icon.png">
+<style>
+/* VOICE: cheerful and calm, kid-sized, one task per screen
+   IDEA: a school exercise book: blue cover, ruled pages, the teacher's red pen
+   PICTURE: the ruled writing page itself; picture prompts drawn as flat little scenes
+   COLOUR and TYPE: cover blue, pencil yellow, red-pen coral; rounded system type for titles and writing, system UI text
+   LAYOUT: one 560px column, blue header band, sticky bottom action bar, sheets slide up */
+:root{color-scheme:light dark;
+--bg:light-dark(#f3f5fb,#0e1322);--card:light-dark(#fff,#171f35);--ink:light-dark(#18213a,#eef1fa);--mut:light-dark(#5b6580,#a4adc6);
+--line:light-dark(#dde4f3,#2a3453);--blue:light-dark(#2f5bea,#6f8dff);--blueS:light-dark(#e9efff,#1c2851);--yel:#ffd23f;--yelS:light-dark(#fff6d6,#3a3214);
+--red:light-dark(#e0464b,#ff7b7f);--redS:light-dark(#ffeceb,#3d1c22);--ok:light-dark(#178a57,#4fd39a);--okS:light-dark(#e4f7ee,#14352a);--org:light-dark(#d9730d,#ffae5c);--orgS:light-dark(#fff0e0,#3a2814)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,'PingFang TC',sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
+.top{background:var(--blue);color:#fff;padding:calc(env(safe-area-inset-top) + 12px) 16px 16px;position:sticky;top:0;z-index:5}
+.top .in{max-width:560px;margin:auto;display:flex;align-items:center;gap:10px;min-height:44px}
+.top h1{font:800 24px/1.1 ui-rounded,'PingFang TC',sans-serif;margin:0;flex:1}
+.top small{display:block;font:600 13px system-ui,sans-serif;opacity:.85}
+.ib{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.16);color:#fff;flex:none}
+.wrap{max-width:560px;margin:auto;padding:16px 16px calc(110px + env(safe-area-inset-bottom))}
+.card{background:var(--card);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 1px 0 var(--line),0 6px 18px rgba(20,30,70,.06)}
+h2{font:700 20px/1.2 ui-rounded,'PingFang TC',sans-serif;margin:0 0 8px}
+.zh{color:var(--mut);font-size:14px}
+.mut{color:var(--mut)}
+.btn{min-height:52px;border-radius:16px;padding:0 20px;font-weight:800;font-size:17px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.pri{background:var(--blue);color:#fff}.pri:disabled{opacity:.5}
+.sec{background:var(--blueS);color:var(--blue)}
+.ghost{color:var(--mut);font-weight:700;min-height:44px;padding:0 12px}
+.danger{color:var(--red)}
+.full{width:100%}
+.kids{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.kid{background:var(--card);border-radius:22px;padding:22px 12px;text-align:center;box-shadow:0 6px 18px rgba(20,30,70,.07)}
+.av{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;margin:0 auto 10px;color:#fff;font:800 36px ui-rounded,'PingFang TC',sans-serif}
+.kid b{display:block;font:700 22px ui-rounded,'PingFang TC',sans-serif}
+.tag{display:inline-block;font-size:12px;font-weight:800;padding:3px 9px;border-radius:99px;background:var(--blueS);color:var(--blue)}
+.tag.y{background:var(--yelS);color:light-dark(#8a6400,#ffd23f)}
+.tag.g{background:var(--okS);color:var(--ok)}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;text-align:center}
+.dot{aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:14px;border:2px dashed var(--line);color:var(--mut);max-width:48px;margin:4px auto 0;width:100%}
+.dot.done{background:var(--blue);border:0;color:#fff}.dot.today{border:3px solid var(--yel);color:var(--ink)}.dot.rest{border:0;background:var(--yelS);color:light-dark(#8a6400,#ffd23f);font-size:11px}
+.wk small{font-size:12px;color:var(--mut);font-weight:700}
+.stats{display:flex;gap:10px;margin-top:14px}.stats div{flex:1;background:var(--bg);border-radius:14px;padding:10px;text-align:center}.stats b{display:block;font:800 24px ui-rounded,'PingFang TC',sans-serif}.stats span{font-size:12px;color:var(--mut);font-weight:700}
+.prompt{background:var(--blue);color:#fff}.prompt .q{font:700 23px/1.25 ui-rounded,'PingFang TC',sans-serif}.prompt .zh{color:rgba(255,255,255,.85)}
+.prompt svg{width:100%;height:auto;border-radius:14px;margin-top:12px;display:block}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.chip{min-height:44px;padding:0 14px;border-radius:99px;background:var(--card);font-weight:800;font-size:15px;box-shadow:0 1px 0 var(--line);display:inline-flex;align-items:center;gap:6px}
+.chip i{font-style:normal;color:var(--mut);font-weight:600;font-size:13px}
+.page{background:var(--card);border-radius:20px;padding:6px 16px 10px 46px;position:relative;box-shadow:0 6px 18px rgba(20,30,70,.06)}
+.page:before{content:"";position:absolute;left:34px;top:0;bottom:0;width:2px;background:light-dark(#ffb4b4,#5a2a33)}
+textarea{width:100%;border:0;outline:0;resize:none;background:transparent repeating-linear-gradient(transparent 0 calc(2.1em - 1px),var(--line) calc(2.1em - 1px) 2.1em);font:20px/2.1em ui-rounded,'PingFang TC',sans-serif;min-height:calc(2.1em * 6);padding:0;display:block}
+.meter{display:flex;align-items:center;gap:10px;margin:12px 2px 0;font-weight:700;font-size:14px;color:var(--mut)}
+.bar{flex:1;height:10px;background:var(--line);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok);border-radius:9px;transition:width .3s}
+.dock{position:fixed;left:0;right:0;bottom:0;background:var(--card);box-shadow:0 -6px 20px rgba(20,30,70,.08);padding:12px 16px calc(12px + env(safe-area-inset-bottom));z-index:6}
+.dock .in{max-width:560px;margin:auto;display:flex;gap:10px}.dock .btn{flex:1}
+.fb .txt{font:19px/1.9 ui-rounded,'PingFang TC',sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}
+mark{background:var(--redS);color:var(--red);border-radius:6px;padding:1px 3px;text-decoration:underline wavy var(--red) 1.5px;text-underline-offset:4px}
+mark.tense{background:var(--orgS);color:var(--org);text-decoration-color:var(--org)}
+mark.grammar,mark.capital,mark.punctuation{background:var(--blueS);color:var(--blue);text-decoration-color:var(--blue)}
+mark sup{font:800 11px system-ui,sans-serif;margin-left:2px}
+.fix{border-top:1px solid var(--line);padding:12px 0;display:grid;grid-template-columns:28px 1fr;gap:6px 10px}
+.fix .n{width:26px;height:26px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-weight:800;font-size:13px}
+.fix .w{font:18px ui-rounded,sans-serif;overflow-wrap:anywhere}.fix .w s{color:var(--red)}.fix .w b{color:var(--ok)}
+.better{background:var(--okS);border-radius:14px;padding:12px 14px;font:18px/1.7 ui-rounded,sans-serif;margin-top:6px}
+.praise{display:flex;gap:10px;align-items:flex-start;background:var(--yelS);border-radius:14px;padding:12px 14px;margin-bottom:12px;font-weight:700}
+.star{flex:none;width:26px;height:26px}
+.sheetbg{position:fixed;inset:0;background:rgba(10,15,35,.45);z-index:9;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--card);width:100%;max-width:560px;border-radius:24px 24px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));max-height:82vh;overflow:auto;animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}.bar i{transition:none}}
+.opt{display:block;width:100%;text-align:left;background:var(--bg);border-radius:16px;padding:14px 16px;margin-bottom:10px;font:20px ui-rounded,sans-serif;min-height:52px}
+.pics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.pics button{background:var(--bg);border-radius:16px;padding:8px;text-align:center;font-weight:800}
+.pics svg{width:100%;height:auto;border-radius:10px;display:block;margin-bottom:6px}
+.words{display:flex;flex-wrap:wrap;gap:8px}
+.word{background:var(--bg);border-radius:14px;padding:8px 14px;min-height:48px;text-align:left}
+.word b{font:700 19px ui-rounded,sans-serif;display:block}.word span{font-size:13px;color:var(--mut)}
+.word.used{background:var(--yelS)}
+label.f{display:block;font-weight:800;margin:16px 0 6px}
+input.t,select.t{width:100%;min-height:52px;border-radius:14px;border:2px solid var(--line);background:var(--card);padding:0 14px;font-size:18px}
+.choice{display:grid;gap:10px}
+.choice button{text-align:left;border-radius:16px;border:2px solid var(--line);padding:12px 14px;background:var(--card)}
+.choice button.on{border-color:var(--blue);background:var(--blueS)}
+.choice b{font:700 18px ui-rounded,'PingFang TC',sans-serif}.choice p{margin:2px 0 0;font-size:14px;color:var(--mut)}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pin{font:800 32px ui-rounded,'PingFang TC',sans-serif;letter-spacing:.5em;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:700;z-index:20;max-width:90vw;text-align:center}
+.paper{background:#fff;color:#1b2033;border-radius:6px;padding:22px 20px;box-shadow:0 8px 24px rgba(20,30,70,.12);font-size:14px}
+.paper h3{font:800 20px ui-rounded,'PingFang TC',sans-serif;margin:0;color:#2f5bea}.paper h4{font:800 14px system-ui,sans-serif;color:#2f5bea;border-bottom:1.5px solid #dde4f3;padding-bottom:4px;margin:18px 0 8px}
+.paper .d{margin-bottom:10px}.paper .d b{font-size:13px}.paper .d p{margin:2px 0 0;font:15px/1.6 ui-rounded,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}
+.paper .c{font:14px ui-rounded,sans-serif;margin:3px 0}.paper s{color:#e0464b}.paper .g{color:#178a57;font-weight:700}
+.paper .lines div{border-bottom:1px solid #c9d1e6;height:26px}
+.banner{background:var(--okS);color:var(--ok);border-radius:14px;padding:12px 14px;font-weight:700;margin-top:12px}
+.list .it{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-top:1px solid var(--line);align-items:center}
+.load{padding:80px 20px;text-align:center;color:var(--mut);font-weight:700}
+</style>
+</head><body>
+<div id="app"><div class="load">Loading… 載入中</div></div>
+<div id="sheet"></div>
+<script>
+{
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const dIdx=d=>(d.getDay()+6)%7;
+const monday=d=>addDays(new Date(d.getFullYear(),d.getMonth(),d.getDate()),-dIdx(d));
+const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAYL=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fmt=d=>MON[d.getMonth()]+' '+d.getDate();
+const hash=s=>{let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)};
+const wc=t=>(t.match(/[A-Za-z']+/g)||[]).length;
+const clone=o=>JSON.parse(JSON.stringify(o));
+const COLORS=['#2f5bea','#e0464b','#178a57','#d9730d','#7c4ddb','#0f8fa3'];
+const STAR='<svg class="star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.2 1.3-6.6L2.5 9.3l6.6-.8z" fill="#ffc21a" stroke="#d99a00" stroke-width="1"/></svg>';
+const BACK='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
+
+const LEVELS={
+ 1:{name:'Level 1',zh:'入門 · 1–2 句',goal:8,sent:'1–2 sentences',vocab:2,desc:'Short sentences with fill-in starters. 填空式開頭，寫 1–2 句。'},
+ 2:{name:'Level 2',zh:'進階 · 3–4 句',goal:25,sent:'3–4 sentences',vocab:3,desc:'3–4 sentences and 3 new words. 寫 3–4 句，用上 3 個單字。'},
+ 3:{name:'Level 3',zh:'挑戰 · 5 句以上',goal:45,sent:'5+ sentences',vocab:5,desc:'5+ sentences, linking words and 5 new words. 寫 5 句以上，用 first/then/finally。'}};
+const sugLevel=a=>a<=6?1:a<=8?2:3;
+const sugMode=a=>a<=7?'simple':'strict';
+const MODES={simple:{name:'Simple 簡單批改',desc:'Spelling, past tense, capitals and full stops. 拼字、時態、大寫、句號。'},
+ strict:{name:'Strict 嚴格批改',desc:'Everything in Simple, plus grammar and a better way to write it. 再加文法，並提供更好的寫法。'}};
+
+const TOPICS=[
+ ['What did you eat today?','你今天吃了什麼？','Today I ate ___.'],
+ ['What did you play today?','你今天玩了什麼？','Today I played ___ with ___.'],
+ ['Who did you see today?','你今天見到了誰？','Today I saw ___.'],
+ ['What did you learn at school?','你今天在學校學了什麼？','At school, I learned ___.'],
+ ['What made you happy today?','今天什麼事讓你開心？','I was happy when ___.'],
+ ['Where did you go today?','你今天去了哪裡？','Today I went to ___.'],
+ ['What was the weather like?','今天天氣怎麼樣？','Today it was ___ outside.'],
+ ['What did you do after school?','放學後你做了什麼？','After school, I ___.'],
+ ['Tell me about a friend.','說說你的一個朋友。','My friend ___ is ___.'],
+ ['What was hard today?','今天有什麼事很難？','Today ___ was hard for me.'],
+ ['What did you see on the way home?','回家路上你看到了什麼？','On the way home, I saw ___.'],
+ ['What do you want to do tomorrow?','明天你想做什麼？','Tomorrow I want to ___.']];
+const STARTERS={1:['Today I ___.','It was ___.'],2:['After that, I ___.','I felt ___ because ___.'],3:['First, I ___. Then, ___.','The best part of my day was ___.','Finally, ___.']};
+const VOCAB={
+ 1:'happy:開心,big:大,small:小,fun:好玩,cat:貓,dog:狗,ball:球,cake:蛋糕,play:玩,run:跑,eat:吃,park:公園,sun:太陽,rain:雨,book:書,friend:朋友,jump:跳,hot:熱,cold:冷,toy:玩具,mom:媽媽,dad:爸爸,red:紅色,swim:游泳',
+ 2:'delicious:好吃的,yesterday:昨天,because:因為,favorite:最喜歡的,exciting:刺激的,tired:累的,together:一起,outside:外面,quickly:很快地,noisy:吵鬧的,afternoon:下午,library:圖書館,sandwich:三明治,beautiful:美麗的,scary:可怕的,laugh:笑,finish:完成,busy:忙碌的,weekend:週末,later:後來,lucky:幸運的,sunny:晴朗的,hungry:餓的,classmate:同學',
+ 3:'although:雖然,suddenly:突然,finally:最後,however:然而,adventure:冒險,decided:決定了,amazing:驚人的,enjoyed:享受了,patient:有耐心的,surprised:驚訝的,challenge:挑戰,discover:發現,proud:驕傲的,practice:練習,imagine:想像,nervous:緊張的,celebrate:慶祝,especially:尤其,explore:探索,carefully:小心地,exhausted:筋疲力盡的,delighted:很高興的,energetic:精力充沛的,instead:反而'};
+const vocabFor=(lv,seed)=>{const l=VOCAB[lv].split(',').map(x=>x.split(':'));const out=[];let s=seed;while(out.length<LEVELS[lv].vocab){s=(s*1103515245+12345)&0x7fffffff;const w=l[s%l.length];if(!out.includes(w))out.push(w)}return out};
+const used=(text,w)=>new RegExp('\\b'+w+'(s|es|ed|d|ing)?\\b','i').test(text);
+
+const sv=b=>`<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">${b}</svg>`;
+const PICS=[
+ {id:'park',t:'At the park',zh:'在公園',h:'slide, swing, sunny, run',s:sv('<rect width="160" height="100" fill="#bfe3ff"/><circle cx="132" cy="22" r="12" fill="#ffd23f"/><rect y="70" width="160" height="30" fill="#7cc96b"/><rect x="28" y="44" width="7" height="30" fill="#8a5a3b"/><circle cx="31" cy="38" r="17" fill="#3fa45b"/><circle cx="22" cy="46" r="10" fill="#4fb86a"/><path d="M76 74 L104 40" stroke="#e0464b" stroke-width="6" stroke-linecap="round"/><path d="M104 40 V74 M114 40 V74 M100 40 H118" stroke="#2f5bea" stroke-width="4"/><circle cx="60" cy="62" r="5" fill="#f4c19b"/><path d="M60 67 v10 M60 70 l-6 5 M60 70 l6 -4 M60 77 l-5 7 M60 77 l5 7" stroke="#2f5bea" stroke-width="3" stroke-linecap="round"/>')},
+ {id:'rain',t:'A rainy day',zh:'下雨天',h:'umbrella, wet, puddle, boots',s:sv('<rect width="160" height="100" fill="#a9bccf"/><ellipse cx="50" cy="22" rx="30" ry="12" fill="#e9eef4"/><ellipse cx="112" cy="18" rx="28" ry="11" fill="#e9eef4"/><g stroke="#2f5bea" stroke-width="2" stroke-linecap="round"><path d="M30 40l-3 7M52 44l-3 7M74 38l-3 7M120 40l-3 7M140 46l-3 7M98 34l-3 7M18 58l-3 7M146 64l-3 7"/></g><rect y="82" width="160" height="18" fill="#6d7f93"/><ellipse cx="62" cy="88" rx="22" ry="4" fill="#8fb0d6"/><path d="M60 58 a24 20 0 0 1 48 0z" fill="#e0464b"/><path d="M84 58 v20 a4 4 0 0 1 -8 0" stroke="#333" stroke-width="2.5" fill="none"/><circle cx="84" cy="66" r="5" fill="#f4c19b"/><rect x="79" y="71" width="10" height="11" rx="3" fill="#ffd23f"/>')},
+ {id:'party',t:'A birthday party',zh:'生日派對',h:'cake, candles, gift, sing',s:sv('<rect width="160" height="100" fill="#ffe7ef"/><rect y="80" width="160" height="20" fill="#f6c6d6"/><rect x="52" y="54" width="56" height="26" rx="4" fill="#fff" stroke="#f08aa8" stroke-width="2"/><rect x="52" y="54" width="56" height="8" fill="#f08aa8"/><g fill="#2f5bea"><rect x="64" y="42" width="4" height="12"/><rect x="78" y="42" width="4" height="12"/><rect x="92" y="42" width="4" height="12"/></g><g fill="#ffb300"><ellipse cx="66" cy="38" rx="3" ry="5"/><ellipse cx="80" cy="38" rx="3" ry="5"/><ellipse cx="94" cy="38" rx="3" ry="5"/></g><circle cx="24" cy="26" r="12" fill="#2f5bea"/><circle cx="138" cy="30" r="12" fill="#ffd23f"/><path d="M24 38 q4 20 0 40 M138 42 q-4 18 0 38" stroke="#888" fill="none"/><rect x="118" y="62" width="22" height="18" fill="#178a57"/><rect x="127" y="62" width="4" height="18" fill="#ffd23f"/>')},
+ {id:'beach',t:'At the beach',zh:'在海邊',h:'sand, waves, shells, sandcastle',s:sv('<rect width="160" height="100" fill="#bfe8ff"/><circle cx="30" cy="22" r="12" fill="#ffd23f"/><rect y="52" width="160" height="22" fill="#3a9ad9"/><path d="M0 52 q10 -5 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0" fill="#7cc4f0"/><rect y="70" width="160" height="30" fill="#f3d79b"/><path d="M96 86 h28 v-10 h-4 v4 h-4 v-4 h-4 v4 h-4 v-4 h-4 v4 h-4 v-4 h-4z" fill="#d9a85b"/><circle cx="50" cy="82" r="8" fill="#fff"/><path d="M42 82 h16 M50 74 v16" stroke="#e0464b" stroke-width="3"/><path d="M138 88 l6 -6 l6 6z" fill="#f08aa8"/>')},
+ {id:'dinner',t:'Family dinner',zh:'家庭晚餐',h:'rice, noodles, chopsticks, yummy',s:sv('<rect width="160" height="100" fill="#ffefd6"/><rect x="10" y="56" width="140" height="10" rx="3" fill="#b9773c"/><rect x="20" y="66" width="6" height="30" fill="#8a5a3b"/><rect x="134" y="66" width="6" height="30" fill="#8a5a3b"/><path d="M34 56 a16 12 0 0 0 32 0z" fill="#fff" stroke="#2f5bea" stroke-width="2"/><ellipse cx="50" cy="54" rx="14" ry="4" fill="#fffaf0"/><path d="M94 56 a18 13 0 0 0 36 0z" fill="#fff" stroke="#e0464b" stroke-width="2"/><path d="M100 53 q6 -4 12 0 t12 0" stroke="#e8b04a" stroke-width="3" fill="none"/><path d="M70 30 l20 22 M76 28 l16 24" stroke="#8a5a3b" stroke-width="2.5" stroke-linecap="round"/><path d="M46 40 q-4 -6 0 -12 M54 40 q-4 -6 0 -12 M108 40 q-4 -6 0 -12 M116 40 q-4 -6 0 -12" stroke="#c9b9a6" stroke-width="2" fill="none"/>')},
+ {id:'football',t:'Playing football',zh:'踢足球',h:'kick, goal, team, win',s:sv('<rect width="160" height="100" fill="#bfe3ff"/><rect y="56" width="160" height="44" fill="#5fbf5a"/><path d="M0 78 h160" stroke="#fff" stroke-width="2" opacity=".7"/><path d="M96 30 h52 v34 M96 30 v34" stroke="#fff" stroke-width="4" fill="none"/><g stroke="#fff" stroke-width="1" opacity=".6"><path d="M104 30 v34 M112 30 v34 M120 30 v34 M128 30 v34 M136 30 v34 M96 40 h52 M96 50 h52"/></g><circle cx="62" cy="76" r="9" fill="#fff" stroke="#222" stroke-width="1.5"/><path d="M62 71 l4 3 l-1.5 5 h-5 l-1.5 -5z" fill="#222"/><circle cx="36" cy="50" r="5" fill="#f4c19b"/><path d="M36 55 v12 M36 59 l-7 4 M36 59 l7 -3 M36 67 l-6 9 M36 67 l10 6" stroke="#e0464b" stroke-width="3.5" stroke-linecap="round"/>')}];
+const TYPES={spelling:['Spelling','拼字'],tense:['Tense','時態'],capital:['Capital','大寫'],punctuation:['Full stop','標點'],grammar:['Grammar','文法']};
+
+/* ---------- state & storage ---------- */
+let settings={pin:'',kids:[]},entries={},ready=false,mode='loading',note='';
+
+const st={view:'who',kid:null,date:null,draft:'',fb:null,checking:false,parent:false,wk:0,pic:null,typeMs:0,last:0,edit:null,pinIn:'',confirmDel:false};
+const kidBy=id=>settings.kids.find(k=>k.id===id);
+const eid=(k,d)=>'e_'+k+'_'+d;
+function lsLoad(){try{const o=JSON.parse(localStorage.getItem('lwd1')||'{}');if(o.settings)settings=o.settings;if(o.entries)entries=o.entries}catch(e){}}
+function lsSave(){try{localStorage.setItem('lwd1',JSON.stringify({settings,entries}))}catch(e){}}
+async function saveSettings(){lsSave()}
+async function saveEntry(e){entries[e.id]=e;lsSave()}
+
+function init(){lsLoad();mode='local';ready=true;render()}
+async function aiJson(prompt){
+ const key=(settings.apiKey||'').trim();if(!key)throw {code:'nokey'};
+ let r;try{r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+  body:JSON.stringify({model:'deepseek-chat',temperature:0.2,max_tokens:1500,response_format:{type:'json_object'},messages:[{role:'system',content:'You are a helpful English teacher. Reply with a json object only.'},{role:'user',content:prompt}]})})}catch(e){throw {code:'network'}}
+ if(r.status===401)throw {code:'badkey'};if(r.status===402)throw {code:'nobalance'};if(r.status===429)throw {code:'rate_limited'};if(!r.ok)throw {code:'http',status:r.status};
+ const j=await r.json();let t=(((j.choices||[])[0]||{}).message||{}).content||'';t=t.replace(/^```(json)?|```$/g,'').trim();return JSON.parse(t);
+}
+const AIERR={nokey:'Ask a parent to add the DeepSeek key first. 請家長先在設定裡填 DeepSeek 金鑰。',badkey:'The DeepSeek key is wrong. DeepSeek 金鑰不正確。',nobalance:'DeepSeek balance is empty. DeepSeek 餘額不足，請儲值。',rate_limited:'Too many checks. Wait a minute. 太多次了，等一分鐘再試。',network:'No internet connection. 網路連不上，請檢查網路。'};
+let pdfLib=null;
+function loadPdf(){if(window.jspdf)return Promise.resolve();if(pdfLib)return pdfLib;
+ const urls=['https://cdn.bootcdn.net/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','https://cdn.staticfile.net/jspdf/2.5.1/jspdf.umd.min.js','https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'];
+ pdfLib=new Promise((ok,no)=>{let i=0;const next=()=>{if(i>=urls.length){pdfLib=null;no();return}const sc=document.createElement('script');sc.src=urls[i++];sc.onload=()=>window.jspdf?ok():next();sc.onerror=next;document.head.appendChild(sc)};next()});return pdfLib}
+function saveBlob(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)}
+
+/* ---------- helpers ---------- */
+function toast(t){const o=document.createElement('div');o.className='toast';o.textContent=t;document.body.appendChild(o);setTimeout(()=>o.remove(),2800)}
+const today=()=>new Date();
+function weekInfo(kid,mon){const out=[];for(let i=0;i<7;i++){const d=addDays(mon,i);out.push({d,key:ymd(d),e:entries[eid(kid.id,ymd(d))]})}return out}
+function streak(kid){let n=0,d=new Date();if(!entries[eid(kid.id,ymd(d))])d=addDays(d,-1);for(let i=0;i<60;i++){if(dIdx(d)>4){d=addDays(d,-1);continue}if(entries[eid(kid.id,ymd(d))]){n++;d=addDays(d,-1)}else break}return n}
+function kidEntries(kid){return Object.values(entries).filter(e=>e.kid===kid.id).sort((a,b)=>a.date<b.date?1:-1)}
+function readyUp(kid){if(kid.level>=3)return false;const l=kidEntries(kid).slice(0,5);if(l.length<5)return false;const g=LEVELS[kid.level].goal;return l.every(e=>e.words>=g)&&l.reduce((s,e)=>s+((e.firstFb&&e.firstFb.issues.length)||0),0)/5<=1.5}
+function topicFor(kid,date){return TOPICS[hash(date+kid.id)%TOPICS.length]}
+function avatar(k,i,size){return `<div class="av" style="background:${COLORS[i%COLORS.length]}${size?';width:'+size+'px;height:'+size+'px;font-size:'+size/2.2+'px;margin:0':''}">${esc((k.name||'?')[0].toUpperCase())}</div>`}
+function top(title,sub,back){return `<header class="top"><div class="in">${back?`<button class="ib" data-a="${back}" aria-label="Back">${BACK}</button>`:''}<h1>${esc(title)}${sub?`<small>${esc(sub)}</small>`:''}</h1></div></header>`}
+
+/* ---------- views ---------- */
+function vWho(){
+ if(!settings.kids.length)return top('Little Writers','英文小作家日記')+`<main class="wrap"><div class="card"><h2>Welcome! 歡迎</h2><p class="mut">A parent sets things up first: make a PIN and add each child. 請家長先設定密碼並新增孩子。</p><button class="btn pri full" data-a="parent">Parent setup 家長設定</button></div>${note?`<p class="mut">${esc(note)}</p>`:''}</main>`;
+ return top('Who is writing?','今天誰要寫日記？')+`<main class="wrap"><div class="kids">${settings.kids.map((k,i)=>`<button class="kid" data-a="kid" data-v="${esc(k.id)}">${avatar(k,i)}<b>${esc(k.name)}</b><span class="tag">${LEVELS[k.level].name}</span></button>`).join('')}</div>
+ ${note?`<p class="mut">${esc(note)}</p>`:''}<div style="text-align:center;margin-top:28px"><button class="ghost" data-a="parent">Parent 家長 ›</button></div>
+ </main>`;
+}
+function vHome(){
+ const kid=kidBy(st.kid);if(!kid){st.view='who';return vWho()}
+ const t=today(),ti=dIdx(t),wk=weekInfo(kid,monday(t));
+ const done=wk.filter((w,i)=>i<5&&w.e).length,missed=wk.filter((w,i)=>i<5&&i<ti&&!w.e);
+ const stars=wk.reduce((s,w)=>s+(w.e?(w.e.vocabUsed||[]).length:0),0);
+ const te=wk[ti].e;let main='';
+ if(ti<5){main=te?`<div class="card"><div class="praise">${STAR}<div>Done for today! Great job. 今天完成了，很棒！</div></div><button class="btn sec full" data-a="write" data-v="${wk[ti].key}">Read or edit 看看 / 修改</button></div>`
+  :`<div class="card"><h2>${esc(topicFor(kid,wk[ti].key)[0])}</h2><p class="zh" style="margin-top:-4px">${esc(topicFor(kid,wk[ti].key)[1])}</p><button class="btn pri full" data-a="write" data-v="${wk[ti].key}">Write today’s diary 寫今天的日記</button></div>`}
+ else main=`<div class="card"><h2>Weekend: rest day! 週末休息</h2><p class="mut" style="margin:0">${done===5?'Your whole week is done. 這週的週記完成了！':'You can make up a missed day. 可以補寫沒寫到的日子。'}</p></div>`;
+ const mk=missed.length?`<div class="card"><h2>Make up 補寫</h2><div class="chips" style="margin:0">${missed.map(w=>`<button class="chip" data-a="write" data-v="${w.key}">${DAYL[dIdx(w.d)]} <i>${fmt(w.d)}</i></button>`).join('')}</div></div>`:'';
+ const kidI=settings.kids.indexOf(kid);
+ return top('Hi, '+kid.name+'!',LEVELS[kid.level].name+' · '+LEVELS[kid.level].sent,'who')+`<main class="wrap">
+ <div class="card"><div class="week">${wk.map((w,i)=>`<div class="wk"><small>${DAYS[i]}</small><div class="dot ${i>4?(w.e?'done':'rest'):w.e?'done':''} ${i===ti&&!w.e?'today':''}">${w.e?'✓':i>4?'rest':w.d.getDate()}</div></div>`).join('')}</div>
+ <div class="stats"><div><b>${done}/5</b><span>days 天</span></div><div><b>${stars}</b><span>word stars 單字星</span></div><div><b>${streak(kid)}</b><span>streak 連續</span></div></div></div>
+ ${main}${mk}</main>`;
+}
+function vWrite(){
+ const kid=kidBy(st.kid),date=parse(st.date),lv=LEVELS[kid.level],tp=topicFor(kid,st.date),e=entries[eid(kid.id,st.date)];
+ const voc=vocabFor(kid.level,hash(st.date+kid.id)),pic=PICS.find(p=>p.id===st.pic);
+ const make=e?e.makeup:ymd(today())!==st.date;
+ const fb=st.fb;
+ let fbH='';
+ if(fb){const stale=fb.text!==st.draft.trim();
+  fbH=`<div class="card fb" style="margin-top:14px"><div class="praise">${STAR}<div>${esc(fb.praise)}<div class="zh">${esc(fb.praiseZh)}</div></div></div>
+  ${fb.issues.length?`<h2>Let’s fix ${fb.issues.length} thing${fb.issues.length>1?'s':''} 一起改改看</h2><div class="txt">${marked(fb.text,fb.issues)}</div>
+  <div style="margin-top:12px">${fb.issues.map((x,i)=>`<div class="fix"><span class="n">${i+1}</span><div><span class="tag ${x.type==='tense'?'y':''}">${TYPES[x.type][0]} ${TYPES[x.type][1]}</span><div class="w"><s>${esc(x.wrong)}</s> → <b>${esc(x.right)}</b></div><div class="mut" style="font-size:14px">${esc(x.tip)} ${x.tipZh?'· '+esc(x.tipZh):''}</div></div></div>`).join('')}</div>`
+  :`<h2>No mistakes found! 全對！</h2>`}
+  ${fb.better?`<h2 style="margin-top:14px">A better way to say it 更好的寫法</h2><div class="better">${esc(fb.better)}</div>`:''}
+  ${fb.next?`<p class="mut" style="margin:12px 0 0"><b>Next time 下次試試：</b>${esc(fb.next)} ${fb.nextZh?'· '+esc(fb.nextZh):''}</p>`:''}
+  ${stale?'<p class="banner" style="background:var(--yelS);color:inherit">You changed your writing. Tap “Check again” to see. 你改過了，再按一次檢查。</p>':fb.issues.length?'<p class="zh" style="margin:10px 0 0">Try fixing them yourself in the page above, then check again. 自己在上面改改看，再檢查一次。</p>':''}</div>`}
+ return top(DAYL[dIdx(date)]+', '+fmt(date),make?'Make-up day 補寫':lv.name,'home')+`<main class="wrap">
+ <div class="card prompt"><div class="q">${pic?'Look at the picture. What happened?':esc(tp[0])}</div><div class="zh">${pic?'看圖說故事：發生了什麼事？':esc(tp[1])}</div>${pic?pic.s+`<div class="zh" style="margin-top:8px">Words: ${esc(pic.h)}</div>`:''}</div>
+ <div class="chips"><button class="chip" data-a="sheet" data-v="ideas">Ideas <i>開頭</i></button><button class="chip" data-a="sheet" data-v="pics">${pic?'Change picture':'Pictures'} <i>看圖</i></button><button class="chip" data-a="sheet" data-v="words" id="wchip">Words <i>單字 ${voc.filter(w=>used(st.draft,w[0])).length}/${voc.length}</i></button></div>
+ <div class="page"><textarea id="ta" rows="6" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Start writing here…" aria-label="Your diary">${esc(st.draft)}</textarea></div>
+ <div class="meter"><span id="wc">0 words</span><div class="bar"><i id="bar"></i></div><span>goal ${lv.goal}</span></div>
+ ${fbH}</main>
+ <div class="dock"><div class="in">${fb?`<button class="btn sec" data-a="check" ${st.checking?'disabled':''}>${st.checking?'Checking…':'Check again 再檢查'}</button><button class="btn pri" data-a="save">Done 完成</button>`:`<button class="btn pri" data-a="check" ${st.checking?'disabled':''}>${st.checking?'Checking… 檢查中':'Check ✓ 檢查'}</button>`}</div></div>`;
+}
+function marked(text,issues){
+ const rg=[];let from=0;
+ issues.forEach((x,i)=>{if(!x.wrong)return;let p=text.indexOf(x.wrong,from);if(p<0)p=text.toLowerCase().indexOf(x.wrong.toLowerCase());if(p<0)return;if(rg.some(r=>p<r.e&&p+x.wrong.length>r.s))return;rg.push({s:p,e:p+x.wrong.length,i,t:x.type});from=p+x.wrong.length});
+ rg.sort((a,b)=>a.s-b.s);let o='',c=0;
+ for(const r of rg){o+=esc(text.slice(c,r.s))+`<mark class="${r.t}">${esc(text.slice(r.s,r.e))}<sup>${r.i+1}</sup></mark>`;c=r.e}
+ return o+esc(text.slice(c));
+}
+function vPin(){
+ const first=!settings.pin;
+ return top('Parent 家長',first?'Create a 4-digit PIN 設定 4 位數密碼':'Enter your PIN 輸入密碼','who')+`<main class="wrap"><div class="card"><p class="mut" style="margin-top:0">${first?'Kids won’t be able to open parent settings without it. 孩子不知道密碼就進不去家長設定。':'Only parents can change levels and print the weekly journal. 只有家長可以調整難度和列印週記。'}</p>
+ <input class="t pin" id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" aria-label="PIN"><button class="btn pri full" style="margin-top:14px" data-a="pin">${first?'Save PIN 儲存':'Open 進入'}</button></div></main>`;
+}
+function vParent(){
+ return top('Parent 家長','Children, levels and weekly journals 孩子、難度、週記','who')+`<main class="wrap">
+ ${settings.kids.map((k,i)=>{const wk=weekInfo(k,monday(today())),n=wk.filter((w,j)=>j<5&&w.e).length;return `<div class="card"><div class="row">${avatar(k,i,52)}<div style="flex:1"><h2 style="margin:0">${esc(k.name)}</h2><div class="zh">Age ${k.age} · ${LEVELS[k.level].name} · ${k.mode==='strict'?'Strict 嚴格':'Simple 簡單'} · this week ${n}/5</div></div></div>
+ ${readyUp(k)?`<div class="banner">Ready for ${LEVELS[k.level+1].name}? The last 5 entries met the goal with few mistakes. 最近 5 篇都達標、錯誤很少，可以考慮升級。<br><button class="btn sec" style="margin-top:8px;min-height:44px" data-a="levelup" data-v="${esc(k.id)}">Level up 升級</button></div>`:''}
+ <div class="row" style="margin-top:12px"><button class="btn pri" style="flex:1" data-a="week" data-v="${esc(k.id)}">Weekly journal 週記</button><button class="btn sec" data-a="editkid" data-v="${esc(k.id)}">Edit 編輯</button></div></div>`}).join('')}
+ <button class="btn sec full" data-a="editkid" data-v="">+ Add a child 新增孩子</button>
+ <div class="card" style="margin-top:14px"><h2>Settings 設定</h2><div class="list"><div class="it"><span>Change PIN 更改密碼</span><button class="ghost" data-a="resetpin">Change ›</button></div>
+ </div></div>
+ <div class="card"><h2>AI checking 批改設定</h2><p class="zh" style="margin-top:-4px">${settings.apiKey?'DeepSeek key saved ✓ 已儲存金鑰':'Paste your DeepSeek API key. 貼上 DeepSeek API 金鑰。'}</p>
+ <input class="t" id="key" type="password" autocomplete="off" placeholder="sk-..." value="${esc(settings.apiKey||'')}"><div class="row" style="margin-top:10px"><button class="btn pri" style="flex:1" data-a="savekey">Save 儲存</button><button class="btn sec" data-a="testkey">Test 測試</button></div></div>
+ <div class="card"><h2>Backup 備份</h2><p class="zh" style="margin-top:-4px">Data is saved on this phone only. Back it up now and then, or move it to another phone. 資料只存在這支手機，建議偶爾備份，也可以搬到另一支手機。</p>
+ <div class="row"><button class="btn sec" style="flex:1" data-a="export">Save backup 備份</button><label class="btn sec" style="flex:1">Restore 還原<input type="file" id="imp" accept=".json,application/json" hidden></label></div></div></main>`;
+}
+function vEdit(){
+ const e=st.edit,sl=sugLevel(e.age),sm=sugMode(e.age);
+ return top(e.id?'Edit '+(e.name||''):'Add a child','新增 / 編輯孩子','parent')+`<main class="wrap"><div class="card">
+ <label class="f" for="nm" style="margin-top:0">English name 英文名字</label><input class="t" id="nm" value="${esc(e.name)}" autocomplete="off" placeholder="e.g. Leo">
+ <p class="zh" style="margin:6px 0 0">Shown on the printed journal, so use English letters. 會印在週記上，請用英文。</p>
+ <label class="f" for="ag">Age 年齡</label><select class="t" id="ag">${[4,5,6,7,8,9,10,11,12].map(a=>`<option ${a===e.age?'selected':''}>${a}</option>`).join('')}</select>
+ <label class="f">Level 難度</label><div class="choice">${[1,2,3].map(l=>`<button data-a="pickL" data-v="${l}" class="${e.level===l?'on':''}"><b>${LEVELS[l].name}</b> <span class="zh">${LEVELS[l].zh}</span> ${l===sl?'<span class="tag g">Suggested 建議</span>':''}<p>${LEVELS[l].desc}</p></button>`).join('')}</div>
+ <label class="f">Checking 批改方式</label><div class="choice">${['simple','strict'].map(m=>`<button data-a="pickM" data-v="${m}" class="${e.mode===m?'on':''}"><b>${MODES[m].name}</b> ${m===sm?'<span class="tag g">Suggested 建議</span>':''}<p>${MODES[m].desc}</p></button>`).join('')}</div>
+ <p class="zh">We suggest a level from the age. You can change it any time. 系統依年齡建議難度，之後隨時可以調整。</p>
+ <button class="btn pri full" style="margin-top:8px" data-a="savekid">Save 儲存</button>
+ ${e.id?`<button class="btn ghost danger full" style="margin-top:8px" data-a="delkid">${st.confirmDel?'Tap again to delete this child 再按一次確認刪除':'Delete child 刪除'}</button>`:''}</div></main>`;
+}
+function weekData(kid,mon){
+ const days=weekInfo(kid,mon).slice(0,5),fixes=[],better=[],cnt={},words=new Set();let total=0,n=0;
+ days.forEach((w,i)=>{const e=w.e;if(!e)return;n++;total+=e.words||0;(e.vocabUsed||[]).forEach(x=>words.add(x));const f=e.firstFb;if(f){f.issues.forEach(x=>{fixes.push({day:DAYS[i],...x});cnt[x.type]=(cnt[x.type]||0)+1});if(f.better)better.push({day:DAYS[i],t:f.better})}});
+ return {days,fixes,better,cnt,words:[...words],total,n,range:fmt(mon)+' – '+fmt(addDays(mon,4))+', '+addDays(mon,4).getFullYear()};
+}
+function vWeek(){
+ const kid=kidBy(st.kid),mon=addDays(monday(today()),st.wk*7),W=weekData(kid,mon);
+ return top(kid.name+'’s journal','Weekly journal 週記','parent')+`<main class="wrap">
+ <div class="row" style="justify-content:space-between;margin-bottom:12px"><button class="ib" style="background:var(--card);color:var(--ink)" data-a="wk" data-v="-1" aria-label="Previous week">${BACK}</button><b>${esc(W.range)}</b><button class="ib" style="background:var(--card);color:var(--ink);transform:scaleX(-1)" data-a="wk" data-v="1" ${st.wk>=0?'disabled':''} aria-label="Next week">${BACK}</button></div>
+ <div class="paper"><div class="row" style="justify-content:space-between"><h3>My Weekly Journal</h3><span>${esc(kid.name)} · ${LEVELS[kid.level].name}</span></div>
+ <h4>My journal</h4>${W.days.map((w,i)=>`<div class="d"><b>${DAYL[i]}, ${fmt(w.d)}${w.e&&w.e.makeup?' (make-up)':''}</b><p>${w.e?esc(w.e.original||w.e.text):'<span style="color:#98a2bd">(no entry)</span>'}</p></div>`).join('')}
+ <h4>Corrections</h4>${W.fixes.length?W.fixes.map(f=>`<div class="c">${f.day}: <s>${esc(f.wrong)}</s> → <span class="g">${esc(f.right)}</span> <span style="color:#7a839c">(${TYPES[f.type][0]})</span></div>`).join(''):'<div class="c" style="color:#98a2bd">No corrections this week.</div>'}
+ ${W.better.length?'<h4>Better sentences</h4>'+W.better.map(b=>`<div class="c"><b>${b.day}:</b> ${esc(b.t)}</div>`).join(''):''}
+ <h4>This week</h4><div class="c">${W.n} entr${W.n===1?'y':'ies'} · ${W.total} words${Object.keys(W.cnt).length?' · Practice: '+Object.entries(W.cnt).map(([k,v])=>TYPES[k][0]+' '+v).join(', '):''}</div>${W.words.length?`<div class="c">Words I used: ${esc(W.words.join(', '))}</div>`:''}
+ <h4>Teacher’s comment</h4><div class="lines"><div></div><div></div><div></div></div></div>
+ <p class="zh">The PDF fits on A4. On iPhone, tap Share to print or send it by WeChat. PDF 為 A4 格式，打開後按「分享」可以列印或用微信傳給老師。</p></main>
+ <div class="dock"><div class="in"><button class="btn pri" data-a="pdf">Download PDF 下載</button></div></div>`;
+}
+function render(){
+ if(!ready){$('#app').innerHTML='<div class="load">Loading… 載入中</div>';return}
+ if(st.view==='parent'&&!st.parent)st.view='pin';
+ const v={who:vWho,home:vHome,write:vWrite,pin:vPin,parent:vParent,edit:vEdit,week:vWeek}[st.view]||vWho;
+ $('#app').innerHTML=v();window.scrollTo(0,0);
+ if(st.view==='write')updMeter();
+}
+
+/* ---------- writing ---------- */
+function updMeter(){
+ const kid=kidBy(st.kid),g=LEVELS[kid.level].goal,n=wc(st.draft);
+ const w=$('#wc'),b=$('#bar');if(w)w.textContent=n+' word'+(n===1?'':'s');if(b)b.style.width=Math.min(100,n/g*100)+'%';
+ const voc=vocabFor(kid.level,hash(st.date+kid.id)),c=$('#wchip i');if(c)c.textContent='單字 '+voc.filter(x=>used(st.draft,x[0])).length+'/'+voc.length;
+}
+function openWrite(date){
+ const kid=kidBy(st.kid),e=entries[eid(kid.id,date)];
+ Object.assign(st,{view:'write',date,draft:e?e.text:'',fb:e&&e.fb?{...e.fb,text:e.text}:null,pic:e?e.pic||null:null,typeMs:0,last:0});
+ render();
+}
+function insert(t){
+ const ta=$('#ta');if(!ta)return;const s=ta.selectionStart??ta.value.length,en=ta.selectionEnd??s;
+ const before=ta.value.slice(0,s);const lead=before&&!/\s$/.test(before)?' ':'';
+ ta.setRangeText(lead+t,s,en,'end');st.draft=ta.value;updMeter();ta.focus();
+}
+function buildPrompt(kid,text){
+ const tp=topicFor(kid,st.date),voc=vocabFor(kid.level,hash(st.date+kid.id)).map(w=>w[0]),strict=kid.mode==='strict',max=kid.level===1?3:strict?6:5;
+ return `You are a kind, encouraging English teacher checking a short diary entry written by a ${kid.age}-year-old child who is learning English as a second language.
+Correction mode: ${strict?'STRICT':'SIMPLE'}.
+SIMPLE mode flags only: spelling mistakes; verb tense mistakes (a diary about today should use the past tense for finished actions); a missing capital letter at the start of a sentence or for "I"; a missing full stop or question mark at the end of a sentence. Ignore everything else.
+STRICT mode flags all of those plus grammar mistakes (articles, plurals, subject-verb agreement, word order, missing words, prepositions). In STRICT mode also write "better": a natural rewrite of the whole entry that a good student of this age could write, keeping the child's own ideas and simple words.
+Flag at most ${max} mistakes, the most important first. If the same mistake repeats, flag it once.
+Return ONLY a JSON object, no other text:
+{"issues":[{"type":"spelling|tense|capital|punctuation|grammar","wrong":"the exact wrong words copied from the entry (1-4 words)","right":"the corrected words","tip":"very short tip in simple English, max 8 words","tipZh":"繁體中文簡短說明，最多15字"}],
+"corrected":"the full entry with only the flagged mistakes fixed",
+"better":"${strict?'the improved rewrite':''}",
+"praise":"one short, warm sentence in simple English praising something specific in the entry",
+"praiseZh":"the praise in Traditional Chinese",
+"next":"one tiny tip for next time, in simple English",
+"nextZh":"the tip in Traditional Chinese"}
+${strict?'':'"better" must be an empty string. '}If there are no mistakes, "issues" is an empty array.
+Today's question: "${tp[0]}". Words the child was asked to try: ${voc.join(', ')}.
+The entry:
+"""
+${text}
+"""`;
+}
+function norm(r,text){
+ const s=v=>typeof v==='string'?v:'';
+ const issues=(Array.isArray(r&&r.issues)?r.issues:[]).filter(x=>x&&TYPES[x.type]&&s(x.wrong)).map(x=>({type:x.type,wrong:s(x.wrong),right:s(x.right),tip:s(x.tip),tipZh:s(x.tipZh)})).slice(0,6);
+ return {issues,corrected:s(r&&r.corrected),better:s(r&&r.better),praise:s(r&&r.praise)||'Nice work!',praiseZh:s(r&&r.praiseZh),next:s(r&&r.next),nextZh:s(r&&r.nextZh),text};
+}
+function entryFrom(text,fb){
+ const kid=kidBy(st.kid),id=eid(kid.id,st.date),old=entries[id]||{},voc=vocabFor(kid.level,hash(st.date+kid.id));
+ const ms=(old.typeMs||0)+st.typeMs;st.typeMs=0;const n=wc(text);
+ const fbS=fb?{issues:fb.issues,corrected:fb.corrected,better:fb.better,praise:fb.praise,praiseZh:fb.praiseZh,next:fb.next,nextZh:fb.nextZh}:old.fb||null;
+ return {type:'entry',id,kid:kid.id,date:st.date,week:ymd(monday(parse(st.date))),text,original:old.original||text,firstFb:old.firstFb||fbS,fb:fbS,
+  words:n,typeMs:ms,wpm:ms>5000?Math.round(n/(ms/60000)):0,makeup:old.makeup??(ymd(today())!==st.date),topic:topicFor(kid,st.date)[0],pic:st.pic,
+  vocabUsed:voc.filter(w=>used(text,w[0])).map(w=>w[0]),checks:(old.checks||0)+(fb?1:0),updated:Date.now()};
+}
+async function check(){
+ const text=st.draft.trim();if(wc(text)<2){toast('Write a little more first. 再多寫一點喔！');return}
+ if(!settings.apiKey){toast(AIERR.nokey);return}
+ st.checking=true;render();
+ try{const kid=kidBy(st.kid);const r=await aiJson(buildPrompt(kid,text));st.fb=norm(r,text);await saveEntry(entryFrom(text,st.fb))}
+ catch(e){toast(AIERR[e&&e.code]||'Could not check. Try again. 檢查失敗，請再試一次。')}
+ st.checking=false;render();
+}
+async function saveDraft(){
+ const text=st.draft.trim();if(wc(text)<1){toast('Write something first. 先寫一點吧！');return}
+ await saveEntry(entryFrom(text,null));toast('Saved! Great job. 完成了，好棒！');st.view='home';render();
+}
+
+/* ---------- sheets ---------- */
+function sheet(kind){
+ const kid=kidBy(st.kid),tp=topicFor(kid,st.date),voc=vocabFor(kid.level,hash(st.date+kid.id));let h='';
+ if(kind==='ideas'){const list=[tp[2],...STARTERS[kid.level]];h=`<h2>Ideas to start 開頭提示</h2><p class="zh" style="margin-top:-4px">Tap one to add it. 點一下就會加進去。</p>${list.map(s=>`<button class="opt" data-a="ins" data-v="${esc(s.split('___')[0])}">${esc(s)}</button>`).join('')}`}
+ if(kind==='pics')h=`<h2>Pick a picture 選一張圖</h2><p class="zh" style="margin-top:-4px">Write about what you see. 看圖寫寫看。</p><div class="pics">${PICS.map(p=>`<button data-a="pic" data-v="${p.id}">${p.s}${esc(p.t)}<div class="zh">${p.zh}</div></button>`).join('')}</div>${st.pic?'<button class="btn ghost full" data-a="pic" data-v="">Back to today’s question 回到今日題目</button>':''}`;
+ if(kind==='words')h=`<h2>Today’s words 今日單字</h2><p class="zh" style="margin-top:-4px">Use them to earn stars. Tap to add. 用上一個就得一顆星。</p><div class="words">${voc.map(w=>`<button class="word ${used(st.draft,w[0])?'used':''}" data-a="ins" data-v="${esc(w[0])}"><b>${used(st.draft,w[0])?'★ ':''}${esc(w[0])}</b><span>${esc(w[1])}</span></button>`).join('')}</div>`;
+ $('#sheet').innerHTML=`<div class="sheetbg" data-a="close"><div class="sheet" role="dialog" aria-modal="true">${h}<button class="btn ghost full" data-a="close" style="margin-top:8px">Close 關閉</button></div></div>`;
+}
+const closeSheet=()=>{$('#sheet').innerHTML=''};
+
+/* ---------- PDF ---------- */
+async function pdf(){
+ try{toast('Making PDF… 產生中');await loadPdf()}catch(e){toast('Could not load the PDF tool. Check the internet. PDF 工具載入失敗，請檢查網路。');return}
+ const kid=kidBy(st.kid),mon=addDays(monday(today()),st.wk*7),Wd=weekData(kid,mon);
+ const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),W=210,M=16,CW=W-2*M;let y=0;
+ const clean=s=>String(s||'').replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/[–—]/g,'-').replace(/…/g,'...').replace(/→/g,'->').replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g,'');
+ const need=h=>{if(y+h>284){doc.addPage();y=16}};
+ const font=(sz,st2,c)=>{doc.setFont('helvetica',st2);doc.setFontSize(sz);doc.setTextColor(...c)};
+ const para=(t,sz,st2,c,ind=0)=>{font(sz,st2,c);const lh=sz*0.3528*1.4;for(const l of doc.splitTextToSize(clean(t),CW-ind)){need(lh);doc.text(l,M+ind,y+lh*0.72);y+=lh}};
+ const sec=t=>{need(12);y+=4;font(12,'bold',[47,91,234]);doc.text(t,M,y+4);y+=6;doc.setDrawColor(221,228,243);doc.setLineWidth(0.4);doc.line(M,y,W-M,y);y+=3};
+ doc.setFillColor(47,91,234);doc.rect(0,0,W,24,'F');font(18,'bold',[255,255,255]);doc.text('My Weekly Journal',M,15);
+ font(10,'normal',[255,255,255]);doc.text(clean(kid.name)+'   |   '+clean(Wd.range)+'   |   '+LEVELS[kid.level].name,W-M,15,{align:'right'});y=28;
+ sec('My journal');
+ Wd.days.forEach((w,i)=>{need(10);para(DAYL[i]+', '+fmt(w.d)+(w.e&&w.e.makeup?'  (make-up)':''),9.5,'bold',[27,32,51]);para(w.e?(w.e.original||w.e.text):'(no entry)',11.5,'normal',w.e?[27,32,51]:[152,162,189],3);y+=2});
+ sec('Corrections');
+ if(!Wd.fixes.length)para('No corrections this week.',10,'normal',[152,162,189]);
+ Wd.fixes.forEach(f=>{const lh=5.6;need(lh);let x=M;const seg=(t,c,b)=>{font(10.5,b?'bold':'normal',c);t=clean(t);doc.text(t,x,y+4);x+=doc.getTextWidth(t)};
+  const total=(f.day+': '+f.wrong+' -> '+f.right+'  ('+TYPES[f.type][0]+')');font(10.5,'normal',[0,0,0]);
+  if(doc.getTextWidth(clean(total))>CW){para(total,10.5,'normal',[27,32,51]);return}
+  seg(f.day+':  ',[122,131,156]);const sx=x;seg(f.wrong,[224,70,75]);doc.setDrawColor(224,70,75);doc.line(sx,y+2.8,x,y+2.8);seg('  ->  ',[122,131,156]);seg(f.right,[23,138,87],true);seg('   ('+TYPES[f.type][0]+')',[122,131,156]);y+=lh});
+ if(Wd.better.length){sec('Better sentences');Wd.better.forEach(b=>{para(b.day+': '+b.t,10.5,'italic',[27,32,51]);y+=1})}
+ sec('This week');
+ para(Wd.n+(Wd.n===1?' entry':' entries')+'  |  '+Wd.total+' words'+(Object.keys(Wd.cnt).length?'  |  To practise: '+Object.entries(Wd.cnt).map(([k,v])=>TYPES[k][0]+' '+v).join(', '):''),10.5,'normal',[27,32,51]);
+ if(Wd.words.length)para('Words I used: '+Wd.words.join(', '),10.5,'normal',[27,32,51]);
+ sec("Teacher's comment");need(26);doc.setDrawColor(201,209,230);for(let i=1;i<=3;i++)doc.line(M,y+i*8,W-M,y+i*8);y+=26;
+ const blob=doc.output('blob'),name=('Journal_'+clean(kid.name).replace(/[^A-Za-z0-9]+/g,'_')+'_'+ymd(mon)+'.pdf');
+ saveBlob(blob,name)
+}
+
+/* ---------- events ---------- */
+document.addEventListener('input',e=>{
+ if(e.target.id==='ta'){const now=Date.now();if(st.last&&now-st.last<8000)st.typeMs+=now-st.last;st.last=now;st.draft=e.target.value;updMeter()}
+ if(e.target.id==='nm'&&st.edit)st.edit.name=e.target.value;
+});
+document.addEventListener('change',e=>{
+ if(e.target.id==='imp'&&e.target.files[0]){const f=e.target.files[0];f.text().then(t=>{const o=JSON.parse(t);if(o.app!=='lwd')throw 0;settings={...o.settings,apiKey:settings.apiKey||o.settings.apiKey||''};entries={...entries,...o.entries};lsSave();toast('Restored. 已還原。');render()}).catch(()=>toast('Not a diary backup file. 不是正確的備份檔。'))}
+ if(e.target.id==='ag'&&st.edit){const a=+e.target.value;st.edit.age=a;if(!st.edit.tL)st.edit.level=sugLevel(a);if(!st.edit.tM)st.edit.mode=sugMode(a);render()}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();if(e.key==='Enter'&&e.target.id==='pin')act('pin')});
+document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;if(t.dataset.a==='close'&&t.classList.contains('sheetbg')&&e.target!==t)return;act(t.dataset.a,t.dataset.v)});
+async function act(a,v){
+ switch(a){
+ case 'who':Object.assign(st,{view:'who',parent:false});render();break;
+ case 'kid':st.kid=v;st.view='home';render();break;
+ case 'home':st.view='home';render();break;
+ case 'write':openWrite(v);break;
+ case 'sheet':sheet(v);break;
+ case 'close':closeSheet();break;
+ case 'ins':closeSheet();insert(v);break;
+ case 'pic':closeSheet();st.pic=v||null;render();break;
+ case 'check':check();break;
+ case 'save':saveDraft();break;
+ case 'parent':st.view=st.parent?'parent':'pin';render();break;
+ case 'pin':{const p=($('#pin')||{}).value||'';if(!/^\d{4}$/.test(p)){toast('Please enter 4 digits. 請輸入 4 位數字。');break}
+  if(!settings.pin){settings.pin=p;await saveSettings();st.parent=true;st.view=settings.kids.length?'parent':'edit';if(!settings.kids.length)newEdit();render()}
+  else if(p===settings.pin){st.parent=true;st.view='parent';render()}else toast('Wrong PIN. 密碼不對。');break}
+ case 'resetpin':settings.pin='';st.parent=false;st.view='pin';render();break;
+ case 'editkid':{if(v){const k=kidBy(v);st.edit={...k,tL:true,tM:true}}else newEdit();st.confirmDel=false;st.view='edit';render();break}
+ case 'pickL':st.edit.level=+v;st.edit.tL=true;render();break;
+ case 'pickM':st.edit.mode=v;st.edit.tM=true;render();break;
+ case 'savekid':{const e=st.edit,name=(e.name||'').trim();if(!name){toast('Please type a name. 請輸入名字。');break}
+  const k={id:e.id||('k'+Date.now().toString(36)),name,age:e.age,level:e.level,mode:e.mode};
+  const i=settings.kids.findIndex(x=>x.id===k.id);if(i>=0)settings.kids[i]=k;else settings.kids.push(k);await saveSettings();st.view='parent';render();break}
+ case 'delkid':if(!st.confirmDel){st.confirmDel=true;render();break}settings.kids=settings.kids.filter(k=>k.id!==st.edit.id);await saveSettings();st.view='parent';render();break;
+ case 'levelup':{const k=kidBy(v);k.level=Math.min(3,k.level+1);await saveSettings();toast(k.name+' is now '+LEVELS[k.level].name+'!');render();break}
+ case 'week':st.kid=v;st.wk=0;st.view='week';render();break;
+ case 'wk':st.wk=Math.min(0,st.wk+(+v));render();break;
+ case 'pdf':pdf();break;
+ case 'savekey':settings.apiKey=($('#key')||{}).value.trim();await saveSettings();toast('Saved. 已儲存。');render();break;
+ case 'testkey':{settings.apiKey=($('#key')||{}).value.trim();await saveSettings();toast('Testing… 測試中');try{const r=await aiJson('Return the json object {"ok":true}.');toast(r&&r.ok?'It works! 可以用了 ✓':'Got a reply. 有回應。')}catch(e){toast(AIERR[e&&e.code]||('Error '+(e&&e.status||'')+' 連線失敗'))}break}
+ case 'export':saveBlob(new Blob([JSON.stringify({app:'lwd',v:1,settings,entries})],{type:'application/json'}),'diary-backup-'+ymd(today())+'.json');break;
+ }
+}
+function newEdit(){st.edit={id:'',name:'',age:6,level:sugLevel(6),mode:sugMode(6),tL:false,tM:false}}
+init();
+}
+</script>
+</body></html>
