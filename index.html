@@ -297,7 +297,8 @@ function vPastOne(){
   ${P&&P.miss.length?`<div class="pen" style="font-size:18px;margin-top:6px">${P.miss.map(i=>`<button class="mk ${i===st.psel?'sel':''}" data-a="pwhy" data-v="${i}">${fixHTML(iss[i].wrong,iss[i].right)}</button>`).join(' ')}</div>`:''}
   ${why?`<div class="why" style="background:var(--bg);margin-top:10px"><b><span style="color:var(--red)">${esc(why.wrong)}</span> → <span style="color:var(--ok)">${esc(why.right)}</span></b> <span class="mut">${esc(why.tipZh||why.tip||'')}</span></div>`:''}
   ${fb&&!iss.length?`<div class="praise" style="margin:10px 0 0">${STAR}<div>No mistakes! 這天全對！</div></div>`:''}</div>`;
- const remake=`<button class="btn ghost full" style="margin-top:6px" data-a="regen" ${st.regen?'disabled':''}>${st.regen?'Making it… 產生中…':(fb&&fb.ups?'Make it again 重新產生':'Make a better version 產生更好的寫法')}</button>`;
+ const vs=(fb&&fb.versions)||[],vi=fb&&fb.vi!=null?fb.vi:vs.length-1;
+ const remake=`<div class="row" style="margin-top:10px;gap:8px">${vs.length>1?`<button class="btn sec" style="flex:1;min-height:46px;font-size:15px;white-space:nowrap;padding:0 8px" data-a="bver" data-v="-1" ${vi<=0?'disabled':''}>‹ 上一個</button>${vi<vs.length-1?`<button class="btn sec" style="flex:1;min-height:46px;font-size:15px;white-space:nowrap;padding:0 8px" data-a="bver" data-v="1">下一個 ›</button>`:''}`:''}<button class="btn ghost" style="flex:1;min-height:46px;font-size:15px;white-space:nowrap;padding:0 8px" data-a="regen" ${st.regen?'disabled':''}>${st.regen?'Making… 產生中':(fb&&fb.ups?(vs.length>1?'重新產生':'Make it again 重新產生'):'Make a better version 產生更好的寫法')}</button></div>${vs.length>1?`<p class="zh" style="text-align:center;margin:6px 0 0">第 ${vi+1} / ${vs.length} 個 · 顯示的這個就是要用的</p>`:''}`;
  const better=`<div class="card"><div class="lab2">A better way 更好的寫法${fb&&fb.ups&&fb.ups.length?' · <span style="font-weight:600">Tap the wavy words 點波浪線</span>':''}</div>${fb&&fb.better?`<div class="better" style="margin-top:8px">${fb.ups?betterHTML(fb.better,fb.ups,true):esc(fb.better)}</div>`:''}${remake}</div>`;
  const star=fb&&fb.star?`<div class="card" style="padding:6px">${starHTML(fb.star)}</div>`:'';
  return top(DAYL[dIdx(d)]+', '+fmt(d),e.topic||'','past')+`<main class="wrap">${mine}${better}${star}</main>
@@ -476,6 +477,7 @@ async function saveDraft(){
  await saveEntry(entryFrom(text,null));toast('Saved! Great job. 完成了，好棒！');st.view='home';render();
 }
 
+async function useVersion(e,vs,vi){const v=vs[vi];const fb={...(e.fb||{issues:[],corrected:''}),...v,versions:vs,vi};const ff=e.firstFb?{...e.firstFb,better:v.better,ups:v.ups,star:v.star}:fb;await saveEntry({...e,fb,firstFb:ff})}
 async function regen(){
  const kid=kidBy(st.kid),e=entries[eid(kid.id,st.pastDate)];if(!e)return;if(!settings.apiKey){toast(AIERR.nokey);return}
  st.regen=true;render();
@@ -484,7 +486,7 @@ ${betterRules(kid)}
 The child's entry: <<${e.text}>>
 ${e.fb&&e.fb.corrected&&e.fb.issues&&e.fb.issues.length?`The corrected entry (start from this one and keep all of these fixes): <<${e.fb.corrected}>>
 Fixes that must stay: ${e.fb.issues.map(x=>`"${x.wrong}" -> "${x.right}"`).join('; ')}`:''}`);
-  const nb=keepFixes(normBetter(r),e.fb&&e.fb.issues);if(!nb.better)throw {code:'http'};const fb={...(e.fb||{issues:[],corrected:''}),...nb};const ff=e.firstFb?{...e.firstFb,...nb}:fb;await saveEntry({...e,fb,firstFb:ff})}
+  const nb=keepFixes(normBetter(r),e.fb&&e.fb.issues);if(!nb.better)throw {code:'http'};const of=e.fb||{issues:[],corrected:''};let vs=(of.versions||(of.better?[{better:of.better,ups:of.ups||[],star:of.star||null}]:[])).slice(-4);vs=[...vs,{better:nb.better,ups:nb.ups,star:nb.star}];await useVersion(e,vs,vs.length-1)}
  catch(err){toast(AIERR[err&&err.code]||'Could not make it. Try again. 產生失敗，再試一次。')}
  st.regen=false;render();
 }
@@ -693,6 +695,7 @@ async function act(a,v){
  case 'upwhy':{const f=st.rv?st.fb:(st.view==='pastOne'?(entries[eid(st.kid,st.pastDate)]||{}).fb:st.fb);const u=f&&f.ups&&f.ups[+v];if(u){toast(u.p+'：'+(u.zh||''));say(u.p)}break}
  case 'sayStar':{const f=st.view==='pastOne'&&!st.rv?(entries[eid(st.kid,st.pastDate)]||{}).fb:st.fb;if(f&&f.star)say(f.star.en);break}
  case 'regen':regen();break;
+ case 'bver':{const e=entries[eid(st.kid,st.pastDate)];const f=e&&e.fb;if(!f||!f.versions)break;const vi=Math.max(0,Math.min(f.versions.length-1,(f.vi??f.versions.length-1)+(+v)));await useVersion(e,f.versions,vi);render();break}
  case 'selday':st.sel=v;render();break;
  case 'lookback':st.view='past';render();break;
  case 'past':st.view='past';render();break;
