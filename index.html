@@ -44,7 +44,7 @@ h2{font:700 20px/1.2 ui-rounded,'PingFang TC',sans-serif;margin:0 0 8px}
 .tag.g{background:var(--okS);color:var(--ok)}
 .week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;text-align:center}
 .dot{aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:14px;border:2px dashed var(--line);color:var(--mut);max-width:48px;margin:4px auto 0;width:100%}
-.dot.done{background:var(--blue);border:0;color:#fff}.dot.today{border:3px solid var(--yel);color:var(--ink)}.dot.rest{border:0;background:var(--yelS);color:light-dark(#8a6400,#ffd23f);font-size:11px}
+.dot.done{background:var(--blue);border:0;color:#fff}.dot.sel{box-shadow:0 0 0 3px var(--card),0 0 0 6px var(--yel)}.dot.fut{opacity:.45}.wk{background:none;padding:0}.dot.today{border:3px solid var(--yel);color:var(--ink)}.dot.rest{border:0;background:var(--yelS);color:light-dark(#8a6400,#ffd23f);font-size:11px}
 .wk small{font-size:12px;color:var(--mut);font-weight:700}
 .stats{display:flex;gap:10px;margin-top:14px}.stats div{flex:1;background:var(--bg);border-radius:14px;padding:10px;text-align:center}.stats b{display:block;font:800 24px ui-rounded,'PingFang TC',sans-serif}.stats span{font-size:12px;color:var(--mut);font-weight:700}
 .prompt{background:var(--blue);color:#fff}.prompt .q{font:700 23px/1.25 ui-rounded,'PingFang TC',sans-serif}.prompt .zh{color:rgba(255,255,255,.85)}
@@ -259,22 +259,41 @@ function vWho(){
  ${note?`<p class="mut">${esc(note)}</p>`:''}<div style="text-align:center;margin-top:28px"><button class="ghost" data-a="parent">Parent 家長 ›</button></div>
  </main>`;
 }
+const DAYZ=['週一','週二','週三','週四','週五','週六','週日'];
 function vHome(){
  const kid=kidBy(st.kid);if(!kid){st.view='who';return vWho()}
- const t=today(),ti=dIdx(t),wk=weekInfo(kid,monday(t));
- const done=wk.filter((w,i)=>i<5&&w.e).length,missed=wk.filter((w,i)=>i<5&&i<ti&&!w.e);
+ const t=today(),tk=ymd(t),wk=weekInfo(kid,monday(t));
+ if(!st.sel||!wk.some(w=>w.key===st.sel))st.sel=tk;
+ const done=wk.filter((w,i)=>i<5&&w.e).length,bonus=wk.filter((w,i)=>i>4&&w.e).length;
  const stars=wk.reduce((s,w)=>s+(w.e?(w.e.vocabUsed||[]).length:0),0);
- const te=wk[ti].e;let main='';
- if(ti<5){main=te?`<div class="card"><div class="praise">${STAR}<div>Done for today! Great job. 今天完成了，很棒！</div></div><button class="btn sec full" data-a="write" data-v="${wk[ti].key}">Read or edit 看看 / 修改</button></div>`
-  :`<div class="card"><h2>${esc(topicFor(kid,wk[ti].key)[0])}</h2><p class="zh" style="margin-top:-4px">${esc(topicFor(kid,wk[ti].key)[1])}</p><button class="btn pri full" data-a="write" data-v="${wk[ti].key}">Write today’s diary 寫今天的日記</button></div>`}
- else main=`<div class="card"><h2>Weekend: rest day! 週末休息</h2><p class="mut" style="margin:0">${done===5?'Your whole week is done. 這週的週記完成了！':'You can make up a missed day. 可以補寫沒寫到的日子。'}</p></div>`;
- const mk=missed.length?`<div class="card"><h2>Make up 補寫</h2><div class="chips" style="margin:0">${missed.map(w=>`<button class="chip" data-a="write" data-v="${w.key}">${DAYL[dIdx(w.d)]} <i>${fmt(w.d)}</i></button>`).join('')}</div></div>`:'';
- const kidI=settings.kids.indexOf(kid);
+ const sw=wk.find(w=>w.key===st.sel),si=dIdx(sw.d),isT=sw.key===tk,fut=sw.key>tk,tp=topicFor(kid,sw.key);
+ let main;
+ if(fut)main=`<div class="card"><h2>Not yet! 還沒到喔</h2><p class="mut" style="margin:0">${DAYL[si]} hasn’t come yet. ${DAYZ[si]}還沒到，到那天再寫吧！</p></div>`;
+ else if(sw.e)main=`<div class="card"><div class="praise">${STAR}<div>${isT?'Done for today! Great job. 今天完成了，很棒！':`${DAYL[si]} is done! ${DAYZ[si]}已經寫好了！`}</div></div><button class="btn sec full" data-a="write" data-v="${sw.key}">Read or edit 看看 / 修改</button></div>`;
+ else main=`<div class="card">${si>4?'<span class="tag y" style="margin-bottom:8px">Bonus 加分日記</span>':''}<h2>${esc(tp[0])}</h2><p class="zh" style="margin-top:-4px">${esc(tp[1])}</p><button class="btn pri full" data-a="write" data-v="${sw.key}">${isT?'Write today’s diary 寫今天的日記':`Write ${DAYL[si]}’s diary 寫${DAYZ[si]}的日記（補寫）`}</button></div>`;
+ const kidI=settings.kids.indexOf(kid),past=kidEntries(kid).length;
  return top('Hi, '+kid.name+'!',LEVELS[kid.level].name+' · '+LEVELS[kid.level].sent,'who')+`<main class="wrap">
  <div class="card me">${avatar(kid,kidI)}<div style="flex:1"><h2 style="margin:0">${esc(kid.name)}</h2><span class="tag">${LEVELS[kid.level].name}</span></div><button class="chip" data-a="avpick">Change <i>換頭像</i></button></div>
- <div class="card"><div class="week">${wk.map((w,i)=>`<div class="wk"><small>${DAYS[i]}</small><div class="dot ${i>4?(w.e?'done':'rest'):w.e?'done':''} ${i===ti&&!w.e?'today':''}">${w.e?'✓':i>4?'rest':w.d.getDate()}</div></div>`).join('')}</div>
- <div class="stats"><div><b>${done}/5</b><span>days 天</span></div><div><b>${stars}</b><span>word stars 單字星</span></div><div><b>${streak(kid)}</b><span>streak 連續</span></div></div></div>
- ${main}${mk}</main>`;
+ <div class="card"><div class="week">${wk.map((w,i)=>`<button class="wk" data-a="selday" data-v="${w.key}" aria-label="${DAYL[i]}"><small>${DAYS[i]}</small><div class="dot ${w.e?'done':''} ${w.key===tk&&!w.e?'today':''} ${w.key===st.sel?'sel':''} ${w.key>tk?'fut':''}">${w.e?(i>4?'★':'✓'):w.d.getDate()}</div></button>`).join('')}</div>
+ <p class="zh" style="margin:8px 0 0;text-align:center">Tap a day to write or make it up. 點日期可以寫或補寫。</p>
+ <div class="stats"><div><b>${done}/5</b><span>days 天${bonus?` +${bonus}★`:''}</span></div><div><b>${stars}</b><span>word stars 單字星</span></div><div><b>${streak(kid)}</b><span>streak 連續</span></div></div></div>
+ ${main}
+ ${past?`<button class="btn sec full" data-a="lookback">Look back 回顧 · ${past} entr${past>1?'ies':'y'}</button>`:''}</main>`;
+}
+function vPast(){
+ const kid=kidBy(st.kid),list=kidEntries(kid),groups={};
+ list.forEach(e=>{(groups[e.week]=groups[e.week]||[]).push(e)});
+ return top('Look back 回顧','My past diaries 我以前寫的日記','home')+`<main class="wrap">${Object.keys(groups).sort().reverse().map(w=>`<h2 style="margin:6px 4px 8px;font-size:17px" class="mut">Week of ${fmt(parse(w))} · ${esc(w.slice(0,4))}</h2><div class="card list" style="padding-top:6px">${groups[w].map(e=>{const d=parse(e.date);return `<button class="it" style="width:100%;text-align:left" data-a="pastOpen" data-v="${e.date}"><div><b>${DAYL[dIdx(d)]}, ${fmt(d)}</b>${e.reviewed?' <span class="tag g">✓</span>':''}<div class="mut" style="font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:68vw">${esc(e.text)}</div></div><span class="mut">›</span></button>`}).join('')}</div>`).join('')||'<p class="mut">No diaries yet. 還沒有日記。</p>'}</main>`;
+}
+function vPastOne(){
+ const kid=kidBy(st.kid),e=entries[eid(kid.id,st.pastDate)];if(!e){st.view='past';return vPast()}
+ const d=parse(e.date),fb=e.fb,corr=fb&&fb.issues&&fb.issues.length&&fb.corrected?fb.corrected:'';
+ return top(DAYL[dIdx(d)]+', '+fmt(d),e.topic||'','past')+`<main class="wrap">
+ <div class="card"><div class="lab mut" style="font-weight:800;font-size:14px">My writing 我寫的</div><div class="fb"><div class="txt">${esc(e.text)}</div></div></div>
+ ${corr?`<div class="card"><div class="mut" style="font-weight:800;font-size:14px">Correct version 正確的版本</div><div class="better">${esc(corr)}</div></div>`:fb?'<div class="card"><div class="praise" style="margin:0">'+STAR+'<div>No mistakes this day! 這天全對！</div></div></div>':''}
+ ${fb&&fb.better?`<div class="card"><div class="mut" style="font-weight:800;font-size:14px">A better way 更好的寫法</div><div class="better">${esc(fb.better)}</div></div>`:''}
+ ${(e.vocabUsed||[]).length?`<div class="card"><div class="mut" style="font-weight:800;font-size:14px">Words I used 用到的單字</div><div class="words" style="margin-top:8px">${e.vocabUsed.map(w=>`<span class="word used"><b>★ ${esc(w)}</b></span>`).join('')}</div></div>`:''}
+ </main><div class="dock"><div class="in"><button class="btn sec" data-a="lookback">Back 返回</button><button class="btn pri" data-a="pastRead">Read along 跟著念</button></div></div>`;
 }
 function vWrite(){
  const kid=kidBy(st.kid),date=parse(st.date),lv=LEVELS[kid.level],tp=topicFor(kid,st.date),e=entries[eid(kid.id,st.date)];
@@ -290,7 +309,9 @@ function vWrite(){
   ${fb.better?`<h2 style="margin-top:14px">A better way to say it 更好的寫法</h2><div class="better">${esc(fb.better)}</div>`:''}
   ${fb.next?`<p class="mut" style="margin:12px 0 0"><b>Next time 下次試試：</b>${esc(fb.next)} ${fb.nextZh?'· '+esc(fb.nextZh):''}</p>`:''}
   ${stale?'<p class="banner" style="background:var(--yelS);color:inherit">You changed your writing. Tap “Check again” to see. 你改過了，再按一次檢查。</p>':fb.issues.length?'<p class="zh" style="margin:10px 0 0">Try fixing them yourself in the page above, then check again. 自己在上面改改看，再檢查一次。</p>':''}</div>`}
- return top(DAYL[dIdx(date)]+', '+fmt(date),make?'Make-up day 補寫':lv.name,'home')+`<main class="wrap">
+ const prev=kidEntries(kid).find(x=>x.date<st.date),yest=prev&&prev.date===ymd(addDays(date,-1));
+ const prevH=prev?`<details class="card prev" style="padding:12px 16px"><summary style="cursor:pointer;list-style:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>${yest?'Yesterday 昨天':'Last time 上次（'+DAYZ[dIdx(parse(prev.date))]+'）'}你寫了：</b> <span class="mut">${esc(prev.text)}</span></summary><div class="txt" style="font:18px/1.7 ui-rounded,sans-serif;margin-top:8px;white-space:pre-wrap">${esc(prev.text)}</div></details>`:'';
+ return top(DAYL[dIdx(date)]+', '+fmt(date),make?'Make-up day 補寫':lv.name,'home')+`<main class="wrap">${prevH}
  <div class="card prompt"><div class="q">${pic?'Look at the picture. What happened?':esc(tp[0])}</div><div class="zh">${pic?'看圖說故事：發生了什麼事？':esc(tp[1])}</div>${pic?pic.s+`<div class="zh" style="margin-top:8px">Words: ${esc(pic.h)}</div>`:''}</div>
  <div class="chips"><button class="chip" data-a="sheet" data-v="ideas">Ideas <i>開頭</i></button><button class="chip" data-a="sheet" data-v="pics">${pic?'Change picture':'Pictures'} <i>看圖</i></button><button class="chip" data-a="sheet" data-v="words" id="wchip">Words <i>單字 ${voc.filter(w=>used(st.draft,w[0])).length}/${voc.length}</i></button><button class="chip" data-a="bot" style="background:var(--blueS);color:var(--blue)">Ask Robo <i style="color:inherit">問機器人</i></button></div>
  <div class="page"><textarea id="ta" rows="6" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Start writing here…" aria-label="Your diary">${esc(st.draft)}</textarea></div>
@@ -337,16 +358,16 @@ function vEdit(){
  ${e.id?`<button class="btn ghost danger full" style="margin-top:8px" data-a="delkid">${st.confirmDel?'Tap again to delete this child 再按一次確認刪除':'Delete child 刪除'}</button>`:''}</div></main>`;
 }
 function weekData(kid,mon){
- const days=weekInfo(kid,mon).slice(0,5),fixes=[],better=[],cnt={},words=new Set();let total=0,n=0;
- days.forEach((w,i)=>{const e=w.e;if(!e)return;n++;total+=e.words||0;(e.vocabUsed||[]).forEach(x=>words.add(x));const f=e.firstFb;if(f){f.issues.forEach(x=>{fixes.push({day:DAYS[i],...x});cnt[x.type]=(cnt[x.type]||0)+1});if(f.better)better.push({day:DAYS[i],t:f.better})}});
- return {days,fixes,better,cnt,words:[...words],total,n,range:fmt(mon)+' – '+fmt(addDays(mon,4))+', '+addDays(mon,4).getFullYear()};
+ const days=weekInfo(kid,mon).filter((w,i)=>i<5||w.e),fixes=[],better=[],cnt={},words=new Set();let total=0,n=0;
+ days.forEach(w=>{const i=dIdx(w.d),e=w.e;if(!e)return;n++;total+=e.words||0;(e.vocabUsed||[]).forEach(x=>words.add(x));const f=e.firstFb;if(f){f.issues.forEach(x=>{fixes.push({day:DAYS[i],...x});cnt[x.type]=(cnt[x.type]||0)+1});if(f.better)better.push({day:DAYS[i],t:f.better})}});
+ return {days,fixes,better,cnt,words:[...words],total,n,range:fmt(mon)+' – '+fmt(days[days.length-1].d)+', '+days[days.length-1].d.getFullYear()};
 }
 function vWeek(){
  const kid=kidBy(st.kid),mon=addDays(monday(today()),st.wk*7),W=weekData(kid,mon);
  return top(kid.name+'’s journal','Weekly journal 週記','parent')+`<main class="wrap">
  <div class="row" style="justify-content:space-between;margin-bottom:12px"><button class="ib" style="background:var(--card);color:var(--ink)" data-a="wk" data-v="-1" aria-label="Previous week">${BACK}</button><b>${esc(W.range)}</b><button class="ib" style="background:var(--card);color:var(--ink);transform:scaleX(-1)" data-a="wk" data-v="1" ${st.wk>=0?'disabled':''} aria-label="Next week">${BACK}</button></div>
  <div class="paper"><div class="row" style="justify-content:space-between"><h3>My Weekly Journal</h3><span>${esc(kid.name)} · ${LEVELS[kid.level].name}</span></div>
- <h4>My journal</h4>${W.days.map((w,i)=>`<div class="d"><b>${DAYL[i]}, ${fmt(w.d)}${w.e&&w.e.makeup?' (make-up)':''}</b><p>${w.e?esc(w.e.original||w.e.text):'<span style="color:#98a2bd">(no entry)</span>'}</p></div>`).join('')}
+ <h4>My journal</h4>${W.days.map(w=>`<div class="d"><b>${DAYL[dIdx(w.d)]}, ${fmt(w.d)}${dIdx(w.d)>4?' (bonus)':''}${w.e&&w.e.makeup?' (make-up)':''}</b><p>${w.e?esc(w.e.original||w.e.text):'<span style="color:#98a2bd">(no entry)</span>'}</p></div>`).join('')}
  <h4>Corrections</h4>${W.fixes.length?W.fixes.map(f=>`<div class="c">${f.day}: <s>${esc(f.wrong)}</s> → <span class="g">${esc(f.right)}</span> <span style="color:#7a839c">(${TYPES[f.type][0]})</span></div>`).join(''):'<div class="c" style="color:#98a2bd">No corrections this week.</div>'}
  ${W.better.length?'<h4>Better sentences</h4>'+W.better.map(b=>`<div class="c"><b>${b.day}:</b> ${esc(b.t)}</div>`).join(''):''}
  <h4>This week</h4><div class="c">${W.n} entr${W.n===1?'y':'ies'} · ${W.total} words${Object.keys(W.cnt).length?' · Practice: '+Object.entries(W.cnt).map(([k,v])=>TYPES[k][0]+' '+v).join(', '):''}</div>${W.words.length?`<div class="c">Words I used: ${esc(W.words.join(', '))}</div>`:''}
@@ -357,7 +378,7 @@ function vWeek(){
 function render(){
  if(!ready){$('#app').innerHTML='<div class="load">Loading… 載入中</div>';return}
  if(st.view==='parent'&&!st.parent)st.view='pin';
- const v={who:vWho,home:vHome,write:vWrite,pin:vPin,parent:vParent,edit:vEdit,week:vWeek}[st.view]||vWho;
+ const v={past:vPast,pastOne:vPastOne,who:vWho,home:vHome,write:vWrite,pin:vPin,parent:vParent,edit:vEdit,week:vWeek}[st.view]||vWho;
  $('#app').innerHTML=v();window.scrollTo(0,0);
  if(st.view==='write')updMeter();
 }
@@ -470,7 +491,7 @@ function renderReview(){
  const ss=r.ss,i=r.i;
  if(i>=ss.length){
   overlay(`<div style="text-align:center;margin-top:40px">${STARB}<h2>All done! 全部完成！</h2><p class="mut">You read ${ss.length} sentence${ss.length>1?'s':''} out loud. 你念完 ${ss.length} 句了，好棒！</p></div><div class="grow"></div>
-  <div class="acts">${fb.better&&!r.better?'<button class="btn sec" data-a="raBetter">Challenge: read the better version 挑戰：念更好的寫法</button>':''}<button class="btn pri big" data-a="rvfinish">Finish 完成</button><button class="btn ghost" data-a="rvclose">Go back and fix my writing 回去改我的日記</button></div>`);
+  <div class="acts">${fb.better&&!r.better&&st.view!=='pastOne'?'<button class="btn sec" data-a="raBetter">Challenge: read the better version 挑戰：念更好的寫法</button>':''}<button class="btn pri big" data-a="rvfinish">Finish 完成</button>${st.view==='pastOne'?'':'<button class="btn ghost" data-a="rvclose">Go back and fix my writing 回去改我的日記</button>'}</div>`);
   return;
  }
  overlay(`<h2 style="margin-top:14px">${r.better?'Better version 更好的寫法':'Read along 跟著念'}</h2><div class="zh">Listen first, then read it out loud. 先聽，再大聲念。</div>
@@ -549,7 +570,7 @@ async function pdf(){
  doc.setFillColor(47,91,234);doc.rect(0,0,W,24,'F');font(18,'bold',[255,255,255]);doc.text('My Weekly Journal',M,15);
  font(10,'normal',[255,255,255]);doc.text(clean(kid.name)+'   |   '+clean(Wd.range)+'   |   '+LEVELS[kid.level].name,W-M,15,{align:'right'});y=28;
  sec('My journal');
- Wd.days.forEach((w,i)=>{need(10);para(DAYL[i]+', '+fmt(w.d)+(w.e&&w.e.makeup?'  (make-up)':''),9.5,'bold',[27,32,51]);para(w.e?(w.e.original||w.e.text):'(no entry)',11.5,'normal',w.e?[27,32,51]:[152,162,189],3);y+=2});
+ Wd.days.forEach(w=>{need(10);const i=dIdx(w.d);para(DAYL[i]+', '+fmt(w.d)+(i>4?'  (bonus)':'')+(w.e&&w.e.makeup?'  (make-up)':''),9.5,'bold',[27,32,51]);para(w.e?(w.e.original||w.e.text):'(no entry)',11.5,'normal',w.e?[27,32,51]:[152,162,189],3);y+=2});
  sec('Corrections');
  if(!Wd.fixes.length)para('No corrections this week.',10,'normal',[152,162,189]);
  Wd.fixes.forEach(f=>{const lh=5.6;need(lh);let x=M;const seg=(t,c,b)=>{font(10.5,b?'bold':'normal',c);t=clean(t);doc.text(t,x,y+4);x+=doc.getTextWidth(t)};
@@ -580,7 +601,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
 async function act(a,v){
  switch(a){
  case 'who':Object.assign(st,{view:'who',parent:false});render();break;
- case 'kid':{st.kid=v;st.view='home';render();const k=kidBy(v);if(k&&!k.avatar)act('avpick');break}
+ case 'kid':{st.kid=v;st.sel=null;st.view='home';render();const k=kidBy(v);if(k&&!k.avatar)act('avpick');break}
  case 'home':st.view='home';render();break;
  case 'write':openWrite(v);break;
  case 'sheet':sheet(v);break;
@@ -622,7 +643,12 @@ async function act(a,v){
  case 'botNew':st.bot={phase:'ask',q:'',tries:0};renderBot();break;
  case 'botClose':if(canSpeak)speechSynthesis.cancel();st.bot=null;closeSheet();break;
  case 'rvclose':if(canSpeak)speechSynthesis.cancel();st.rv=null;closeSheet();render();break;
- case 'rvfinish':st.rv=null;closeSheet();saveDraft();break;
+ case 'rvfinish':st.rv=null;closeSheet();if(st.view==='pastOne'){render();break}saveDraft();break;
+ case 'selday':st.sel=v;render();break;
+ case 'lookback':st.view='past';render();break;
+ case 'past':st.view='past';render();break;
+ case 'pastOpen':st.pastDate=v;st.view='pastOne';render();break;
+ case 'pastRead':{const e=entries[eid(st.kid,st.pastDate)];if(!e)break;st.date=e.date;st.fb=e.fb?{...e.fb,text:e.text}:{issues:[],text:e.text,corrected:'',better:''};const t=st.fb.issues&&st.fb.issues.length&&st.fb.corrected?st.fb.corrected:e.text;st.rv={mode:'ra',ss:splitS(t),i:0};if(!st.rv.ss.length)st.rv.ss=[e.text];raPlay();break}
  case 'avpick':$('#sheet').innerHTML=`<div class="sheetbg" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2>Pick your avatar 選一個頭像</h2>${avGrid(kidBy(st.kid).avatar,'setav')}<button class="btn ghost full" data-a="close" style="margin-top:8px">Close 關閉</button></div></div>`;break;
  case 'setav':{const k=kidBy(st.kid);if(k){k.avatar=v;await saveSettings()}closeSheet();render();break}
  case 'pickA':st.edit.avatar=v;render();break;
