@@ -294,7 +294,7 @@ function vPastOne(){
  return top(DAYL[dIdx(d)]+', '+fmt(d),e.topic||'','past')+`<main class="wrap">
  <div class="card"><div class="lab mut" style="font-weight:800;font-size:14px">My writing 我寫的</div><div class="fb"><div class="txt">${esc(e.text)}</div></div></div>
  ${corr?`<div class="card"><div class="mut" style="font-weight:800;font-size:14px">Correct version 正確的版本</div><div class="better">${esc(corr)}</div></div>`:fb?'<div class="card"><div class="praise" style="margin:0">'+STAR+'<div>No mistakes this day! 這天全對！</div></div></div>':''}
- ${fb&&fb.better&&fb.ups?`<div class="card">${betterBlock(fb)}</div>`:`<div class="card"><div class="lab2">A better way 更好的寫法</div>${fb&&fb.better?`<div class="better">${esc(fb.better)}</div>`:''}<button class="btn sec full" style="margin-top:10px" data-a="regen" ${st.regen?'disabled':''}>${st.regen?'Making it… 產生中…':'Make a better version 產生更好的寫法'}</button></div>`}
+ ${fb&&fb.better&&fb.ups?`<div class="card">${betterBlock(fb)}<button class="btn ghost full" style="margin-top:6px" data-a="regen" ${st.regen?'disabled':''}>${st.regen?'Making it… 產生中…':'Make it again 重新產生'}</button></div>`:`<div class="card"><div class="lab2">A better way 更好的寫法</div>${fb&&fb.better?`<div class="better">${esc(fb.better)}</div>`:''}<button class="btn sec full" style="margin-top:10px" data-a="regen" ${st.regen?'disabled':''}>${st.regen?'Making it… 產生中…':'Make a better version 產生更好的寫法'}</button></div>`}
  ${(e.vocabUsed||[]).length?`<div class="card"><div class="mut" style="font-weight:800;font-size:14px">Words I used 用到的單字</div><div class="words" style="margin-top:8px">${e.vocabUsed.map(w=>`<span class="word used"><b>★ ${esc(w)}</b></span>`).join('')}</div></div>`:''}
  </main><div class="dock"><div class="in"><button class="btn sec" data-a="lookback">Back 返回</button><button class="btn pri" data-a="pastRead">Read along 跟著念</button></div></div>`;
 }
@@ -403,7 +403,7 @@ function insert(t){
  ta.setRangeText(lead+t,s,en,'end');st.draft=ta.value;st.caret=ta.selectionEnd;updMeter();ta.focus();
 }
 function betterRules(kid){const strict=kid.mode==='strict',up=Math.min(3,kid.level+1);
- return `"better" is a polished, more beautiful version of the whole entry that a strong student one level above this child (${LEVELS[up].name}) could write. Keep the child's own ideas and events; do not invent big new events. It must be clearly richer than "corrected", not just fixed. Use ${strict?'3 to 4':'2'} of these upgrades: a more vivid adjective or adverb (fun -> super exciting); a linking word to join short sentences (and then, because, after that, so); a feeling or sense detail (I felt..., It smelled...); a different sentence opener (not always "I"). ${strict?'':'Keep it short and easy for a young child. '}
+ return `"better" is a polished, more beautiful version of the whole entry that a strong student one level above this child (${LEVELS[up].name}) could write. Build "better" on top of the corrected entry: keep EVERY correction (the same past tense, spelling and capitals) and never bring back a mistake. Things that already happened today stay in the past tense (went, liked, played). Keep the same meaning and the child's own ideas and events (e.g. "I went to the park" must not become "I want to go to the park"); do not invent big new events. It must be clearly richer than "corrected", not just fixed. Use ${strict?'3 to 4':'2'} of these upgrades: a more vivid adjective or adverb (fun -> super exciting); a linking word to join short sentences (and then, because, after that, so); a feeling or sense detail (I felt..., It smelled...); a different sentence opener (not always "I"). ${strict?'':'Keep it short and easy for a young child. '}
 "upgrades": the upgraded words in "better", each copied EXACTLY as it appears in "better" (2 to 6 words each), with "zh": a short Traditional Chinese note on why it is nicer (max 18 characters).
 "star": the single most beautiful sentence from "better" for the child to remember, copied exactly, with "zh": its meaning in Traditional Chinese.`}
 function buildPrompt(kid,text){
@@ -436,11 +436,19 @@ function normBetter(r){const s=v=>typeof v==='string'?v:'';const better=s(r&&r.b
  const ups=(Array.isArray(r&&r.upgrades)?r.upgrades:[]).filter(x=>x&&s(x.phrase)&&better.toLowerCase().includes(s(x.phrase).toLowerCase())).map(x=>({p:s(x.phrase),zh:s(x.zh)})).slice(0,6);
  const st0=r&&r.star&&typeof r.star==='object'?{en:s(r.star.en),zh:s(r.star.zh)}:null;
  return {better,ups,star:st0&&st0.en?st0:null}}
+function keepFixes(nb,issues){
+ if(!nb||!nb.better)return nb;
+ const fix=t=>{let o=t;(issues||[]).forEach(x=>{if(!x.wrong||!x.right||x.wrong.toLowerCase()===x.right.toLowerCase()||!/^(tense|spelling|grammar)$/.test(x.type))return;
+  const W=x.wrong.split(' '),Rt=x.right.split(' ');let p=0;while(p<W.length&&p<Rt.length&&W[p]===Rt[p])p++;let q=0;while(q<W.length-p&&q<Rt.length-p&&W[W.length-1-q]===Rt[Rt.length-1-q])q++;
+  const cw=W.slice(p,W.length-q).join(' '),cr=Rt.slice(p,Rt.length-q).join(' ');if(!cw||!cr||/[^A-Za-z' ]/.test(cw))return;
+  o=o.replace(new RegExp('\\b'+cw.replace(/'/g,"\\'")+'\\b','g'),cr)});return o};
+ const better=fix(nb.better);return {...nb,better,ups:(nb.ups||[]).map(u=>({...u,p:fix(u.p)})).filter(u=>better.toLowerCase().includes(u.p.toLowerCase())),star:nb.star?{...nb.star,en:fix(nb.star.en)}:null};
+}
 function norm(r,text){
  const s=v=>typeof v==='string'?v:'';
  const issues=(Array.isArray(r&&r.issues)?r.issues:[]).filter(x=>x&&TYPES[x.type]&&s(x.wrong)).map(x=>({type:x.type,wrong:s(x.wrong),right:s(x.right),tip:s(x.tip),tipZh:s(x.tipZh)})).slice(0,6);
  const sentences=(Array.isArray(r&&r.sentences)?r.sentences:[]).filter(x=>x&&s(x.before)&&s(x.after)).map(x=>({before:s(x.before),after:s(x.after)})).slice(0,8);
- return {issues,sentences,...normBetter(r),corrected:s(r&&r.corrected),praise:s(r&&r.praise)||'Nice work!',praiseZh:s(r&&r.praiseZh),next:s(r&&r.next),nextZh:s(r&&r.nextZh),text};
+ return {issues,sentences,...keepFixes(normBetter(r),issues),corrected:s(r&&r.corrected),praise:s(r&&r.praise)||'Nice work!',praiseZh:s(r&&r.praiseZh),next:s(r&&r.next),nextZh:s(r&&r.nextZh),text};
 }
 function entryFrom(text,fb){
  const kid=kidBy(st.kid),id=eid(kid.id,st.date),old=entries[id]||{},voc=vocabFor(kid.level,hash(st.date+kid.id));
@@ -468,9 +476,10 @@ async function regen(){
  st.regen=true;render();
  try{const r=await aiJson(`You are a kind English teacher. A ${kid.age}-year-old child learning English wrote this diary entry. Return ONLY a json object {"better":"...","upgrades":[{"phrase":"...","zh":"..."}],"star":{"en":"...","zh":"..."}}.
 ${betterRules(kid)}
-The entry:
-<<${e.text}>>`);
-  const nb=normBetter(r);if(!nb.better)throw {code:'http'};const fb={...(e.fb||{issues:[],corrected:''}),...nb};const ff=e.firstFb?{...e.firstFb,...nb}:fb;await saveEntry({...e,fb,firstFb:ff})}
+The child's entry: <<${e.text}>>
+${e.fb&&e.fb.corrected&&e.fb.issues&&e.fb.issues.length?`The corrected entry (start from this one and keep all of these fixes): <<${e.fb.corrected}>>
+Fixes that must stay: ${e.fb.issues.map(x=>`"${x.wrong}" -> "${x.right}"`).join('; ')}`:''}`);
+  const nb=keepFixes(normBetter(r),e.fb&&e.fb.issues);if(!nb.better)throw {code:'http'};const fb={...(e.fb||{issues:[],corrected:''}),...nb};const ff=e.firstFb?{...e.firstFb,...nb}:fb;await saveEntry({...e,fb,firstFb:ff})}
  catch(err){toast(AIERR[err&&err.code]||'Could not make it. Try again. 產生失敗，再試一次。')}
  st.regen=false;render();
 }
