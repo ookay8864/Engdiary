@@ -290,13 +290,18 @@ function vPast(){
 }
 function vPastOne(){
  const kid=kidBy(st.kid),e=entries[eid(kid.id,st.pastDate)];if(!e){st.view='past';return vPast()}
- const d=parse(e.date),fb=e.fb,corr=fb&&fb.issues&&fb.issues.length&&fb.corrected?fb.corrected:'';
- return top(DAYL[dIdx(d)]+', '+fmt(d),e.topic||'','past')+`<main class="wrap">
- <div class="card"><div class="lab mut" style="font-weight:800;font-size:14px">My writing 我寫的</div><div class="fb"><div class="txt">${esc(e.text)}</div></div></div>
- ${corr?`<div class="card"><div class="mut" style="font-weight:800;font-size:14px">Correct version 正確的版本</div><div class="better">${esc(corr)}</div></div>`:fb?'<div class="card"><div class="praise" style="margin:0">'+STAR+'<div>No mistakes this day! 這天全對！</div></div></div>':''}
- ${fb&&fb.better&&fb.ups?`<div class="card">${betterBlock(fb)}<button class="btn ghost full" style="margin-top:6px" data-a="regen" ${st.regen?'disabled':''}>${st.regen?'Making it… 產生中…':'Make it again 重新產生'}</button></div>`:`<div class="card"><div class="lab2">A better way 更好的寫法</div>${fb&&fb.better?`<div class="better">${esc(fb.better)}</div>`:''}<button class="btn sec full" style="margin-top:10px" data-a="regen" ${st.regen?'disabled':''}>${st.regen?'Making it… 產生中…':'Make a better version 產生更好的寫法'}</button></div>`}
- ${(e.vocabUsed||[]).length?`<div class="card"><div class="mut" style="font-weight:800;font-size:14px">Words I used 用到的單字</div><div class="words" style="margin-top:8px">${e.vocabUsed.map(w=>`<span class="word used"><b>★ ${esc(w)}</b></span>`).join('')}</div></div>`:''}
- </main><div class="dock"><div class="in"><button class="btn sec" data-a="lookback">Back 返回</button><button class="btn pri" data-a="pastRead">Read along 跟著念</button></div></div>`;
+ const d=parse(e.date),fb=e.fb,iss=(fb&&fb.issues)||[],P=iss.length?penHTML(e.text,iss,st.psel):null;
+ const why=iss[st.psel];
+ const mine=`<div class="card"><div class="lab2">My writing 我寫的${iss.length?' · <span style="font-weight:600">Tap a yellow word 點黃色的字看說明</span>':''}</div>
+  <div class="pen" style="margin-top:6px">${P?P.html.replace(/data-a="why"/g,'data-a="pwhy"'):esc(e.text)}</div>
+  ${P&&P.miss.length?`<div class="pen" style="font-size:18px;margin-top:6px">${P.miss.map(i=>`<button class="mk ${i===st.psel?'sel':''}" data-a="pwhy" data-v="${i}">${fixHTML(iss[i].wrong,iss[i].right)}</button>`).join(' ')}</div>`:''}
+  ${why?`<div class="why" style="background:var(--bg);margin-top:10px"><b><span style="color:var(--red)">${esc(why.wrong)}</span> → <span style="color:var(--ok)">${esc(why.right)}</span></b> <span class="mut">${esc(why.tipZh||why.tip||'')}</span></div>`:''}
+  ${fb&&!iss.length?`<div class="praise" style="margin:10px 0 0">${STAR}<div>No mistakes! 這天全對！</div></div>`:''}</div>`;
+ const remake=`<button class="btn ghost full" style="margin-top:6px" data-a="regen" ${st.regen?'disabled':''}>${st.regen?'Making it… 產生中…':(fb&&fb.ups?'Make it again 重新產生':'Make a better version 產生更好的寫法')}</button>`;
+ const better=`<div class="card"><div class="lab2">A better way 更好的寫法${fb&&fb.ups&&fb.ups.length?' · <span style="font-weight:600">Tap the wavy words 點波浪線</span>':''}</div>${fb&&fb.better?`<div class="better" style="margin-top:8px">${fb.ups?betterHTML(fb.better,fb.ups,true):esc(fb.better)}</div>`:''}${remake}</div>`;
+ const star=fb&&fb.star?`<div class="card" style="padding:6px">${starHTML(fb.star)}</div>`:'';
+ return top(DAYL[dIdx(d)]+', '+fmt(d),e.topic||'','past')+`<main class="wrap">${mine}${better}${star}</main>
+ <div class="dock"><div class="in"><button class="btn sec" data-a="lookback">Back 返回</button><button class="btn pri" data-a="pastRead">Read along 跟著念</button></div></div>`;
 }
 function vWrite(){
  const kid=kidBy(st.kid),date=parse(st.date),lv=LEVELS[kid.level],tp=topicFor(kid,st.date),e=entries[eid(kid.id,st.date)];
@@ -691,7 +696,8 @@ async function act(a,v){
  case 'selday':st.sel=v;render();break;
  case 'lookback':st.view='past';render();break;
  case 'past':st.view='past';render();break;
- case 'pastOpen':st.pastDate=v;st.view='pastOne';render();break;
+ case 'pwhy':st.psel=st.psel===+v?-1:+v;render();break;
+ case 'pastOpen':st.psel=-1;st.pastDate=v;st.view='pastOne';render();break;
  case 'pastRead':{const e=entries[eid(st.kid,st.pastDate)];if(!e)break;st.date=e.date;st.fb=e.fb?{...e.fb,text:e.text}:{issues:[],text:e.text,corrected:'',better:''};const t=st.fb.issues&&st.fb.issues.length&&st.fb.corrected?st.fb.corrected:e.text;st.rv={mode:'ra',ss:splitS(t),i:0};if(!st.rv.ss.length)st.rv.ss=[e.text];raPlay();break}
  case 'avpick':$('#sheet').innerHTML=`<div class="sheetbg" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2>Pick your avatar 選一個頭像</h2>${avGrid(kidBy(st.kid).avatar,'setav')}<button class="btn ghost full" data-a="close" style="margin-top:8px">Close 關閉</button></div></div>`;break;
  case 'setav':{const k=kidBy(st.kid);if(k){k.avatar=v;await saveSettings()}closeSheet();render();break}
