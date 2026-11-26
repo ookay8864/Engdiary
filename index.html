@@ -120,6 +120,29 @@ ruby rt{font-size:.55em;color:var(--mut);font-weight:600}
 .bt .bot{position:sticky;bottom:0;background:var(--bg);padding:12px 0 calc(14px + env(safe-area-inset-bottom));z-index:3}
 .ra2{font:22px/1.95 ui-rounded,sans-serif;background:var(--card);border-radius:18px;padding:16px 18px;overflow-wrap:anywhere}
 .bs{border-radius:8px;cursor:pointer;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background .2s}.bs.on{background:var(--yelS);box-shadow:0 0 0 2px var(--yel)}
+.botp2{position:fixed;z-index:13;left:0;right:0;bottom:var(--kb,0px);margin:auto;max-width:560px;height:min(68vh,calc(var(--vvh,100vh) - 24px));display:flex;flex-direction:column;background:var(--bg);border-radius:24px 24px 0 0;box-shadow:0 -10px 30px rgba(10,15,35,.18);animation:up .2s ease-out}
+.bhead{display:flex;align-items:center;gap:10px;padding:12px 14px 8px}
+.chat{flex:1;overflow:auto;padding:4px 14px 10px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+.me{align-self:flex-end;background:var(--blue);color:#fff;border-radius:18px 18px 4px 18px;padding:10px 14px;max-width:80%;font-size:18px;overflow-wrap:anywhere}
+.ro{align-self:flex-start;background:var(--card);border-radius:18px 18px 18px 4px;padding:12px 14px;max-width:92%;box-shadow:0 1px 0 var(--line);overflow-wrap:anywhere}
+.ro.wide{align-self:stretch;max-width:none}
+.dots i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mut);margin-right:5px;animation:bl 1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes bl{50%{opacity:.25}}
+.comp{padding:8px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg)}
+.recent{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}.recent button{flex:none;background:var(--card);border-radius:99px;padding:6px 12px;font-weight:800;font-size:15px;box-shadow:0 1px 0 var(--line)}
+.microw{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bigmic{width:84px;height:84px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:34px;box-shadow:0 6px 16px rgba(47,91,234,.35);position:relative;flex:none}
+.bigmic.on{background:var(--red)}.bigmic.on:after{content:"";position:absolute;inset:-8px;border-radius:50%;border:3px solid var(--red);animation:pr 1.2s infinite}
+@keyframes pr{from{transform:scale(.9);opacity:1}to{transform:scale(1.25);opacity:0}}
+@media (prefers-reduced-motion:reduce){.bigmic.on:after,.dots i{animation:none}}
+.side{min-width:88px;min-height:48px;border-radius:14px;background:var(--card);font-weight:800;font-size:15px;box-shadow:0 1px 0 var(--line)}
+.interim{text-align:center;min-height:24px;color:var(--mut);font-weight:700;margin-bottom:6px}
+.wc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.wcard{background:var(--card);border-radius:18px;padding:14px;text-align:left;box-shadow:0 1px 0 var(--line),0 6px 14px rgba(20,30,70,.05);min-height:96px;position:relative}
+.wcard b{font:800 24px ui-rounded,sans-serif;display:block;overflow-wrap:anywhere}.wcard .ok{position:absolute;top:10px;right:10px}
+.flash{background:var(--card);border-radius:24px;padding:26px 18px;text-align:center;box-shadow:0 6px 18px rgba(20,30,70,.08)}
+.seg{display:flex;background:var(--card);border-radius:14px;padding:4px;margin-bottom:14px;box-shadow:0 1px 0 var(--line)}.seg button{flex:1;min-height:44px;border-radius:11px;font-weight:800}.seg button.on{background:var(--blue);color:#fff}
+.warn{background:var(--yelS);border-radius:14px;padding:12px 14px;font-weight:700;margin-top:10px}
 .botbg{position:fixed;inset:0;background:rgba(10,15,35,.22);z-index:12}
 .botp{position:fixed;z-index:13;left:0;right:0;bottom:var(--kb,0px);margin:auto;max-width:560px;max-height:min(70vh,560px);overflow:auto;background:var(--bg);border-radius:24px 24px 0 0;box-shadow:0 -10px 30px rgba(10,15,35,.18);padding:14px 16px calc(16px + env(safe-area-inset-bottom));animation:up .2s ease-out}
 .opts{display:grid;gap:10px;margin-top:12px}.opts button{background:var(--card);border-radius:16px;padding:12px 16px;text-align:left;min-height:56px;box-shadow:0 1px 0 var(--line)}.opts b{font:700 24px ui-rounded,sans-serif;display:block}
@@ -261,13 +284,13 @@ function lookup(q){
 const TYPES={spelling:['Spelling','拼字'],tense:['Tense','時態'],capital:['Capital','大寫'],punctuation:['Full stop','標點'],grammar:['Grammar','文法']};
 
 /* ---------- state & storage ---------- */
-let settings={pin:'',kids:[]},entries={},ready=false,mode='loading',note='';
+let settings={pin:'',kids:[]},entries={},cards={},ready=false,mode='loading',note='';
 
 const st={view:'who',kid:null,date:null,draft:'',fb:null,checking:false,parent:false,wk:0,pic:null,typeMs:0,last:0,edit:null,pinIn:'',confirmDel:false};
 const kidBy=id=>settings.kids.find(k=>k.id===id);
 const eid=(k,d)=>'e_'+k+'_'+d;
-function lsLoad(){try{const o=JSON.parse(localStorage.getItem('lwd1')||'{}');if(o.settings)settings=o.settings;if(o.entries)entries=o.entries}catch(e){}}
-function lsSave(){try{localStorage.setItem('lwd1',JSON.stringify({settings,entries}))}catch(e){}}
+function lsLoad(){try{const o=JSON.parse(localStorage.getItem('lwd1')||'{}');if(o.settings)settings=o.settings;if(o.entries)entries=o.entries;if(o.cards)cards=o.cards}catch(e){}}
+function lsSave(){try{localStorage.setItem('lwd1',JSON.stringify({settings,entries,cards}))}catch(e){}}
 async function saveSettings(){lsSave()}
 async function saveEntry(e){entries[e.id]=e;lsSave()}
 
@@ -323,7 +346,7 @@ function vHome(){
  <p class="zh" style="margin:8px 0 0;text-align:center">Tap a day to write or make it up. 點日期可以寫或補寫。</p>
  <div class="stats"><div><b>${done}/5</b><span>days 天${bonus?` +${bonus}★`:''}</span></div><div><b>${stars}</b><span>word stars 單字星</span></div><div><b>${streak(kid)}</b><span>streak 連續</span></div></div></div>
  ${main}
- ${past?`<button class="btn sec full" data-a="lookback">Look back 回顧 · ${past} entr${past>1?'ies':'y'}</button>`:''}</main>`;
+ <div class="row" style="flex-wrap:nowrap">${past?`<button class="btn sec" style="flex:1" data-a="lookback">Look back 回顧</button>`:''}<button class="btn sec" style="flex:1" data-a="cards">Word cards 單字卡${kidCards().length?' · '+kidCards().length:''}</button></div></main>`;
 }
 function vPast(){
  const kid=kidBy(st.kid),list=kidEntries(kid),groups={};
@@ -396,7 +419,7 @@ function vParent(){
  <div class="card"><h2>AI checking 批改設定</h2><p class="zh" style="margin-top:-4px">${settings.apiKey?'DeepSeek key saved ✓ 已儲存金鑰':'Paste your DeepSeek API key. 貼上 DeepSeek API 金鑰。'}</p>
  <input class="t" id="key" type="password" autocomplete="off" placeholder="sk-..." value="${esc(settings.apiKey||'')}"><div class="row" style="margin-top:10px"><button class="btn pri" style="flex:1" data-a="savekey">Save 儲存</button><button class="btn sec" data-a="testkey">Test 測試</button></div></div>
  <div class="card"><h2>Backup 備份</h2><p class="zh" style="margin-top:-4px">Data is saved on this phone only. Back it up now and then, or move it to another phone. 資料只存在這支手機，建議偶爾備份，也可以搬到另一支手機。</p>
- <div class="row"><button class="btn sec" style="flex:1" data-a="export">Save backup 備份</button><label class="btn sec" style="flex:1">Restore 還原<input type="file" id="imp" accept=".json,application/json" hidden></label></div></div></main>`;
+ ${backupNote()}<p class="zh" style="margin:8px 0">Tap Back up, then choose WeChat (文件傳輸助手) or Save to Files. 按「備份」後，選微信傳到文件傳輸助手，或儲存到檔案。</p><div class="row"><button class="btn pri" style="flex:1" data-a="export">Back up 備份</button><label class="btn sec" style="flex:1">Restore 還原<input type="file" id="imp" accept=".json,application/json" hidden></label></div></div></main>`;
 }
 function vEdit(){
  const e=st.edit,sl=sugLevel(e.age),sm=sugMode(e.age);
@@ -426,13 +449,14 @@ function vWeek(){
  ${W.better.length?'<h4>Better sentences</h4>'+W.better.map(b=>`<div class="c"><b>${b.day}:</b> ${betterHTML(b.t,b.ups,false)}</div>`).join(''):''}
  <h4>This week</h4><div class="c">${W.n} entr${W.n===1?'y':'ies'} · ${W.total} words${Object.keys(W.cnt).length?' · Practice: '+Object.entries(W.cnt).map(([k,v])=>TYPES[k][0]+' '+v).join(', '):''}</div>${W.words.length?`<div class="c">Words I used: ${esc(W.words.join(', '))}</div>`:''}
  <h4>Teacher’s comment</h4><div class="lines"><div></div><div></div><div></div></div></div>
- <p class="zh">The PDF fits on A4. On iPhone, tap Share to print or send it by WeChat. PDF 為 A4 格式，打開後按「分享」可以列印或用微信傳給老師。</p></main>
+ <p class="zh">The PDF fits on A4. On iPhone, tap Share to print or send it by WeChat. PDF 為 A4 格式，打開後按「分享」可以列印或用微信傳給老師。</p>${(backupAge()===null||backupAge()>7)&&Object.keys(entries).length?`<div class="warn" style="margin-top:14px">${backupAge()===null?'Not backed up yet. 還沒備份過。':'Last backup '+backupAge()+' days ago. 已經 '+backupAge()+' 天沒備份。'}<button class="btn sec full" style="margin-top:8px" data-a="export">Back up now 順便備份</button></div>`:''}</main>
+ 
  <div class="dock"><div class="in"><button class="btn pri" data-a="pdf">Download PDF 下載</button></div></div>`;
 }
 function render(){
  if(!ready){$('#app').innerHTML='<div class="load">Loading… 載入中</div>';return}
  if(st.view==='parent'&&!st.parent)st.view='pin';
- const v={past:vPast,pastOne:vPastOne,who:vWho,home:vHome,write:vWrite,pin:vPin,parent:vParent,edit:vEdit,week:vWeek}[st.view]||vWho;
+ const v={cards:vCards,past:vPast,pastOne:vPastOne,who:vWho,home:vHome,write:vWrite,pin:vPin,parent:vParent,edit:vEdit,week:vWeek}[st.view]||vWho;
  $('#app').innerHTML=v();window.scrollTo(0,0);
  if(st.view==='write')updMeter();
 }
@@ -445,7 +469,7 @@ function updMeter(){
 }
 function openWrite(date){
  const kid=kidBy(st.kid),e=entries[eid(kid.id,date)];
- Object.assign(st,{view:'write',caret:null,date,draft:e?e.text:'',fb:e&&e.fb?{...e.fb,text:e.text}:null,pic:e?e.pic||null:null,typeMs:0,last:0});
+ Object.assign(st,{view:'write',caret:null,bot:null,date,draft:e?e.text:'',fb:e&&e.fb?{...e.fb,text:e.text}:null,pic:e?e.pic||null:null,typeMs:0,last:0});
  render();
 }
 function insert(t){
@@ -616,62 +640,118 @@ function botPrompt(kid,q){return `A ${kid.age}-year-old child learning English a
 Reply ONLY a json object: {"type":"word|choose|refuse|unclear","word":"correct spelling","zh":"short meaning in ${ZHN()}","options":[{"word":"...","zh":"..."}],"message":"short friendly English (refuse/unclear only)","messageZh":"same in ${ZHN()}"}
 Child: <<${q}>>`}
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-function botWordRes(w,zh){const k=DICT[w.toLowerCase()];return {word:w,zh:zh||(k?k.z:''),example:''}}
+const kidCards=()=>cards[st.kid]||(cards[st.kid]=[]);
+function addCard(w,zh,learned){const L=kidCards(),k=w.toLowerCase(),t=ymd(today());let c=L.find(x=>x.w.toLowerCase()===k);
+ if(c){c.last=t;if(!learned)c.n=(c.n||1)+1;if(learned)c.ok=true;if(zh&&!c.zh)c.zh=zh}else{L.push({w,zh:zh||'',n:1,first:t,last:t,ok:!!learned})}lsSave()}
+function botNew(){const old=st.bot;st.bot={log:old?old.log:[{ro:'Hi! Which word can’t you spell? Tap the mic and say it.',zh:'嗨！哪個字不會拼？按麥克風說說看，用中文說最準喔。'}],phase:'ask',lang:old?old.lang:'zh',typing:false,listen:false,interim:''}}
+function bubble(x){
+ if(x.me!=null)return `<div class="me">${esc(x.me)}</div>`;
+ if(x.card)return `<div class="ro" style="text-align:center;min-width:60%"><div class="spell" style="font-size:32px">${x.hide?esc(x.card.replace(/[^ ]/g,'_').split('').join(' ')):esc(x.card.toUpperCase().split('').join(' '))}</div><div style="font:700 20px ui-rounded,sans-serif">${x.hide?'':esc(x.card)+' · '}${PY(x.zh||'')}</div></div>`;
+ return `<div class="ro"><b>${esc(x.ro||'')}</b>${x.zh?`<div class="zh">${PY(x.zh)}</div>`:''}</div>`;
+}
 function renderBot(){
  const b=st.bot;if(!b){closeSheet();return}
- const head=`<div class="robo"><div class="av" style="width:48px;height:48px"><svg viewBox="0 0 100 100">${AVS.robot}</svg></div><div style="flex:1"><b style="font:800 20px ui-rounded,sans-serif">Ask Robo 問機器人</b><div class="zh">I help with spelling only. 我只幫忙拼字喔！</div></div><button class="ib" style="background:var(--card);color:var(--mut)" data-a="botClose" aria-label="Close">✕</button></div>`;
- let h='';
- if(b.phase==='ask'||b.phase==='msg'||b.phase==='loading'){
-  h=`${b.phase==='msg'?`<div class="bub"><b>${esc(b.res.message||'Can you ask about one word?')}</b><div class="zh">${PY(b.res.messageZh||'用中文說說看，例如「寫字」。')}</div></div>`:''}
-  <div class="bub"><b>Which word? 哪個字不會拼？</b><div class="zh" style="margin:2px 0 8px">Saying it in Chinese works best. 用中文說最準，例如「寫字」「蘋果」。</div>
-  ${SR?`<div class="mic"><button class="btn ${b.listen==='zh'?'pri':'sec'}" data-a="mic" data-v="zh">${b.listen==='zh'?'Listening… 聽著呢':'🎤 說中文'}</button><button class="btn ${b.listen==='en'?'pri':'sec'}" data-a="mic" data-v="en">${b.listen==='en'?'Listening…':'🎤 English'}</button></div>`:''}
-  <div class="row" style="margin-top:10px;flex-wrap:nowrap"><input class="t" id="botq" style="flex:1" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="寫字 / apple / how to spell…" value="${esc(b.q||'')}"><button class="btn pri" data-a="botAsk" ${b.phase==='loading'?'disabled':''}>${b.phase==='loading'?'…':'Ask 問'}</button></div>
-  ${b.phase==='loading'?'<p class="zh" style="margin:10px 0 0">Robo is thinking… 想一想…</p>':''}</div>`;
- } else if(b.phase==='choose'){
-  h=`<div class="bub"><b>Which one do you mean? 你要的是哪一個？</b><div class="opts">${b.opts.map(o=>`<button data-a="botPick" data-v="${esc(o.word)}"><b>${esc(o.word)}</b><span class="mut">${PY(o.zh||'')}</span></button>`).join('')}</div>
-  <button class="btn ghost full" style="margin-top:6px" data-a="botNew">None of these 都不是，再問一次</button></div>`;
- } else if(b.phase==='show'){
-  const w=b.res.word;
-  h=`<div class="bub" style="text-align:center"><div class="zh">Remember this word! 把這個字記起來！</div><div class="spell">${esc(w.toUpperCase().split('').join(' '))}</div><div style="font:700 22px ui-rounded,sans-serif">${esc(w)} · ${PY(b.res.zh)}</div></div>
-  <div class="acts" style="margin-top:12px"><div class="row" style="flex-wrap:nowrap"><button class="btn sec" style="flex:1" data-a="botSpell">Listen again 再聽一次</button><button class="btn ghost" data-a="botNot">Not this one 不是這個</button></div><button class="btn pri big" data-a="botMem">✓ I remember it 我記住了</button></div>`;
- } else if(b.phase==='spell'){
-  const w=b.res.word;
-  h=`<div class="bub" style="text-align:center"><b style="font-size:19px">Now spell it yourself! 現在自己拼拼看</b><div class="zh" style="margin:4px 0 8px">${PY(b.res.zh)}</div><div class="blanks">${w.split('').map(c=>c===' '?'&nbsp;':'_').join(' ')}</div>
-  <input class="t" id="botg" style="margin-top:10px;text-align:center;font-size:22px" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type the word">
+ let live='';const w=b.cur&&b.cur.word;
+ if(b.phase==='loading')live=`<div class="ro"><span class="dots"><i></i><i></i><i></i></span> <span class="zh">Robo is thinking… 想一想…</span></div>`;
+ if(b.phase==='choose')live=`<div class="ro wide"><b>Which one do you mean? 你要的是哪一個？</b><div class="opts">${b.opts.map(o=>`<button data-a="botPick" data-v="${esc(o.word)}"><b>${esc(o.word)}</b><span class="mut">${PY(o.zh||'')}</span></button>`).join('')}</div><button class="btn ghost full" data-a="botAgain">None of these 都不是，再問一次</button></div>`;
+ if(b.phase==='word')live=`<div class="ro wide"><div class="zh" style="margin-bottom:8px">Look carefully and remember it! 仔細看，把它記起來！</div><div class="row" style="flex-wrap:nowrap"><button class="btn sec" style="flex:1" data-a="botSpell">🔊 Listen 再聽</button><button class="btn ghost" data-a="botNot">Not this 不是這個</button></div><button class="btn pri big full" style="margin-top:8px" data-a="botMem">✓ I remember it 我記住了</button></div>`;
+ if(b.phase==='spell')live=`<div class="ro wide" style="text-align:center"><b style="font-size:18px">Now spell it yourself! 現在自己拼拼看</b><div class="zh" style="margin:2px 0 6px">${PY(b.cur.zh)}</div>
+  <input class="t" id="botg" style="text-align:center;font-size:24px" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type the word 打出來">
   ${b.tries?`<p style="margin:8px 0 0;color:var(--red);font-weight:700">Not quite. Try again! 差一點，再試一次！</p>`:''}
-  ${b.tries>=2?`<p class="zh" style="margin:4px 0 0">Hint 提示：it starts with “${esc(w[0])}” and has ${w.replace(/ /g,'').length} letters. 開頭是 ${esc(w[0])}，共 ${w.replace(/ /g,'').length} 個字母。</p>`:''}</div>
-  <div class="acts" style="margin-top:12px"><div class="row" style="flex-wrap:nowrap"><button class="btn sec" style="flex:1" data-a="botWord">Hear the word 聽單字</button>${b.tries>=3?'<button class="btn ghost" data-a="botLook">Look again 再看一次</button>':''}</div><button class="btn pri big" data-a="botCheck">Check 對答案</button></div>`;
- } else if(b.phase==='ok'){
-  h=`<div class="bub" style="text-align:center"><h2 style="margin:4px 0">Correct! 拼對了！ ★</h2><div style="font:700 26px ui-rounded,sans-serif">${esc(b.res.word)}</div></div>
-  <div class="acts" style="margin-top:12px"><button class="btn pri big" data-a="botAdd">Add to my diary 加進日記</button><button class="btn ghost" data-a="botNew">Ask another word 再問一個字</button></div>`;
- }
- $('#sheet').innerHTML=`<div class="botbg" data-a="botBg"></div><div class="botp" role="dialog" aria-modal="true">${head}${h}</div>`;
- const f=$('#botg')||(b.phase==='ask'&&!b.listen?$('#botq'):null);if(f)f.focus({preventScroll:true});
+  ${b.tries>=2?`<p class="zh" style="margin:4px 0 0">Hint 提示：starts with “${esc(w[0])}”, ${w.replace(/ /g,'').length} letters. 開頭是 ${esc(w[0])}，共 ${w.replace(/ /g,'').length} 個字母。</p>`:''}
+  <div class="row" style="margin-top:10px;flex-wrap:nowrap"><button class="btn sec" style="flex:1" data-a="botWord">🔊 Hear it 聽單字</button>${b.tries>=3?'<button class="btn ghost" data-a="botLook">Look again 再看一次</button>':''}<button class="btn pri" style="flex:1" data-a="botCheck">Check 對答案</button></div></div>`;
+ if(b.phase==='ok')live=`<div class="ro wide" style="text-align:center"><div style="font-size:30px">★</div><b style="font-size:20px">Correct! 拼對了！</b><div class="zh">Saved to your word cards. 已放進你的單字卡。</div><button class="btn pri big full" style="margin-top:10px" data-a="botAdd">Add to my diary 加進日記</button><button class="btn ghost full" data-a="botAgain">Ask another word 再問一個字</button></div>`;
+ const showComp=b.phase==='ask'||b.phase==='loading';
+ const rec=kidCards().slice().sort((x,y)=>(y.last||'').localeCompare(x.last||'')).slice(0,8);
+ const comp=showComp?`<div class="comp">${rec.length&&!b.typing?`<div class="recent">${rec.map(c=>`<button data-a="botRecent" data-v="${esc(c.w)}">${esc(c.w)}</button>`).join('')}</div>`:''}
+  ${b.typing?`<div class="row" style="flex-wrap:nowrap"><input class="t" id="botq" style="flex:1" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="寫字 / apple"><button class="btn pri" data-a="botAsk">Ask 問</button><button class="side" data-a="botType" style="min-width:56px">🎤</button></div>`
+  :`<div class="interim">${b.listen?esc(b.interim||'Listening… 聽著呢，請說'):SR?'Tap the mic and say the word 按一下說話':'Tap ⌨ to type 點鍵盤打字'}</div>
+  <div class="microw"><button class="side" data-a="botLang">${b.lang==='zh'?'中文 ⇄ EN':'EN ⇄ 中文'}</button>${SR?`<button class="bigmic ${b.listen?'on':''}" data-a="mic" aria-label="Microphone">🎤</button>`:''}<button class="side" data-a="botType">⌨ Type 打字</button></div>`}</div>`:'';
+ const sc=$('#chat');const keep=sc?sc.scrollTop:0;
+ $('#sheet').innerHTML=`<div class="botbg" data-a="botBg"></div><div class="botp2" role="dialog" aria-modal="true">
+  <div class="bhead"><div class="av" style="width:44px;height:44px;margin:0;flex:none"><svg viewBox="0 0 100 100">${AVS.robot}</svg></div><div style="flex:1"><b style="font:800 20px ui-rounded,sans-serif">Robo</b><div class="zh">I help with spelling only. 我只幫忙拼字喔！</div></div><button class="ib" style="background:var(--card);color:var(--mut)" data-a="botClose" aria-label="Close">✕</button></div>
+  <div class="chat" id="chat">${b.log.map(bubble).join('')}${live}</div>${comp}</div>`;
+ const c=$('#chat');if(c)c.scrollTop=c.scrollHeight;
+ if(b.phase==='spell'){const g=$('#botg');if(g)g.focus({preventScroll:true})}
+ if(b.typing&&b.phase==='ask'){const q=$('#botq');if(q)q.focus({preventScroll:true})}
 }
-function botShow(w,zh){const b=st.bot;b.res=botWordRes(w,zh);b.phase='show';b.tries=0;renderBot();spellSay(b.res.word)}
+function botShow(w,zh){const b=st.bot,k=DICT[w.toLowerCase()];b.cur={word:w,zh:zh||(k?k.z:'')};b.log.push({card:w,zh:b.cur.zh});b.phase='word';b.tries=0;addCard(w,b.cur.zh,false);renderBot();spellSay(w)}
 function botChoose(words,zhs){const b=st.bot;b.opts=words.map((w,i)=>({word:(DICT[w.toLowerCase()]||{w}).w,zh:(zhs&&zhs[i])||(DICT[w.toLowerCase()]||{}).z||''}));b.phase='choose';renderBot()}
 async function botAsk(qq){
- const b=st.bot,q=(qq??(($('#botq')||{}).value||'')).trim();if(!q){toast('Type or say a word first. 先打字或用說的。');return}
- b.q=q;const loc=lookup(q);
+ const b=st.bot,q=String(qq??(($('#botq')||{}).value||'')).trim();if(!q){toast('Say or type a word first. 先說或打一個字。');return}
+ b.log.push({me:q});b.typing=false;const loc=lookup(q);
  if(loc&&loc.word){botShow(loc.word);return}
  if(loc&&loc.choose){botChoose(loc.choose);return}
- if(!settings.apiKey){b.res={message:'I don’t know that one yet.',messageZh:'這個字我還不會，請家長設定 AI 金鑰。'};b.phase='msg';renderBot();return}
+ if(!settings.apiKey){b.log.push({ro:'I don’t know that one yet.',zh:'這個字我還不會，請家長設定 AI 金鑰。'});renderBot();return}
  b.phase='loading';renderBot();
- try{const kid=kidBy(st.kid);const r=await aiJson(botPrompt(kid,q),300);const ok=w=>typeof w==='string'&&/^[A-Za-z][A-Za-z' -]{0,30}$/.test(w.trim());
+ try{const kid=kidBy(st.kid);const r=await aiJson(botPrompt(kid,q),300);if(st.bot!==b)return;const ok=w=>typeof w==='string'&&/^[A-Za-z][A-Za-z' -]{0,30}$/.test(w.trim());
   if(r.type==='choose'&&Array.isArray(r.options)&&r.options.filter(o=>o&&ok(o.word)).length>1){const os=r.options.filter(o=>o&&ok(o.word)).slice(0,4);botChoose(os.map(o=>o.word.trim()),os.map(o=>String(o.zh||'')))}
   else if(r.type==='word'&&ok(r.word)){const w=r.word.trim();if(HG[w.toLowerCase()])botChoose(HG[w.toLowerCase()]);else botShow(w,String(r.zh||''))}
-  else{b.res={message:String(r.message||''),messageZh:String(r.messageZh||'')};b.phase='msg';renderBot()}}
- catch(e){b.phase='ask';renderBot();toast(AIERR[e&&e.code]||'Robo could not answer. Try again. 機器人沒回應，再試一次。')}
+  else{b.log.push({ro:String(r.message||'Can you ask about one word?'),zh:String(r.messageZh||'用中文說說看，例如「寫字」。')});b.phase='ask';renderBot()}}
+ catch(e){b.phase='ask';b.log.push({ro:'Oops, I didn’t hear the answer. Try again.',zh:AIERR[e&&e.code]||'機器人沒回應，再試一次。'});renderBot()}
 }
-function mic(lang){
- const b=st.bot;if(!SR){toast('Use the microphone on the keyboard. 請用鍵盤上的麥克風。');return}
- try{const rec=new SR();rec.lang=lang==='zh'?'zh-CN':'en-US';rec.interimResults=false;rec.maxAlternatives=1;
-  rec.onresult=e=>{const t=e.results[0][0].transcript;b.listen=null;b.q=t;renderBot();botAsk(t)};
-  rec.onerror=()=>{b.listen=null;renderBot();toast('Voice didn’t work. Use the keyboard microphone. 語音不能用，請用鍵盤上的麥克風。')};
-  rec.onend=()=>{if(b.listen){b.listen=null;renderBot()}};b.listen=lang;renderBot();rec.start()}
- catch(e){b.listen=null;renderBot();toast('Voice didn’t work. 語音不能用。')}
+let REC=null;
+function mic(){
+ const b=st.bot;if(!SR){toast('Use the keyboard microphone. 請用鍵盤上的麥克風。');return}
+ if(b.listen&&REC){try{REC.stop()}catch(e){}return}
+ try{const rec=new SR();REC=rec;rec.lang=b.lang==='zh'?'zh-CN':'en-US';rec.interimResults=true;rec.maxAlternatives=1;let fin='';
+  rec.onresult=e=>{let t='';for(const r of e.results){t+=r[0].transcript;if(r.isFinal)fin=t}b.interim=t;const el=document.querySelector('.interim');if(el)el.textContent=t};
+  rec.onerror=ev=>{b.listen=false;REC=null;renderBot();if(ev&&ev.error!=='no-speech'&&ev.error!=='aborted')toast('Voice didn’t work. Tap ⌨ to type. 語音不能用，請點「打字」。')};
+  rec.onend=()=>{const t=(fin||b.interim||'').trim();b.listen=false;b.interim='';REC=null;if(t)botAsk(t);else renderBot()};
+  b.listen=true;b.interim='';renderBot();rec.start()}
+ catch(e){b.listen=false;renderBot();toast('Voice didn’t work. 語音不能用。')}
 }
-if(window.visualViewport){const kb=()=>{const v=visualViewport;document.documentElement.style.setProperty('--kb',Math.max(0,innerHeight-v.height-v.offsetTop)+'px')};visualViewport.addEventListener('resize',kb);visualViewport.addEventListener('scroll',kb)}
+if(window.visualViewport){const kb=()=>{const v=visualViewport;document.documentElement.style.setProperty('--kb',Math.max(0,innerHeight-v.height-v.offsetTop)+'px');document.documentElement.style.setProperty('--vvh',v.height+'px')};visualViewport.addEventListener('resize',kb);visualViewport.addEventListener('scroll',kb);kb()}
+
+/* ---------- word cards ---------- */
+function vCards(){
+ const kid=kidBy(st.kid),L=kidCards().slice().sort((x,y)=>(y.last||'').localeCompare(x.last||''));
+ if(!L.length)return top('My word cards','我的單字卡','home')+`<main class="wrap"><div class="card"><h2>No cards yet 還沒有單字卡</h2><p class="mut" style="margin:0">When you ask Robo how to spell a word, it is saved here. 寫日記時問 Robo，問過的字會自動放進來。</p></div></main>`;
+ const learned=L.filter(c=>c.ok).length;let body='';
+ if(st.cmode!=='practice'){
+  body=`<div class="wc">${L.map(c=>`<button class="wcard" data-a="cardSay" data-v="${esc(c.w)}">${c.ok?'<span class="tag g ok">✓</span>':''}<b>${esc(c.w)}</b><div class="mut">${PY(c.zh)}</div><div class="zh" style="font-size:12px;margin-top:4px">Asked ${c.n||1}× 問過 ${c.n||1} 次</div></button>`).join('')}</div>`;
+ } else {
+  const q=st.cq;const c=q&&L.find(x=>x.w===q.w);
+  if(!c){body=`<div class="flash">${STARB}<h2>All done! 全部練完了！</h2><button class="btn pri big full" data-a="cardStart">Practice again 再練一次</button></div>`}
+  else body=`<div class="zh" style="text-align:center;margin-bottom:8px">Card ${q.i+1} of ${q.list.length} · 第 ${q.i+1} / ${q.list.length} 張</div>
+  <div class="flash"><div class="zh">What’s the English word? 英文怎麼拼？</div><div style="font:800 34px/1.4 ui-rounded,sans-serif;margin:8px 0">${PY(c.zh||'?')}</div>
+  <button class="chip" data-a="cardSay" data-v="${esc(c.w)}">🔊 Hear it 聽一聽</button>
+  ${q.show?`<div class="spell" style="margin-top:14px">${esc(c.w)}</div>`:`<input class="t" id="cg" style="margin-top:14px;text-align:center;font-size:24px" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type it 打出來">`}
+  ${q.res==='ok'?'<p style="color:var(--ok);font-weight:800;margin:10px 0 0">Correct! ★ 答對了！</p>':q.res==='no'?'<p style="color:var(--red);font-weight:800;margin:10px 0 0">Not quite. Try again! 再試一次！</p>':''}</div>
+  <div class="row" style="margin-top:12px;flex-wrap:nowrap">${q.res==='ok'||q.show?`<button class="btn pri big" style="flex:1" data-a="cardNext">Next 下一張 ›</button>`:`<button class="btn ghost" data-a="cardShow">Show answer 看答案</button><button class="btn pri big" style="flex:1;white-space:nowrap" data-a="cardCheck">Check 對答案</button>`}</div>`;
+ }
+ return top('My word cards','我的單字卡 · '+L.length+' words','home')+`<main class="wrap">
+ <div class="seg"><button class="${st.cmode!=='practice'?'on':''}" data-a="cardMode" data-v="look">Look 看一看</button><button class="${st.cmode==='practice'?'on':''}" data-a="cardMode" data-v="practice">Practice 練一練</button></div>
+ <p class="zh" style="margin:-4px 0 12px;text-align:center">${st.cmode==='practice'?'See the Chinese, spell the English. 看中文，拼英文。':`Tap a card to hear it. 點卡片聽發音 · ✓ learned 已學會 ${learned}/${L.length}`}</p>${body}</main>
+ <div class="dock"><div class="in"><button class="btn sec" data-a="cardPdf">Print cards 打印單字卡</button></div></div>`;
+}
+function cardStart(){const L=kidCards();const list=[...L.filter(c=>!c.ok),...L.filter(c=>c.ok)].map(c=>c.w);st.cq=list.length?{list,i:0,w:list[0],tries:0,show:false,res:''}:null;st.cmode='practice'}
+function zhImg(text,px){const t=zhConv(String(text||''));const c=document.createElement('canvas'),x=c.getContext('2d');const f=`600 ${px}px "PingFang SC","PingFang TC","Heiti SC",sans-serif`;x.font=f;const w=Math.ceil(x.measureText(t).width)+4;c.width=Math.max(w,4);c.height=Math.ceil(px*1.4);x.font=f;x.fillStyle='#5b6580';x.textBaseline='middle';x.fillText(t,2,c.height/2);return {d:c.toDataURL('image/png'),w:c.width,h:c.height}}
+async function cardPdf(){
+ const kid=kidBy(st.kid),L=kidCards().slice().sort((x,y)=>(x.first||'').localeCompare(y.first||''));if(!L.length)return;
+ try{toast('Making PDF… 產生中');await loadPdf()}catch(e){toast('Could not load the PDF tool. 請檢查網路。');return}
+ const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),M=12,CW=(210-2*M-6)/2,CH=48,G=6,TOP=26;
+ const head=p=>{doc.setFillColor(47,91,234);doc.rect(0,0,210,18,'F');doc.setTextColor(255);doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text('My Word Cards',M,12);doc.setFont('helvetica','normal');doc.setFontSize(10);doc.text(String(kid.name).replace(/[^\x20-\x7E]/g,'')+'  |  '+L.length+' words  |  '+fmt(today())+', '+today().getFullYear()+(p>1?'  |  page '+p:''),210-M,12,{align:'right'})};
+ let p=1;head(p);
+ L.forEach((c,i)=>{const k=i%10;if(i&&k===0){doc.addPage();p++;head(p)}const col=k%2,row=Math.floor(k/2),x=M+col*(CW+G),y=TOP+row*(CH+5);
+  doc.setDrawColor(180,190,215);doc.setLineDashPattern([1.5,1.2],0);doc.roundedRect(x,y,CW,CH,3,3);doc.setLineDashPattern([],0);
+  doc.setTextColor(27,32,51);doc.setFont('helvetica','bold');doc.setFontSize(24);doc.text(c.w.replace(/[^\x20-\x7E]/g,''),x+CW/2,y+15,{align:'center'});
+  if(c.zh){const im=zhImg(c.zh,48),hh=7,ww=Math.min(CW-10,im.w/im.h*hh);doc.addImage(im.d,'PNG',x+CW/2-ww/2,y+20,ww,hh)}
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(122,131,156);doc.text('Write it 3 times:',x+5,y+35);doc.setDrawColor(201,209,230);doc.line(x+5,y+43,x+CW-5,y+43);
+  if(c.ok){doc.setTextColor(23,138,87);doc.setFont('helvetica','bold');doc.text('learned',x+CW-5,y+6,{align:'right'})}});
+ saveBlob(doc.output('blob'),'WordCards_'+String(kid.name).replace(/[^A-Za-z0-9]+/g,'_')+'_'+ymd(today())+'.pdf');
+}
+
+/* ---------- backup ---------- */
+function backupAge(){return settings.lastBackup?Math.floor((Date.now()-settings.lastBackup)/864e5):null}
+function backupNote(){const a=backupAge(),has=Object.keys(entries).length;if(a===null)return has?'<div class="warn">Not backed up yet. 還沒備份過，建議現在備份一次。</div>':'';return a>7?`<div class="warn">Last backup: ${a} days ago. 已經 ${a} 天沒備份了。</div>`:`<p class="zh" style="margin:8px 0 0">Last backup 上次備份：${a===0?'today 今天':a+' days ago '+a+' 天前'}</p>`}
+async function backup(){
+ const data=JSON.stringify({app:'lwd',v:2,settings,entries,cards}),name='diary-backup-'+ymd(today())+'.json';
+ const done=async()=>{settings.lastBackup=Date.now();await saveSettings();toast('Backed up. 備份完成。');render()};
+ try{const f=new File([data],name,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Diary backup 日記備份'});await done();return}}
+ catch(e){if(e&&e.name==='AbortError')return}
+ saveBlob(new Blob([data],{type:'application/json'}),name);await done();
+}
 
 /* ---------- sheets ---------- *//* ---------- sheets ---------- */
 function sheet(kind){
@@ -719,10 +799,10 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('focusout',e=>{if(e.target.id==='ta')st.caret=e.target.selectionEnd});
 document.addEventListener('change',e=>{
- if(e.target.id==='imp'&&e.target.files[0]){const f=e.target.files[0];f.text().then(t=>{const o=JSON.parse(t);if(o.app!=='lwd')throw 0;settings={...o.settings,apiKey:settings.apiKey||o.settings.apiKey||''};entries={...entries,...o.entries};lsSave();toast('Restored. 已還原。');render()}).catch(()=>toast('Not a diary backup file. 不是正確的備份檔。'))}
+ if(e.target.id==='imp'&&e.target.files[0]){const f=e.target.files[0];f.text().then(t=>{const o=JSON.parse(t);if(o.app!=='lwd')throw 0;settings={...o.settings,apiKey:settings.apiKey||o.settings.apiKey||''};entries={...entries,...o.entries};if(o.cards)Object.keys(o.cards).forEach(k=>{const m={};[...(cards[k]||[]),...o.cards[k]].forEach(c=>{const x=m[c.w.toLowerCase()];m[c.w.toLowerCase()]=x?{...x,n:Math.max(x.n,c.n),ok:x.ok||c.ok}:c});cards[k]=Object.values(m)});lsSave();toast('Restored. 已還原。');render()}).catch(()=>toast('Not a diary backup file. 不是正確的備份檔。'))}
  if(e.target.id==='ag'&&st.edit){const a=+e.target.value;st.edit.age=a;if(!st.edit.tL)st.edit.level=sugLevel(a);if(!st.edit.tM)st.edit.mode=sugMode(a);render()}
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(st.bot)act('botClose');else if(st.rv)act('rvclose');else closeSheet()}if(e.key==='Enter'&&e.target.id==='pin')act('pin');if(e.key==='Enter'&&e.target.id==='botq'){e.preventDefault();act('botAsk')}if(e.key==='Enter'&&e.target.id==='botg'){e.preventDefault();act('botCheck')}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('.botp2'))act('botClose');else if(st.rv)act('rvclose');else closeSheet()}if(e.key==='Enter'&&e.target.id==='pin')act('pin');if(e.key==='Enter'&&e.target.id==='botq'){e.preventDefault();act('botAsk')}if(e.key==='Enter'&&e.target.id==='botg'){e.preventDefault();act('botCheck')}if(e.key==='Enter'&&e.target.id==='cg'){e.preventDefault();act('cardCheck')}});
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;if(t.dataset.a==='close'&&t.classList.contains('sheetbg')&&e.target!==t)return;if(t.dataset.a==='botBg'&&e.target!==t)return;act(t.dataset.a,t.dataset.v)});
 async function act(a,v){
  switch(a){
@@ -752,6 +832,31 @@ async function act(a,v){
  case 'week':st.kid=v;st.wk=0;st.view='week';render();break;
  case 'wk':st.wk=Math.min(0,st.wk+(+v));render();break;
  case 'pdf':pdf();break;
+ case 'bot':botNew();renderBot();break;
+ case 'botAsk':botAsk();break;
+ case 'botRecent':botAsk(v);break;
+ case 'botType':st.bot.typing=!st.bot.typing;renderBot();break;
+ case 'botLang':st.bot.lang=st.bot.lang==='zh'?'en':'zh';renderBot();break;
+ case 'mic':mic();break;
+ case 'botPick':st.bot.log.push({me:v});botShow(v);break;
+ case 'botAgain':st.bot.phase='ask';st.bot.cur=null;renderBot();break;
+ case 'botSpell':spellSay(st.bot.cur.word);break;
+ case 'botWord':say(st.bot.cur.word);break;
+ case 'botNot':{const b=st.bot,w=b.cur.word.toLowerCase();if(HG[w])botChoose(HG[w]);else{b.log.push({ro:'Try saying it in Chinese.',zh:'試試用中文說，例如「寫字」。'});b.phase='ask';renderBot()}break}
+ case 'botMem':{const b=st.bot;b.log.forEach(x=>{if(x.card===b.cur.word)x.hide=true});b.phase='spell';b.tries=0;renderBot();break}
+ case 'botLook':{const b=st.bot;b.log.forEach(x=>{if(x.card===b.cur.word)x.hide=false});b.phase='word';renderBot();break}
+ case 'botCheck':{const b=st.bot,g=(($('#botg')||{}).value||'').trim().toLowerCase().replace(/\s+/g,' ');if(!g)break;b.log.push({me:g});if(g===b.cur.word.toLowerCase()){b.log.forEach(x=>{if(x.card===b.cur.word)x.hide=false});b.phase='ok';addCard(b.cur.word,b.cur.zh,true);renderBot();say('Great job! '+b.cur.word)}else{b.tries++;renderBot()}break}
+ case 'botAdd':{const w=st.bot.cur.word;st.bot.phase='ask';st.bot.cur=null;const keep=st.bot;closeSheet();st.bot=keep;insert(w);st.botOpen=false;break}
+ case 'botClose':if(canSpeak)speechSynthesis.cancel();try{REC&&REC.abort()}catch(e){}closeSheet();st.botOpen=false;break;
+ case 'botBg':act('botClose');break;
+ case 'cards':st.cmode='look';st.view='cards';render();break;
+ case 'cardMode':if(v==='practice')cardStart();else st.cmode='look';render();break;
+ case 'cardSay':say(v);break;
+ case 'cardStart':cardStart();render();break;
+ case 'cardShow':st.cq.show=true;render();break;
+ case 'cardCheck':{const q=st.cq,g=(($('#cg')||{}).value||'').trim().toLowerCase();if(!g)break;if(g===q.w.toLowerCase()){q.res='ok';addCard(q.w,'',true);say(q.w)}else{q.res='no';q.tries++;if(q.tries>=2)q.show=true}render();break}
+ case 'cardNext':{const q=st.cq;q.i++;if(q.i>=q.list.length){st.cq={list:q.list,i:q.i,w:null}}else Object.assign(q,{w:q.list[q.i],tries:0,show:false,res:''});render();break}
+ case 'cardPdf':cardPdf();break;
  case 'review':st.rv={mode:'pen',sel:-1};renderReview();break;
  case 'why':st.rv.sel=+v;renderReview();break;
  case 'raStart':st.rv={mode:'better'};renderReview();break;
@@ -759,16 +864,6 @@ async function act(a,v){
  case 'raAgain':raPlay();break;
  case 'raNext':{const r=st.rv;if(canSpeak)speechSynthesis.cancel();r.i++;if(r.i<r.ss.length)raPlay();else{r.phase='';await markReviewed();renderReview()}break}
  case 'raBetter':st.rv={mode:'ra',ss:splitS(st.fb.better),i:0,better:true};raPlay();break;
- case 'bot':st.bot={phase:'ask',q:'',tries:0};renderBot();break;
- case 'botAsk':botAsk();break;
- case 'botSpell':spellSay(st.bot.res.word);break;
- case 'botWord':say(st.bot.res.word);break;
- case 'botMem':st.bot.phase='spell';st.bot.tries=0;renderBot();break;
- case 'botLook':st.bot.phase='show';renderBot();break;
- case 'botCheck':{const b=st.bot,g=(($('#botg')||{}).value||'').trim().toLowerCase().replace(/\s+/g,' ');if(!g)break;if(g===b.res.word.toLowerCase()){b.phase='ok';renderBot();say('Great job! '+b.res.word)}else{b.tries++;renderBot()}break}
- case 'botAdd':{const w=st.bot.res.word;st.bot=null;closeSheet();insert(w);break}
- case 'botNew':st.bot={phase:'ask',q:'',tries:0};renderBot();break;
- case 'botClose':if(canSpeak)speechSynthesis.cancel();st.bot=null;closeSheet();break;
  case 'rvclose':if(canSpeak)speechSynthesis.cancel();st.rv=null;closeSheet();render();break;
  case 'rvfinish':st.rv=null;closeSheet();if(st.view==='pastOne'){render();break}saveDraft();break;
  case 'upwhy':{const f=st.rv?st.fb:(st.view==='pastOne'?(entries[eid(st.kid,st.pastDate)]||{}).fb:st.fb);const u=f&&f.ups&&f.ups[+v];if(u){toast(u.p+'：'+(u.zh||''));say(u.p)}break}
@@ -787,16 +882,12 @@ async function act(a,v){
  case 'betterDone':{if(canSpeak)speechSynthesis.cancel();const past=st.view==='pastOne';st.rv=null;closeSheet();if(past){render();break}await markReviewed();saveDraft();break}
  case 'setZh':settings.zh=v;await saveSettings();render();loadZh();break;
  case 'togglePy':settings.py=!settings.py;await saveSettings();render();loadZh();break;
- case 'botBg':act('botClose');break;
- case 'botPick':botShow(v);break;
- case 'botNot':{const b=st.bot,w=b.res.word.toLowerCase();if(HG[w])botChoose(HG[w]);else{b.res={message:'Try saying it in Chinese.',messageZh:'試試用中文說，例如「寫字怎麼拼」。'};b.phase='msg';b.q='';renderBot()}break}
- case 'mic':mic(v);break;
  case 'avpick':$('#sheet').innerHTML=`<div class="sheetbg" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2>Pick your avatar 選一個頭像</h2>${avGrid(kidBy(st.kid).avatar,'setav')}<button class="btn ghost full" data-a="close" style="margin-top:8px">Close 關閉</button></div></div>`;break;
  case 'setav':{const k=kidBy(st.kid);if(k){k.avatar=v;await saveSettings()}closeSheet();render();break}
  case 'pickA':st.edit.avatar=v;render();break;
  case 'savekey':settings.apiKey=($('#key')||{}).value.trim();await saveSettings();toast('Saved. 已儲存。');render();break;
  case 'testkey':{settings.apiKey=($('#key')||{}).value.trim();await saveSettings();toast('Testing… 測試中');try{const r=await aiJson('Return the json object {"ok":true}.');toast(r&&r.ok?'It works! 可以用了 ✓':'Got a reply. 有回應。')}catch(e){toast(AIERR[e&&e.code]||('Error '+(e&&e.status||'')+' 連線失敗'))}break}
- case 'export':saveBlob(new Blob([JSON.stringify({app:'lwd',v:1,settings,entries})],{type:'application/json'}),'diary-backup-'+ymd(today())+'.json');break;
+ case 'export':backup();break;
  }
 }
 function newEdit(){st.edit={id:'',name:'',avatar:'',age:6,level:sugLevel(6),mode:sugMode(6),tL:false,tM:false}}
