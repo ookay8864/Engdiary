@@ -118,6 +118,7 @@ input.t,select.t{width:100%;min-height:52px;border-radius:14px;border:2px solid 
 .a4 .cr{font-size:13.5px;line-height:1.55}.a4 .cr div{overflow-wrap:anywhere}.a4 .cr .n{color:#7a839c;font-weight:800}.a4 .cr .w{color:#e0464b;text-decoration:line-through}.a4 .cr .r{color:#178a57;font-weight:800}
 .a4 h4{font:800 16px ui-rounded,sans-serif;color:#2f5bea;margin:22px 0 6px;border-bottom:1.5px solid #dde4f3;padding-bottom:4px}
 .a4 .bt2 p{margin:0 0 6px;font:italic 15.5px/1.6 Georgia,serif}.a4 .bt2 b{font-style:normal;font-family:system-ui,sans-serif}.a4 .bt2 u{text-decoration:underline wavy #e08a24 1.5px;text-underline-offset:4px}
+.a4 .sug{position:relative;border:1.2px solid #8a93ab;border-radius:6px;padding:12px 14px 10px;margin:0 0 14px;color:#1b2033}.a4 .sug .sl{position:absolute;top:-9px;right:10px;background:#fff;padding:0 6px;font:italic 11px system-ui;color:#5b6580}
 .a4 .sm{font-size:14px;margin:3px 0}.a4 .ln{border-bottom:1px solid #c9d1e6;height:28px}
 .mini2{display:flex;gap:10px;margin-top:4px}.mini2 button{flex:1;background:var(--card);border-radius:14px;padding:10px 12px;text-align:center;box-shadow:0 1px 0 var(--line);min-height:56px}.mini2 b{display:block;font-size:15px;color:var(--blue)}.mini2 span{font-size:12px;color:var(--mut)}.mini2 .due{background:var(--yelS)}.mini2 .due span{color:light-dark(#8a6400,#ffd23f);font-weight:700}
 .wkbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
@@ -135,6 +136,11 @@ input.t,select.t{width:100%;min-height:52px;border-radius:14px;border:2px solid 
 .rv .mini{font-size:15px;margin-top:10px;color:var(--mut)}.rv .mini b{color:var(--ok)}.rv .mini s{color:var(--red)}
 .rv .grow{flex:1;min-height:24px}.rv .acts{display:grid;gap:10px}
 .big{min-height:60px;font-size:19px}
+.buddy{position:fixed;right:12px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:7;width:72px;display:flex;flex-direction:column;align-items:center;background:none;filter:drop-shadow(0 4px 8px rgba(20,30,70,.18))}.buddy svg{width:64px;height:64px}.buddy span{font:800 12px system-ui;color:var(--blue);background:var(--card);border-radius:99px;padding:1px 8px;margin-top:-4px}
+.buddy.hop{animation:hop .9s ease-out}@keyframes hop{0%,100%{transform:translateY(0)}25%{transform:translateY(-22px) rotate(-6deg)}50%{transform:translateY(0)}70%{transform:translateY(-8px) rotate(4deg)}}
+@media (prefers-reduced-motion:reduce){.buddy.hop{animation:none}}
+.guide{background:var(--card);border-radius:16px;margin:0 0 12px;box-shadow:0 1px 0 var(--line)}.guide summary{list-style:none;cursor:pointer;padding:12px 16px;font-weight:800;color:var(--blue)}.guide summary::-webkit-details-marker{display:none}
+.gq{display:grid;gap:8px;padding:0 12px 12px}.gq button{text-align:left;background:var(--bg);border-radius:12px;padding:10px 12px}.gq b{display:block}.gq span{font-size:14px;color:var(--mut);display:block}.gq i{font-style:normal;color:var(--blue);font-weight:700;font-size:15px}
 ruby rt{font-size:.55em;color:var(--mut);font-weight:600}
 .bt{padding-top:0;padding-bottom:0}.bt .tbar{position:sticky;top:0;background:var(--bg);padding:calc(env(safe-area-inset-top) + 12px) 0 10px;z-index:3}
 .bt .bot{position:sticky;bottom:0;background:var(--bg);padding:12px 0 calc(14px + env(safe-area-inset-bottom));z-index:3}
@@ -229,6 +235,23 @@ const TOPICS=[
  ['What was hard today?','今天有什麼事很難？','Today ___ was hard for me.'],
  ['What did you see on the way home?','回家路上你看到了什麼？','On the way home, I saw ___.'],
  ['What do you want to do tomorrow?','明天你想做什麼？','Tomorrow I want to ___.']];
+const OPENERS={A:{n:'Time order 時間順序',d:['This week started on Monday. ','On Tuesday, ','In the middle of the week, ','On Thursday, ','Finally, on Friday, ','On Saturday, ','On Sunday, ']},
+ B:{n:'Feelings 心情',d:['On Monday, I felt ','On Tuesday, I felt ','On Wednesday, I felt ','On Thursday, I felt ','On Friday, I felt ','On Saturday, I felt ','On Sunday, I felt ']},
+ C:{n:'Story 說故事',d:['My week began with ','The next day, ','On Wednesday, ','After that, on Thursday, ','At the end of the week, ','On the weekend, ','On Sunday, ']}};
+const openerFor=date=>(OPENERS[settings.opener||'A']||OPENERS.A).d[dIdx(parse(date))];
+const TQ=[
+ [['What did you eat?','你吃了什麼？','I ate ___.'],['Who made it?','誰做的？','___ made it.'],['How did it taste?','味道怎麼樣？','It was ___.']],
+ [['What did you play?','你玩了什麼？','I played ___.'],['Who did you play with?','和誰一起玩？','I played with ___.'],['Was it fun?','好玩嗎？','It was ___ because ___.']],
+ [['Who did you see?','你見到誰？','I saw ___.'],['Where did you see them?','在哪裡見到？','I saw them at ___.'],['What did you do together?','一起做了什麼？','We ___ together.']],
+ [['What did you learn?','你學到什麼？','I learned ___.'],['Which class was it?','是哪一堂課？','In ___ class,'],['Was it easy or hard?','容易還是難？','It was ___.']],
+ [['What made you happy?','什麼讓你開心？','I was happy because ___.'],['Who was with you?','和誰在一起？','I was with ___.'],['What did you do next?','接著做了什麼？','After that, I ___.']],
+ [['Where did you go?','你去了哪裡？','I went to ___.'],['How did you get there?','怎麼去的？','I went there by ___.'],['What did you see there?','在那裡看到什麼？','I saw ___.']],
+ [['What was the weather like?','天氣怎麼樣？','It was ___ today.'],['What did you wear?','你穿了什麼？','I wore ___.'],['What did you do outside?','在外面做了什麼？','I ___ outside.']],
+ [['What did you do after school?','放學後做了什麼？','After school, I ___.'],['Where were you?','你在哪裡？','I was at ___.'],['How did you feel?','你覺得怎麼樣？','I felt ___.']],
+ [['What is your friend’s name?','朋友叫什麼名字？','My friend’s name is ___.'],['What do you like to do together?','你們喜歡一起做什麼？','We like to ___.'],['Why do you like them?','為什麼喜歡他？','I like ___ because ___.']],
+ [['What was hard today?','今天什麼很難？','___ was hard for me.'],['Why was it hard?','為什麼很難？','It was hard because ___.'],['What did you do?','你怎麼做？','So I ___.']],
+ [['What did you see on the way home?','回家路上看到什麼？','On the way home, I saw ___.'],['What was it doing?','它在做什麼？','It was ___.'],['How did you feel?','你覺得怎麼樣？','I felt ___.']],
+ [['What do you want to do tomorrow?','明天想做什麼？','Tomorrow I want to ___.'],['Who will you do it with?','和誰一起？','I will do it with ___.'],['Why?','為什麼？','because ___.']]];
 const STARTERS={1:['Today I ___.','It was ___.'],2:['After that, I ___.','I felt ___ because ___.'],3:['First, I ___. Then, ___.','The best part of my day was ___.','Finally, ___.']};
 const VOCAB={
  1:'happy:開心,big:大,small:小,fun:好玩,cat:貓,dog:狗,ball:球,cake:蛋糕,play:玩,run:跑,eat:吃,park:公園,sun:太陽,rain:雨,book:書,friend:朋友,jump:跳,hot:熱,cold:冷,toy:玩具,mom:媽媽,dad:爸爸,red:紅色,swim:游泳',
@@ -261,14 +284,32 @@ const AVS={
  robot:BG('#e3e8f5')+'<path d="M50 14 v12" stroke="#5b6580" stroke-width="3"/><circle cx="50" cy="12" r="5" fill="#e0464b"/><rect x="18" y="26" width="64" height="56" rx="14" fill="#9fb0d6"/><rect x="12" y="46" width="8" height="16" rx="3" fill="#7c8db3"/><rect x="80" y="46" width="8" height="16" rx="3" fill="#7c8db3"/><circle cx="37" cy="50" r="9" fill="#fff"/><circle cx="63" cy="50" r="9" fill="#fff"/><circle cx="37" cy="50" r="4.5" fill="#2f5bea"/><circle cx="63" cy="50" r="4.5" fill="#2f5bea"/><rect x="36" y="64" width="28" height="9" rx="4" fill="#fff"/><path d="M43 64 v9 M50 64 v9 M57 64 v9" stroke="#9fb0d6" stroke-width="2"/>',
  dino:BG('#e1f6f1')+'<path d="M30 30 l6 -14 l6 12 l6 -15 l6 15 l6 -12 l6 14z" fill="#2f9e86"/><circle cx="50" cy="57" r="31" fill="#4fc1a6"/>'+E(52)+CK(64)+'<circle cx="45" cy="62" r="1.8" fill="#1d5c4e"/><circle cx="55" cy="62" r="1.8" fill="#1d5c4e"/><path d="M38 69 q12 10 24 0" stroke="#1d5c4e" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M44 70 l2 4 l2 -3 M52 70 l2 3 l2 -4" stroke="#fff" stroke-width="2" fill="none"/>'};
 const AVID=Object.keys(AVS);
+const noBG=x=>x.replace(/^<rect width="100" height="100" fill="[^"]+"\/>/,'');
+const BUD={
+ mp:{n:'Momo',s:'<path d="M30 30 L24 8 L40 24Z M70 30 L76 8 L60 24Z" fill="#ffd23f"/><ellipse cx="50" cy="58" rx="36" ry="34" fill="#ff8fb8"/><circle cx="50" cy="48" r="16" fill="#fff"/><circle cx="52" cy="50" r="8" fill="#222"/><circle cx="49" cy="46" r="3" fill="#fff"/><path d="M36 72 q14 12 28 0" stroke="#222" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M47 75 v6 h6 v-6" fill="#fff" stroke="#222" stroke-width="1.5"/><ellipse cx="16" cy="62" rx="6" ry="10" fill="#ff8fb8"/><ellipse cx="84" cy="62" rx="6" ry="10" fill="#ff8fb8"/>'},
+ mb:{n:'Bubu',s:'<g fill="#5b9dff"><circle cx="30" cy="40" r="16"/><circle cx="50" cy="30" r="18"/><circle cx="70" cy="40" r="16"/><circle cx="26" cy="62" r="16"/><circle cx="74" cy="62" r="16"/><circle cx="50" cy="62" r="28"/></g><rect x="34" y="84" width="10" height="10" rx="4" fill="#3f7be0"/><rect x="56" y="84" width="10" height="10" rx="4" fill="#3f7be0"/>'+'<circle cx="40" cy="52" r="7" fill="#fff"/><circle cx="60" cy="52" r="7" fill="#fff"/><circle cx="41" cy="53" r="3.5" fill="#222"/><circle cx="61" cy="53" r="3.5" fill="#222"/><path d="M42 68 q8 7 16 0" stroke="#222" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="30" cy="64" r="4" fill="#ff9bb0" opacity=".7"/><circle cx="70" cy="64" r="4" fill="#ff9bb0" opacity=".7"/>'},
+ mg:{n:'Gogo',s:'<path d="M38 26 Q32 12 26 10 M62 26 Q68 12 74 10" stroke="#3a9a52" stroke-width="3" fill="none"/><circle cx="26" cy="10" r="5" fill="#ffd23f"/><circle cx="74" cy="10" r="5" fill="#ffd23f"/><circle cx="50" cy="56" r="36" fill="#5fcf7a"/><circle cx="36" cy="50" r="8" fill="#fff"/><circle cx="64" cy="50" r="8" fill="#fff"/><circle cx="37" cy="51" r="4" fill="#222"/><circle cx="65" cy="51" r="4" fill="#222"/><path d="M30 66 q20 18 40 0z" fill="#2b6b3a"/><path d="M38 66 l4 6 l4 -6 M54 66 l4 6 l4 -6" fill="#fff"/><circle cx="24" cy="64" r="5" fill="#ff9bb0" opacity=".6"/><circle cx="76" cy="64" r="5" fill="#ff9bb0" opacity=".6"/>'},
+ cat:{n:'Kiki',s:noBG(AVS.cat)},
+ dino:{n:'Dino',s:noBG(AVS.dino)},
+ dog:{n:'Lucky',s:noBG(AVS.dog)},
+ crab:{n:'Crabby',s:'<path d="M26 66 l-12 10 M30 72 l-10 14 M74 66 l12 10 M70 72 l10 14" stroke="#e0464b" stroke-width="4" stroke-linecap="round"/><path d="M18 40 q-12 -6 -6 -18 q10 -2 14 8 q-2 -6 4 -8 q4 8 -4 18z" fill="#f05a4f"/><path d="M82 40 q12 -6 6 -18 q-10 -2 -14 8 q2 -6 -4 -8 q-4 8 4 18z" fill="#f05a4f"/><path d="M24 42 l10 12 M76 42 l-10 12" stroke="#f05a4f" stroke-width="5"/><ellipse cx="50" cy="62" rx="30" ry="20" fill="#f05a4f"/><path d="M42 44 v-14 M58 44 v-14" stroke="#c43b35" stroke-width="3"/><circle cx="42" cy="28" r="7" fill="#fff"/><circle cx="58" cy="28" r="7" fill="#fff"/><circle cx="43" cy="29" r="3.5" fill="#222"/><circle cx="59" cy="29" r="3.5" fill="#222"/><path d="M42 66 q8 7 16 0" stroke="#7a1f1a" stroke-width="3" fill="none" stroke-linecap="round"/>'},
+ hermit:{n:'Shelly',s:'<circle cx="58" cy="48" r="32" fill="#f3d3b0"/><circle cx="58" cy="48" r="22" fill="#e9b98b"/><circle cx="58" cy="48" r="13" fill="#f3d3b0"/><circle cx="58" cy="48" r="5" fill="#d79a62"/><path d="M58 16 q30 6 30 32" stroke="#d79a62" stroke-width="2" fill="none"/><ellipse cx="30" cy="70" rx="22" ry="14" fill="#ff8a4c"/><path d="M22 58 v-12 M34 58 v-12" stroke="#d96a30" stroke-width="3"/><circle cx="22" cy="44" r="6" fill="#fff"/><circle cx="34" cy="44" r="6" fill="#fff"/><circle cx="23" cy="45" r="3" fill="#222"/><circle cx="35" cy="45" r="3" fill="#222"/><path d="M24 72 q6 5 12 0" stroke="#7a2f10" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M12 80 l-6 8 M20 82 l-4 10 M40 82 l2 10" stroke="#ff8a4c" stroke-width="3.5" stroke-linecap="round"/>'}};
+const budOf=k=>BUD[(k&&k.buddy)||'mg']||BUD.mg;
+const budGrid=cur=>`<div class="avs">${Object.entries(BUD).map(([k,b])=>`<button class="${k===(cur||'mg')?'on':''}" data-a="setbuddy" data-v="${k}" aria-label="${b.n}" style="background:var(--bg)"><svg viewBox="0 0 100 100">${b.s}</svg></button>`).join('')}</div>`;
 const avGrid=(cur,act)=>`<div class="avs">${AVID.map(a=>`<button class="${a===cur?'on':''}" data-a="${act}" data-v="${a}" aria-label="${a}"><svg viewBox="0 0 100 100">${AVS[a]}</svg></button>`).join('')}</div>`;
 const canSpeak='speechSynthesis' in window;
-let VOICE=null;
+let VOICE=null,VOICE_OK=null;
 const NOVEL=/Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Fred|Junior|Kathy|Ralph|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley/i;
-function pickVoice(){if(!canSpeak)return;const vs=speechSynthesis.getVoices().filter(v=>/^en[-_](US|GB|AU|IE|CA)/i.test(v.lang)&&!NOVEL.test(v.name));let best=null,bs=-1;for(const v of vs){let sc=0;if(/premium/i.test(v.name))sc+=1;if(/enhanced|natural|neural/i.test(v.name))sc+=3;if(/Ava|Samantha|Zoe|Allison|Susan|Evan|Nathan|Serena|Daniel|Karen|Moira/i.test(v.name))sc+=2;if(/^en[-_]US/i.test(v.lang))sc+=1;if(sc>bs){bs=sc;best=v}}VOICE=best}
+const VPREF={f:['Samantha','Karen','Moira','Tessa','Nicky','Allison','Ava','Susan','Zoe','Victoria','Kate','Serena'],m:['Daniel','Aaron','Arthur','Oliver','Tom','Alex','Evan','Nathan','Rishi','Gordon','Lee']};
+function pickVoice(){if(!canSpeak)return;const vs=speechSynthesis.getVoices().filter(v=>/^en[-_]/i.test(v.lang)&&!NOVEL.test(v.name));if(!vs.length){VOICE=null;return}
+ const g=(settings&&settings.vg)||'f',pref=VPREF[g];let best=null;
+ for(const n of pref){const plain=vs.find(v=>v.name.split(/[ (]/)[0]===n&&!/premium|enhanced/i.test(v.name));const any=vs.find(v=>v.name.split(/[ (]/)[0]===n);if(plain||any){best=plain||any;break}}
+ VOICE=best||vs.find(v=>/^en[-_]US/i.test(v.lang))||vs[0];VOICE_OK=null}
+const RATE=()=>({slow:.72,normal:.88,fast:1.02})[(settings&&settings.vr)||'normal']||.88;
 if(canSpeak){pickVoice();try{speechSynthesis.addEventListener('voiceschanged',pickVoice)}catch(e){}}
-let VOICE_OK=null;window._utt=[];
-function say(list,done,rate=.8){
+window._utt=[];
+function say(list,done,rate){
+ if(rate==null)rate=RATE();
  if(!canSpeak){if(done)done();return}
  const arr=Array.isArray(list)?list:[list];let fired=false;const fin=()=>{if(!fired){fired=true;if(done)done()}};
  const go=useV=>{let started=false;
@@ -283,7 +324,7 @@ function say(list,done,rate=.8){
  if(done)setTimeout(fin,3500+arr.join(' ').length*120);
 }
 const speak=t=>say(t);
-const spellSay=w=>say([...w.toUpperCase().replace(/[^A-Z]/g,'')].join(', ')+'. '+w+'.',null,.7);
+const spellSay=w=>say([...w.toUpperCase().replace(/[^A-Z]/g,'')].join(', ')+'. '+w+'.',null,RATE()*.85);
 let T2S=null,S2T=null;
 const ZHN=()=>settings.zh==='simp'?'Simplified Chinese (简体中文)':'${ZHN()} (繁體中文)';
 function loadScript(urls){return new Promise((ok,no)=>{let i=0;const nx=()=>{if(i>=urls.length){no();return}const sc=document.createElement('script');let done=false;const tm=setTimeout(()=>{if(!done){done=true;sc.remove();nx()}},7000);sc.src=urls[i++];sc.onload=()=>{if(!done){done=true;clearTimeout(tm);ok()}};sc.onerror=()=>{if(!done){done=true;clearTimeout(tm);nx()}};document.head.appendChild(sc)};nx()})}
@@ -319,17 +360,17 @@ function lookup(q){
 const TYPES={spelling:['Spelling','拼字'],tense:['Tense','時態'],capital:['Capital','大寫'],punctuation:['Full stop','標點'],grammar:['Grammar','文法']};
 
 /* ---------- state & storage ---------- */
-let settings={pin:'',kids:[]},entries={},cards={},ready=false,mode='loading',note='';
+let settings={pin:'',kids:[]},entries={},cards={},weeks={},ready=false,mode='loading',note='';
 
 const st={view:'who',kid:null,date:null,draft:'',fb:null,checking:false,parent:false,wk:0,pic:null,typeMs:0,last:0,edit:null,pinIn:'',confirmDel:false};
 const kidBy=id=>settings.kids.find(k=>k.id===id);
 const eid=(k,d)=>'e_'+k+'_'+d;
-function lsLoad(){try{const o=JSON.parse(localStorage.getItem('lwd1')||'{}');if(o.settings)settings=o.settings;if(o.entries)entries=o.entries;if(o.cards)cards=o.cards}catch(e){}}
-function lsSave(){try{localStorage.setItem('lwd1',JSON.stringify({settings,entries,cards}))}catch(e){}}
+function lsLoad(){try{const o=JSON.parse(localStorage.getItem('lwd1')||'{}');if(o.settings)settings=o.settings;if(o.entries)entries=o.entries;if(o.cards)cards=o.cards;if(o.weeks)weeks=o.weeks}catch(e){}}
+function lsSave(){try{localStorage.setItem('lwd1',JSON.stringify({settings,entries,cards,weeks}))}catch(e){}}
 async function saveSettings(){lsSave()}
 async function saveEntry(e){entries[e.id]=e;lsSave()}
 
-function init(){lsLoad();mode='local';ready=true;render();loadZh()}
+function init(){lsLoad();mode='local';ready=true;pickVoice();render();loadZh()}
 async function aiJson(prompt,mt=1500){
  const key=(settings.apiKey||'').trim();if(!key)throw {code:'nokey'};
  let r;try{r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
@@ -422,10 +463,12 @@ function vWrite(){
  const prevH=prev?`<details class="card prev" style="padding:12px 16px"><summary style="cursor:pointer;list-style:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>${yest?'Yesterday 昨天':'Last time 上次（'+DAYZ[dIdx(parse(prev.date))]+'）'}你寫了：</b> <span class="mut">${esc(prev.text)}</span></summary><div class="txt" style="font:18px/1.7 ui-rounded,sans-serif;margin-top:8px;white-space:pre-wrap">${esc(prev.text)}</div></details>`:'';
  return top(DAYL[dIdx(date)]+', '+fmt(date),make?'Make-up day 補寫':lv.name,'home')+`<main class="wrap">${prevH}
  <div class="card prompt"><div class="q">${pic?'Look at the picture. What happened?':esc(tp[0])}</div><div class="zh">${pic?'看圖說故事：發生了什麼事？':PY(tp[1])}</div>${pic?pic.s+`<div class="zh" style="margin-top:8px">Words: ${esc(pic.h)}</div>`:''}</div>
- <div class="chips"><button class="chip" data-a="sheet" data-v="ideas">Ideas <i>開頭</i></button><button class="chip" data-a="sheet" data-v="pics">${pic?'Change picture':'Pictures'} <i>看圖</i></button><button class="chip" data-a="sheet" data-v="words" id="wchip">Words <i>單字 ${voc.filter(w=>used(st.draft,w[0])).length}/${voc.length}</i></button><button class="chip" data-a="bot" style="background:var(--blueS);color:var(--blue)">Ask Robo <i style="color:inherit">問機器人</i></button></div>
+ <details class="guide"${st.guideOpen?' open':''}><summary data-a="guideTog">💡 Need ideas? 想不出來？</summary><div class="gq">${(pic?[['What can you see?','你看到什麼？','In the picture, I can see ___.'],['What happened?','發生了什麼事？','Suddenly, ___.'],['How did they feel?','他們覺得怎麼樣？','They felt ___.']]:TQ[TOPICS.indexOf(tp)]||TQ[0]).map(q=>`<button data-a="ins" data-v="${esc(q[2].split('___')[0])}"><b>${esc(q[0])}</b><span>${PY(q[1])}</span><i>${esc(q[2])}</i></button>`).join('')}</div></details>
+ <div class="chips"><button class="chip" data-a="sheet" data-v="pics">${pic?'Change picture':'Pictures'} <i>看圖</i></button><button class="chip" data-a="sheet" data-v="words" id="wchip">Words <i>單字 ${voc.filter(w=>used(st.draft,w[0])).length}/${voc.length}</i></button></div>
  <div class="page"><textarea id="ta" rows="6" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Start writing here…" aria-label="Your diary">${esc(st.draft)}</textarea></div>
  <div class="meter"><span id="wc">0 words</span><div class="bar"><i id="bar"></i></div><span>goal ${lv.goal}</span></div>
  ${fbH}</main>
+ <button class="buddy ${st.hop?'hop':''}" data-a="bot" aria-label="Ask ${esc(budOf(kid).n)}"><svg viewBox="0 0 100 100">${budOf(kid).s}</svg><span>${esc(budOf(kid).n)}</span></button>
  <div class="dock"><div class="in">${fb&&fb.text!==st.draft.trim()?`<button class="btn pri" data-a="check" ${st.checking?'disabled':''}>${st.checking?'Checking… 檢查中':'Check again 再檢查'}</button>`:fb?`<button class="btn ${e&&e.reviewed?'sec':'pri'}" data-a="review">${e&&e.reviewed?'✓ ':''}Review 看修改</button><button class="btn ${e&&e.reviewed?'pri':'sec'}" data-a="save">Done 完成</button>`:`<button class="btn pri" data-a="check" ${st.checking?'disabled':''}>${st.checking?'Checking… 檢查中':'Check ✓ 檢查'}</button>`}</div></div>`;
 }
 function marked(text,issues){
@@ -460,14 +503,18 @@ async function pinKey(k){
 }
 function vParent(){
  return top('Parent 家長','Children, levels and weekly journals 孩子、難度、週記','who')+`<main class="wrap">
- ${settings.kids.map((k,i)=>{const wk=weekInfo(k,monday(today())),n=wk.filter((w,j)=>j<5&&w.e).length;return `<div class="card"><div class="row">${avatar(k,i,52)}<div style="flex:1"><h2 style="margin:0">${esc(k.name)}</h2><div class="zh">Age ${k.age} · ${LEVELS[k.level].name} · ${k.mode==='strict'?'Strict 嚴格':'Simple 簡單'} · this week ${n}/5</div></div></div>
+ ${settings.kids.map((k,i)=>{const wk=weekInfo(k,monday(today())),n=wk.filter((w,j)=>j<5&&w.e).length;return `<div class="card"><div class="row">${avatar(k,i,52)}<div style="flex:1"><h2 style="margin:0">${esc(k.name)}</h2><div class="zh">Age ${k.age} · ${LEVELS[k.level].name} · this week ${n}/5</div></div></div>
  ${readyUp(k)?`<div class="banner">Ready for ${LEVELS[k.level+1].name}? The last 5 entries met the goal with few mistakes. 最近 5 篇都達標、錯誤很少，可以考慮升級。<br><button class="btn sec" style="margin-top:8px;min-height:44px" data-a="levelup" data-v="${esc(k.id)}">Level up 升級</button></div>`:''}
  <div class="row" style="margin-top:12px"><button class="btn pri" style="flex:1" data-a="week" data-v="${esc(k.id)}">Weekly journal 週記</button><button class="btn sec" data-a="editkid" data-v="${esc(k.id)}">Edit 編輯</button></div></div>`}).join('')}
  <button class="btn sec full" data-a="editkid" data-v="">+ Add a child 新增孩子</button>
- <div class="card" style="margin-top:14px"><h2>Chinese 中文顯示</h2><div class="row"><button class="btn ${settings.zh==='simp'?'sec':'pri'}" style="flex:1" data-a="setZh" data-v="trad">繁體字</button><button class="btn ${settings.zh==='simp'?'pri':'sec'}" style="flex:1" data-a="setZh" data-v="simp">简体字</button></div>
+ <div class="card" style="margin-top:14px"><h2>Daily openers 每日開頭</h2><p class="zh" style="margin-top:-4px">Each day starts with a fixed opener so the week reads as one journal. 每天自動帶好開頭，一週連成一篇。</p><div class="choice">${Object.entries(OPENERS).map(([k,o])=>`<button data-a="setOpener" data-v="${k}" class="${(settings.opener||'A')===k?'on':''}"><b>${k} · ${o.n}</b><p>${esc(o.d.slice(0,3).join(' … '))}…</p></button>`).join('')}</div></div>
+ <div class="card"><h2>Voice 聲音</h2><div class="row"><button class="btn ${(settings.vg||'f')==='f'?'pri':'sec'}" style="flex:1" data-a="setVg" data-v="f">Female 女聲</button><button class="btn ${settings.vg==='m'?'pri':'sec'}" style="flex:1" data-a="setVg" data-v="m">Male 男聲</button></div>
+ <div class="row" style="margin-top:10px">${[['slow','Slow 慢'],['normal','Normal 正常'],['fast','Fast 快']].map(([k,l])=>`<button class="btn ${(settings.vr||'normal')===k?'pri':'sec'}" style="flex:1;font-size:15px;padding:0 6px" data-a="setVr" data-v="${k}">${l}</button>`).join('')}</div>
+ <button class="btn ghost full" style="margin-top:6px" data-a="testSound">▶ Test 試聽${VOICE?' · '+esc(VOICE.name):''}</button></div>
+ <div class="card"><h2>Chinese 中文顯示</h2><div class="row"><button class="btn ${settings.zh==='simp'?'sec':'pri'}" style="flex:1" data-a="setZh" data-v="trad">繁體字</button><button class="btn ${settings.zh==='simp'?'pri':'sec'}" style="flex:1" data-a="setZh" data-v="simp">简体字</button></div>
  <div class="tg"><div><b>Pinyin on key words 重點字加拼音</b><div class="zh">e.g. 今天 with jīn tiān 顯示在字上面</div></div><button class="sw ${settings.py?'on':''}" data-a="togglePy" aria-label="Pinyin" aria-pressed="${settings.py?'true':'false'}"></button></div>
  <p class="zh" style="margin:10px 0 0">Needs internet the first time. 第一次切換需要網路載入。</p></div>
- <div class="card"><h2>Settings 設定</h2><div class="list"><div class="it"><span>Test sound 測試聲音</span><button class="ghost" data-a="testSound">Play ›</button></div><div class="it"><span>Change PIN 更改密碼</span><button class="ghost" data-a="resetpin">Change ›</button></div>
+ <div class="card"><h2>Settings 設定</h2><div class="list"><div class="it"><span>Change PIN 更改密碼</span><button class="ghost" data-a="resetpin">Change ›</button></div>
  </div></div>
  <div class="card"><h2>AI checking 批改設定</h2><p class="zh" style="margin-top:-4px">${settings.apiKey?'DeepSeek key saved ✓ 已儲存金鑰':'Paste your DeepSeek API key. 貼上 DeepSeek API 金鑰。'}</p>
  <input class="t" id="key" type="password" autocomplete="off" placeholder="sk-..." value="${esc(settings.apiKey||'')}"><div class="row" style="margin-top:10px"><button class="btn pri" style="flex:1" data-a="savekey">Save 儲存</button><button class="btn sec" data-a="testkey">Test 測試</button></div></div>
@@ -482,7 +529,6 @@ function vEdit(){
  <label class="f">Avatar 頭像</label>${avGrid(e.avatar,'pickA')}
  <label class="f" for="ag">Age 年齡</label><select class="t" id="ag">${[4,5,6,7,8,9,10,11,12].map(a=>`<option ${a===e.age?'selected':''}>${a}</option>`).join('')}</select>
  <label class="f">Level 難度</label><div class="choice">${[1,2,3].map(l=>`<button data-a="pickL" data-v="${l}" class="${e.level===l?'on':''}"><b>${LEVELS[l].name}</b> <span class="zh">${LEVELS[l].zh}</span> ${l===sl?'<span class="tag g">Suggested 建議</span>':''}<p>${LEVELS[l].desc}</p></button>`).join('')}</div>
- <label class="f">Checking 批改方式</label><div class="choice">${['simple','strict'].map(m=>`<button data-a="pickM" data-v="${m}" class="${e.mode===m?'on':''}"><b>${MODES[m].name}</b> ${m===sm?'<span class="tag g">Suggested 建議</span>':''}<p>${MODES[m].desc}</p></button>`).join('')}</div>
  <p class="zh">We suggest a level from the age. You can change it any time. 系統依年齡建議難度，之後隨時可以調整。</p>
  <button class="btn pri full" style="margin-top:8px" data-a="savekid">Save 儲存</button>
  ${e.id?`<button class="btn ghost danger full" style="margin-top:8px" data-a="delkid">${st.confirmDel?'Tap again to delete this child 再按一次確認刪除':'Delete child 刪除'}</button>`:''}</div></main>`;
@@ -499,7 +545,7 @@ function diffMarks(text,issues){
  (issues||[]).forEach((x,idx)=>{
   const W=String(x.wrong||'').trim().split(/\s+/).filter(Boolean),Rw=String(x.right||'').trim().split(/\s+/).filter(Boolean);
   if(!W.length&&!Rw.length)return;const G=wordDiff(W,Rw);if(!G.length)return;
-  let toks=null;if(W.length){const re=new RegExp(W.map(rx).join('\\s+'),'gi');let m;
+  let toks=null;if(W.length){const re=new RegExp('(?<![A-Za-z0-9\'])'+W.map(rx).join('\\s+')+'(?![A-Za-z0-9])','gi');let m;
    while((m=re.exec(text))){const s0=m.index,tk=[],r2=/\S+/g;let t;while((t=r2.exec(m[0])))tk.push({s:s0+t.index,e:s0+t.index+t[0].length});
     if(!used.some(u=>tk.some(k=>k.s<u.e&&k.e>u.s))){toks=tk;break}if(!m[0].length)re.lastIndex++}}
   G.forEach(g=>{const w=W.slice(g.a,g.ae).join(' '),r=g.b.join(' ');
@@ -507,7 +553,7 @@ function diffMarks(text,issues){
    let s=null,e=null;
    if(toks){if(g.ae>g.a){s=toks[g.a].s;e=toks[g.ae-1].e}else{const k=toks[g.a];s=e=k?k.s:toks[toks.length-1].e}}
    else if(w){const m2=new RegExp('\\b'+w.split(' ').map(rx).join('\\s+')+'\\b','i').exec(text);if(m2&&!used.some(u=>m2.index<u.e&&m2.index+m2[0].length>u.s)){s=m2.index;e=s+m2[0].length}}
-   if(s!=null&&e>s)used.push({s,e});out.push({idx,type,w,r,s,e,tip:x.tip,tipZh:x.tipZh})})});
+   if(s!=null&&out.some(o=>o.s===s&&o.e===e))return;if(s!=null&&e>s)used.push({s,e});out.push({idx,type,w,r,s,e,tip:x.tip,tipZh:x.tipZh})})});
  const loc=out.filter(o=>o.s!=null).sort((a,b)=>a.s-b.s||a.e-b.e),un=out.filter(o=>o.s==null);
  const all=[...loc,...un];all.forEach((o,k)=>o.n=k+1);return {loc,un,all};
 }
@@ -530,19 +576,37 @@ function weekBook(kid,mon){
   return {d:w.d,i,segs,fx,checked:!!f,makeup:!!e.makeup,better:b,ups}});
  const end=addDays(mon,6),newW=(cards[kid.id]||[]).filter(c=>c.first>=ymd(mon)&&c.first<=ymd(end)).map(c=>c.w);
  const last=days.length?days[days.length-1].d:addDays(mon,4);
- return {rows,n,words,fixes,cnt,newW,range:fmt(mon)+' – '+fmt(last)+', '+last.getFullYear(),plan:Math.max(5,days.length)};
+ return {mon,rows,n,words,fixes,cnt,newW,range:fmt(mon)+' – '+fmt(last)+', '+last.getFullYear(),plan:Math.max(5,days.length)};
 }
-function fixNote(f){return f.t==='capital'?' (capital)':f.t==='punctuation'?' (full stop)':!f.w?' (add)':!f.r?' (delete)':''}
+function fixNote(f){return f.t==='capital'?' (capital)':f.t==='punctuation'?' (punctuation)':!f.w?' (add)':!f.r?' (delete)':''}
 function a4HTML(kid,B){
+ const TC=weeks[weekKey(kid,B.mon)]||null,box=(t,big)=>`<div class="sug"><span class="sl">✎ suggested</span><div style="${big?'font:italic 700 22px Georgia,serif':'font:italic 16px/1.55 Georgia,serif'}">${esc(t)}</div></div>`;
  const segH=sg=>sg.map(x=>x.sup?`<sup>${esc(x.sup)}</sup>`:x.u?`<u>${esc(x.t)}</u>`:esc(x.t)).join('');
  return `<div class="hd"><div><b>My Weekly Journal</b><span>${esc(B.range)}</span></div><div style="text-align:right"><b style="font-size:20px">${esc(kid.name)}</b><span>${LEVELS[kid.level].name} · ${B.n}/5 days · ${B.words} words · ${B.fixes} fix${B.fixes===1?'':'es'}</span></div></div>
- <div class="bd"><div class="tb"><div class="th">Day</div><div class="th">What I wrote</div><div class="th">Corrections</div>
+ <div class="bd">${TC?box(TC.title,1):st.tcBusy?'<div class="sug" style="color:#98a2bd">Writing a title… 正在想標題…</div>':''}<div class="tb"><div class="th">Day</div><div class="th">What I wrote</div><div class="th">Corrections</div>
  ${B.rows.map(r=>`<div class="dy"><b>${DAYS[r.i]}</b><span>${r.d.getMonth()+1}/${r.d.getDate()}</span>${r.i>4?'<span>bonus</span>':''}${r.makeup?'<span>make-up</span>':''}</div>
   <div class="wr">${r.none?'<span style="color:#98a2bd">(no entry)</span>':segH(r.segs)}</div>
   <div class="cr">${r.none?'':r.fx.length?r.fx.map(f=>`<div><span class="n">${f.n}.</span> ${f.w?`<span class="w">${esc(f.w)}</span>`:''}${f.w&&f.r?' → ':''}<span class="r">${f.w?'':'+ '}${esc(f.r)}</span><span class="n" style="font-weight:600">${fixNote(f)}</span></div>`).join(''):r.checked?'<div style="color:#178a57;font-weight:800">✓ No mistakes</div>':'<div style="color:#98a2bd">–</div>'}</div>`).join('')}</div>
  ${B.rows.some(r=>r.better)?`<h4>A better way — my week</h4><div class="sm" style="color:#7a839c;margin:-2px 0 6px"><u style="text-decoration:underline wavy #e08a24 1.5px;text-underline-offset:4px">wavy line</u> = nice words to learn: linking words, describing words, feelings</div><div class="bt2">${B.rows.filter(r=>r.better).map(r=>`<p><b>${DAYL[r.i]}:</b> ${betterHTML(r.better,r.ups,false).replace(/<span class="wav">/g,'<u>').replace(/<\/span>/g,'</u>')}</p>`).join('')}</div>`:''}
+ ${TC?`<div style="margin-top:14px">${box(TC.closing,0)}</div>`:''}
  <h4>This week</h4>${Object.keys(B.cnt).length?`<div class="sm"><b>To practise:</b> ${Object.entries(B.cnt).map(([k,v])=>TYPES[k][0]+' ×'+v).join(' · ')}</div>`:''}${B.newW.length?`<div class="sm"><b>New words:</b> ${esc(B.newW.join(', '))}</div>`:''}
  <div class="sm" style="margin-top:10px"><b>Teacher’s comment:</b></div><div class="ln"></div><div class="ln"></div></div>`;
+}
+function weekKey(kid,mon){return kid.id+'_'+ymd(mon)}
+function weekSig(B){return B.rows.filter(r=>!r.none).map(r=>r.i+':'+(r.better||r.segs.map(x=>x.t||'').join('')).length).join('|')}
+async function genTC(kid,mon,B){
+ const k=weekKey(kid,mon),sig=weekSig(B);if(!settings.apiKey||!B.n||st.tcBusy===k)return;const w=weeks[k];if(w&&w.sig===sig)return;st.tcFail=st.tcFail||{};if(st.tcFail[k]===sig)return;
+ st.tcBusy=k;
+ const txt=B.rows.filter(r=>!r.none).map(r=>DAYL[r.i]+': '+(r.better||r.segs.map(x=>x.t||'').join(''))).join('\n');
+ try{const r=await aiJson(`A ${kid.age}-year-old child learning English (${LEVELS[kid.level].name}) wrote this week's diary:
+${txt}
+Write for this weekly journal, at the child's own level, in correct and natural English:
+"title": a short, fun title for the week (2 to 6 words, Title Case, no quotes, no full stop).
+"closing": one closing sentence that sums up the week, using a linking word (e.g. "This week I liked ... because ..."), at most ${kid.level===1?12:kid.level===2?16:20} words.
+Return ONLY a json object {"title":"...","closing":"..."}`,300);
+  const t=fixArticles(String(r.title||'').replace(/["“”.]+/g,'').trim()),c=fixArticles(String(r.closing||'').trim());
+  if(t&&c){weeks[k]={title:t,closing:/[.!?]$/.test(c)?c:c+'.',sig};lsSave()}else st.tcFail[k]=sig}catch(e){st.tcFail[k]=sig}
+ st.tcBusy='';if(st.view==='week')render();
 }
 function vWeek(){
  const kid=kidBy(st.kid),mon=addDays(monday(today()),st.wk*7),B=weekBook(kid,mon);
@@ -562,7 +626,7 @@ function render(){
  const v={cards:vCards,past:vPast,pastOne:vPastOne,who:vWho,home:vHome,write:vWrite,pin:vPin,parent:vParent,edit:vEdit,week:vWeek}[st.view]||vWho;
  $('#app').innerHTML=v();window.scrollTo(0,0);
  if(st.view==='write')updMeter();
- if(st.view==='week')fitA4();
+ if(st.view==='week'){fitA4();const kid=kidBy(st.kid),mon=addDays(monday(today()),st.wk*7);genTC(kid,mon,weekBook(kid,mon))}
 }
 
 /* ---------- writing ---------- */
@@ -573,7 +637,7 @@ function updMeter(){
 }
 function openWrite(date){
  const kid=kidBy(st.kid),e=entries[eid(kid.id,date)];
- Object.assign(st,{view:'write',caret:null,bot:null,date,draft:e?e.text:'',fb:e&&e.fb?{...e.fb,text:e.text}:null,pic:e?e.pic||null:null,typeMs:0,last:0});
+ Object.assign(st,{view:'write',caret:null,bot:null,guideOpen:false,date,draft:e?e.text:openerFor(date),fb:e&&e.fb?{...e.fb,text:e.text}:null,pic:e?e.pic||null:null,typeMs:0,last:0});
  render();
 }
 function insert(t){
@@ -608,17 +672,13 @@ Before you answer, silently check "better": no repeated idea, no repeated senten
 "upgrades": EVERY real upgrade in "better" that the child can learn and reuse, copied EXACTLY as it appears in "better" (1 to 5 words each, never a whole sentence). A real upgrade is: a linking word that joins ideas (because, so, after that, when, before, but, although, then); a more vivid describing word replacing a plain one (happy -> excited, fun -> exciting, good -> delicious); a feeling or sense detail (I felt proud, it smelled yummy); a time or order opener (After school, In the morning, Finally). NOT an upgrade: words the child already wrote, or only adding really / very / so. Each has "zh": a short ${ZHN()} note saying which kind of upgrade it is and why (max 18 characters).
 "star": the single nicest sentence from "better" that contains at least one upgrade, copied exactly, with "zh": its meaning in ${ZHN()}.`}
 function buildPrompt(kid,text){
- const tp=topicFor(kid,st.date),voc=vocabFor(kid.level,hash(st.date+kid.id)).map(w=>w[0]),strict=kid.mode==='strict',max=kid.level===1?3:strict?6:5;
- return `You are a kind, encouraging English teacher checking a short diary entry written by a ${kid.age}-year-old child who is learning English as a second language.
-Correction mode: ${strict?'STRICT':'SIMPLE'}.
-SIMPLE mode flags only: spelling mistakes; a / an mistakes (a new room, an apple); verb tense mistakes (a diary about today should use the past tense for finished actions); a missing capital letter at the start of a sentence or for "I"; a missing full stop or question mark at the end of a sentence. Ignore everything else.
-STRICT mode flags all of those plus grammar mistakes (articles, plurals, subject-verb agreement, word order, missing words, prepositions).
-Check EVERY verb: anything that already happened must be in the past tense (go -> went, write -> wrote). Verbs joined by "and" or "then" must use the same tense (I write homework and I went to bed -> I wrote homework and I went to bed). A word wrongly split into two (home work -> homework, foot ball -> football, birth day -> birthday) is a spelling mistake.
-Flag at most ${max} mistakes, the most important first. If the same mistake repeats, flag it once.
-Return ONLY a JSON object, no other text:
-{"issues":[{"type":"spelling|tense|capital|punctuation|grammar","wrong":"the exact wrong words copied from the entry (1-4 words)","right":"the corrected words","tip":"very short tip in simple English, max 8 words","tipZh":"short note in ${ZHN()}, max 15 characters"}],
-"corrected":"the full entry with only the flagged mistakes fixed",
-"sentences":[{"before":"one sentence from the entry that has a flagged mistake, copied exactly","after":"that same sentence with its mistakes fixed"}],
+ const tp=topicFor(kid,st.date),voc=vocabFor(kid.level,hash(st.date+kid.id)).map(w=>w[0]),op=openerFor(st.date).trim();
+ return `You are a kind, careful English teacher checking a diary entry written by a ${kid.age}-year-old child who is learning English as a second language.
+STEP 1 - "corrected": copy the entry and fix EVERY mistake, changing as little as possible. Fix: spelling; words wrongly split (home work -> homework); a / an; singular / plural; verb tense (things that already happened are in the past tense; verbs joined by and / then use the same tense); subject-verb agreement; missing or wrong small words (to, the, at, in); word order; capital letters (sentence starts, I, names, days, months); punctuation (end every sentence with . ? or !, add needed commas, and split run-on sentences into separate sentences). Keep the child's own words, ideas and sentence order. Do not make it fancier. ${op?`If the entry starts with "${op}", keep that opening.`:''}
+STEP 2 - "notes": one item for each change you made in "corrected".
+Return ONLY a JSON object:
+{"corrected":"the fully corrected entry",
+"notes":[{"wrong":"the exact words from the entry","right":"the fixed words","type":"spelling|tense|capital|punctuation|grammar","tip":"very short tip in simple English, max 8 words","tipZh":"short note in ${ZHN()}, max 15 characters"}],
 "better":"the polished rewrite",
 "upgrades":[{"phrase":"exact upgraded words from better","zh":"為什麼更好"}],
 "star":{"en":"one sentence copied from better","zh":"中文意思"},
@@ -627,12 +687,49 @@ Return ONLY a JSON object, no other text:
 "next":"one tiny tip for next time, in simple English",
 "nextZh":"the tip in ${ZHN()}"}
 ${betterRules(kid)}
-If there are no mistakes, "issues" is an empty array.
+${op?`"better" also starts with "${op.replace(/[ ,.]+$/,'')}".`:''}
 Today's question: "${tp[0]}". Words the child was asked to try: ${voc.join(', ')}.
 The entry:
-"""
-${text}
-"""`;
+<<${text}>>`;
+}
+const PASTV={go:'went',goes:'went',eat:'ate',eats:'ate',see:'saw',sees:'saw',have:'had',has:'had',is:'was',are:'were',am:'was',do:'did',does:'did',make:'made',take:'took',get:'got',come:'came',write:'wrote',run:'ran',swim:'swam',sing:'sang',sit:'sat',sleep:'slept',wake:'woke',buy:'bought',bring:'brought',think:'thought',teach:'taught',catch:'caught',give:'gave',find:'found',say:'said',tell:'told',feel:'felt',leave:'left',meet:'met',ride:'rode',drink:'drank',draw:'drew',fly:'flew',fall:'fell',win:'won',lose:'lost',begin:'began',break:'broke',build:'built',can:'could',will:'would',know:'knew',grow:'grew',throw:'threw',wear:'wore',stand:'stood',understand:'understood',hear:'heard',send:'sent',spend:'spent',keep:'kept',sell:'sold',forget:'forgot',hide:'hid',bite:'bit',shoot:'shot',choose:'chose',speak:'spoke',drive:'drove',fight:'fought'};
+const TIPS={capital:['Use a capital letter here.','這裡要大寫'],punctuation:['Add the right punctuation.','加上正確的標點'],spelling:['Check the spelling.','注意拼字'],tense:['It already happened: use the past tense.','已經發生的事用過去式'],grammar:['Fix the grammar here.','注意文法']};
+function lev(a,b){const m=a.length,n=b.length;if(Math.abs(m-n)>3)return 9;const d=Array.from({length:m+1},(_,i)=>[i]);for(let j=1;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n]}
+function classify(w,r){
+ const st2=x=>x.replace(/[^A-Za-z' ]/g,'').toLowerCase().trim();
+ if(w.toLowerCase()===r.toLowerCase())return 'capital';
+ if(st2(w)===st2(r))return 'punctuation';
+ if(w.replace(/\s+/g,'').toLowerCase()===r.replace(/\s+/g,'').toLowerCase())return 'spelling';
+ const W=st2(w).split(' '),Rr=st2(r).split(' ');
+ if(W.length===Rr.length){const diff=W.map((x,i)=>[x,Rr[i]]).filter(([x,y])=>x!==y);if(diff.length===1){const [x,y]=diff[0];
+  if(/^(a|an)$/.test(x)&&/^(a|an)$/.test(y))return 'grammar';
+  if(PASTV[x]===y||y===x+'ed'||y===x+'d'||(x.endsWith('y')&&y===x.slice(0,-1)+'ied')||y===x+x.slice(-1)+'ed')return 'tense';
+  if(x.length>2&&lev(x,y)<=2&&!(y===x+'s'||x===y+'s'||y===x+'es'))return 'spelling'}}
+ return 'grammar';
+}
+function localFix(t){
+ let o=String(t||'').replace(/\s+/g,' ').trim();if(!o)return o;
+ for(const k in SPLITS){if(['every day','in to','in side','out side'].includes(k))continue;o=o.replace(new RegExp('\\b'+k.replace(' ','\\s+')+'\\b','gi'),m=>/^[A-Z]/.test(m)?SPLITS[k][0].toUpperCase()+SPLITS[k].slice(1):SPLITS[k])}
+ o=fixArticles(o).replace(/\bi\b(?!')/g,'I').replace(/\bi'(m|ll|ve|d)\b/g,"I'$1");
+ o=o.replace(/(^|[.!?]\s+)([a-z])/g,(m,p,c)=>p+c.toUpperCase());
+ if(!/[.!?]["”']?$/.test(o))o+='.';
+ return o;
+}
+function deriveIssues(orig,corr,notes){
+ const A=String(orig||'').trim().split(/\s+/).filter(Boolean),B=String(corr||'').trim().split(/\s+/).filter(Boolean);
+ const out=[],G0=[];wordDiff(A,B).forEach(g=>{if(g.ae-g.a===g.b.length&&g.b.length>1){g.b.forEach((w,k)=>{if(A[g.a+k]!==w)G0.push({a:g.a+k,ae:g.a+k+1,b:[w]})})}else G0.push(g)});
+ G0.forEach(g=>{let a=g.a,ae=g.ae,b=g.b.slice();
+  if(ae===a){if(a>0){a--;b=[A[a],...b]}else if(ae<A.length){b=[...b,A[ae]];ae++}}
+  else if(!b.length){if(a>0){a--;b=[A[a]]}else if(ae<A.length){b=[A[ae]];ae++}}
+  const wrong=A.slice(a,ae).join(' '),right=b.join(' ');if(!wrong||wrong===right)return;
+  let type=classify(wrong,right);const lw=wrong.toLowerCase(),lr=right.toLowerCase();
+  const ws=x=>String(x||'').toLowerCase().match(/[a-z']+/g)||[];const LW=ws(wrong),LR=ws(right);
+  const nt=(notes||[]).find(n=>{if(!n||typeof n.wrong!=='string'||typeof n.right!=='string')return false;const NW=ws(n.wrong),NR=ws(n.right);if(n.wrong.trim().toLowerCase()===lw)return true;
+   const ow=LW.some(x=>x.length>1&&NW.includes(x)),orr=LR.some(x=>x.length>1&&!LW.includes(x)&&NR.includes(x));return ow&&orr});
+  if(type==='grammar'&&nt&&TYPES[nt.type])type=nt.type;
+  const art=/^(a|an)$/i.test(wrong.split(' ')[0])&&/^(a|an)$/i.test(right.split(' ')[0])&&type==='grammar';
+  out.push({type,wrong,right,tip:(nt&&nt.tip)||(art?'Use "a" before a consonant sound, "an" before a vowel sound.':TIPS[type][0]),tipZh:(nt&&nt.tipZh)||(art?'子音前用 a，母音前用 an':TIPS[type][1])})});
+ return out;
 }
 function normBetter(r){const s=v=>typeof v==='string'?v:'';const better=s(r&&r.better);
  const ups=(Array.isArray(r&&r.upgrades)?r.upgrades:[]).filter(x=>x&&s(x.phrase)&&better.toLowerCase().includes(s(x.phrase).toLowerCase())).map(x=>({p:s(x.phrase),zh:s(x.zh)})).slice(0,6);
@@ -654,7 +751,7 @@ function keepFixes(nb,issues){
 const SPLITS={'home work':'homework','foot ball':'football','basket ball':'basketball','base ball':'baseball','birth day':'birthday','class room':'classroom','class mate':'classmate','class mates':'classmates','play ground':'playground','bed room':'bedroom','bath room':'bathroom','some thing':'something','some one':'someone','some times':'sometimes','any one':'anyone','any thing':'anything','every one':'everyone','every thing':'everything','every day':'everyday','no body':'nobody','to day':'today','to morrow':'tomorrow','to night':'tonight','up stairs':'upstairs','down stairs':'downstairs','break fast':'breakfast','week end':'weekend','after noon':'afternoon','sun day':'Sunday','water melon':'watermelon','straw berry':'strawberry','butter fly':'butterfly','snow man':'snowman','rain bow':'rainbow','sun flower':'sunflower','pop corn':'popcorn','sun glasses':'sunglasses','in side':'inside','out side':'outside','grand ma':'grandma','grand pa':'grandpa','tooth brush':'toothbrush','note book':'notebook','school bag':'schoolbag','home made':'homemade','him self':'himself','my self':'myself','your self':'yourself','can not':'cannot','in to':'into'};
 function withSplits(text,issues){const out=[...(issues||[])];const t=String(text||'');
  for(const k in SPLITS){if(k==='every day'||k==='in to'||k==='in side'||k==='out side')continue;const re=new RegExp('\\b'+k.replace(' ','\\s+')+'\\b','gi');let m;while((m=re.exec(t))){const w=m[0];if(out.some(x=>x.wrong&&x.wrong.toLowerCase().replace(/\s+/g,' ').includes(k)))break;const right=/^[A-Z]/.test(w)?SPLITS[k][0].toUpperCase()+SPLITS[k].slice(1):SPLITS[k];out.push({type:'spelling',wrong:w,right,tip:'Write it as one word.',tipZh:'這是一個字，要連在一起寫'});break}}
- articleList(t).forEach(a=>{const wr=a.art+' '+a.w;if(out.some(x=>x.wrong&&x.wrong.toLowerCase().includes(wr.toLowerCase())))return;out.push({type:'grammar',wrong:wr,right:a.need+' '+a.w,tip:'Use "a" before a consonant sound, "an" before a vowel sound.',tipZh:'子音前用 a，母音前用 an'})});
+ const seenA={};articleList(t).forEach(a=>{const wr=a.art+' '+a.w,key=a.art.toLowerCase()+'>'+a.need.toLowerCase();seenA[key]=(seenA[key]||0)+1;const have=out.filter(x=>x.wrong&&x.right&&x.wrong.trim().split(/\s+/)[0].toLowerCase()===a.art.toLowerCase()&&x.right.trim().split(/\s+/)[0].toLowerCase()===a.need.toLowerCase()).length;if(have>=seenA[key])return;if(out.some(x=>x.wrong&&x.wrong.toLowerCase().includes(wr.toLowerCase())))return;out.push({type:'grammar',wrong:wr,right:a.need+' '+a.w,tip:'Use "a" before a consonant sound, "an" before a vowel sound.',tipZh:'子音前用 a，母音前用 an'})});
  return out}
 const WEAKW=new Set('really very so too just quite pretty a an the it was is i my to and of'.split(' '));
 function cleanUps(nb,orig){if(!nb||!nb.ups)return nb;const ow=new Set(String(orig||'').toLowerCase().match(/[a-z']+/g)||[]);
@@ -663,10 +760,11 @@ function cleanUps(nb,orig){if(!nb||!nb.ups)return nb;const ow=new Set(String(ori
  return {...nb,ups,star}}
 function norm(r,text){
  const s=v=>typeof v==='string'?v:'';
- const issues=(Array.isArray(r&&r.issues)?r.issues:[]).filter(x=>x&&TYPES[x.type]&&s(x.wrong)).map(x=>({type:x.type,wrong:s(x.wrong),right:s(x.right),tip:s(x.tip),tipZh:s(x.tipZh)})).slice(0,8);
+ const corr=localFix(s(r&&r.corrected)||text),notes=Array.isArray(r&&r.notes)?r.notes:(Array.isArray(r&&r.issues)?r.issues:[]);
+ const issues=deriveIssues(text,corr,notes);
  const sentences=(Array.isArray(r&&r.sentences)?r.sentences:[]).filter(x=>x&&s(x.before)&&s(x.after)).map(x=>({before:s(x.before),after:s(x.after)})).slice(0,8);
  const iss2=withSplits(text,issues);
- return {issues:iss2,sentences,...cleanUps(keepFixes(normBetter(r),iss2),text),corrected:s(r&&r.corrected),praise:s(r&&r.praise)||'Nice work!',praiseZh:s(r&&r.praiseZh),next:s(r&&r.next),nextZh:s(r&&r.nextZh),text};
+ return {issues:iss2,sentences,...cleanUps(keepFixes(normBetter(r),iss2),text),corrected:corr,praise:s(r&&r.praise)||'Nice work!',praiseZh:s(r&&r.praiseZh),next:s(r&&r.next),nextZh:s(r&&r.nextZh),text};
 }
 function entryFrom(text,fb){
  const kid=kidBy(st.kid),id=eid(kid.id,st.date),old=entries[id]||{},voc=vocabFor(kid.level,hash(st.date+kid.id));
@@ -682,7 +780,7 @@ async function check(){
  st.checking=true;render();
  try{const kid=kidBy(st.kid);const r=await aiJson(buildPrompt(kid,text));st.fb=norm(r,text);if(st.fb.better){const sh=cleanUps(keepFixes(await shorten(kid,text,{better:st.fb.better,ups:st.fb.ups,star:st.fb.star}),st.fb.issues),text);Object.assign(st.fb,sh)}await saveEntry(entryFrom(text,st.fb));st.rv={mode:'pen',sel:-1}}
  catch(e){toast(AIERR[e&&e.code]||'Could not check. Try again. 檢查失敗，請再試一次。')}
- st.checking=false;render();if(st.rv)renderReview();
+ st.checking=false;st.hop=true;render();st.hop=false;if(st.rv)renderReview();
 }
 async function saveDraft(){
  const text=st.draft.trim();if(wc(text)<1){toast('Write something first. 先寫一點吧！');return}
@@ -804,7 +902,7 @@ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 const kidCards=()=>cards[st.kid]||(cards[st.kid]=[]);
 function addCard(w,zh,learned){const L=kidCards(),k=w.toLowerCase(),t=ymd(today());let c=L.find(x=>x.w.toLowerCase()===k);
  if(c){c.last=t;if(!learned)c.n=(c.n||1)+1;if(learned)c.ok=true;if(zh&&!c.zh)c.zh=zh}else{L.push({w,zh:zh||'',n:1,first:t,last:t,ok:!!learned})}lsSave()}
-function botNew(){const old=st.bot;st.bot={log:old?old.log:[{ro:'Hi! Which word can’t you spell? Tap the mic and say it.',zh:'嗨！哪個字不會拼？按麥克風說說看，用中文說最準喔。'}],phase:'ask',lang:old?old.lang:'zh',typing:false,listen:false,interim:''}}
+function botNew(){const old=st.bot;st.bot={log:old?old.log:[{ro:`Hi! I’m ${budOf(kidBy(st.kid)).n}. Which word can’t you spell? Tap the mic and say it.`,zh:'嗨！哪個字不會拼？按麥克風說說看，用中文說最準喔。'}],phase:'ask',lang:old?old.lang:'zh',typing:false,listen:false,interim:''}}
 function bubble(x){
  if(x.me!=null)return `<div class="cme">${esc(x.me)}</div>`;
  if(x.card)return `<div class="ro" style="text-align:center;min-width:60%"><div class="spell" style="font-size:32px">${x.hide?esc(x.card.replace(/[^ ]/g,'_').split('').join(' ')):esc(x.card.toUpperCase().split('').join(' '))}</div><div style="font:700 20px ui-rounded,sans-serif">${x.hide?'':esc(x.card)+' · '}${PY(x.zh||'')}</div></div>`;
@@ -813,7 +911,7 @@ function bubble(x){
 function renderBot(){
  const b=st.bot;if(!b){closeSheet();return}
  let live='';const w=b.cur&&b.cur.word;
- if(b.phase==='loading')live=`<div class="ro"><span class="dots"><i></i><i></i><i></i></span> <span class="zh">Robo is thinking… 想一想…</span></div>`;
+ if(b.phase==='loading')live=`<div class="ro"><span class="dots"><i></i><i></i><i></i></span> <span class="zh">${esc(budOf(kidBy(st.kid)).n)} is thinking… 想一想…</span></div>`;
  if(b.phase==='choose')live=`<div class="ro wide"><b>Which one do you mean? 你要的是哪一個？</b><div class="opts">${b.opts.map(o=>`<button data-a="botPick" data-v="${esc(o.word)}"><b>${esc(o.word)}</b><span class="mut">${PY(o.zh||'')}</span></button>`).join('')}</div><button class="btn ghost full" data-a="botAgain">None of these 都不是，再問一次</button></div>`;
  if(b.phase==='word')live=`<div class="ro wide"><div class="zh" style="margin-bottom:8px">Look carefully and remember it! 仔細看，把它記起來！</div><div class="row" style="flex-wrap:nowrap"><button class="btn sec" style="flex:1" data-a="botSpell">🔊 Listen 再聽</button><button class="btn ghost" data-a="botNot">Not this 不是這個</button></div><button class="btn pri big full" style="margin-top:8px" data-a="botMem">✓ I remember it 我記住了</button></div>`;
  if(b.phase==='spell')live=`<div class="ro wide" style="text-align:center"><b style="font-size:18px">Now spell it yourself! 現在自己拼拼看</b><div class="zh" style="margin:2px 0 6px">${PY(b.cur.zh)}</div>
@@ -830,7 +928,7 @@ function renderBot(){
   <div class="microw"><button class="side" data-a="botLang">${b.lang==='zh'?'中文 ⇄ EN':'EN ⇄ 中文'}</button>${SR?`<button class="bigmic ${b.listen?'on':''}" data-a="mic" aria-label="Microphone">🎤</button>`:''}<button class="side" data-a="botType">⌨ Type 打字</button></div>`}</div>`:'';
  const sc=$('#chat');const keep=sc?sc.scrollTop:0;
  $('#sheet').innerHTML=`<div class="botbg" data-a="botBg"></div><div class="botp2" role="dialog" aria-modal="true">
-  <div class="bhead"><div class="av" style="width:44px;height:44px;margin:0;flex:none"><svg viewBox="0 0 100 100">${AVS.robot}</svg></div><div style="flex:1"><b style="font:800 20px ui-rounded,sans-serif">Robo</b><div class="zh">I help with spelling only. 我只幫忙拼字喔！</div></div><button class="ib" style="background:var(--card);color:var(--mut)" data-a="botClose" aria-label="Close">✕</button></div>
+  <div class="bhead"><div style="width:48px;height:48px;flex:none"><svg viewBox="0 0 100 100" width="48" height="48">${budOf(kidBy(st.kid)).s}</svg></div><div style="flex:1"><b style="font:800 20px ui-rounded,sans-serif">${esc(budOf(kidBy(st.kid)).n)}</b><div class="zh">I help with spelling only. 我只幫忙拼字喔！</div></div><button class="ib" style="background:var(--card);color:var(--mut)" data-a="botClose" aria-label="Close">✕</button></div>
   <div class="chat" id="chat">${b.log.map(bubble).join('')}${live}</div>${comp}</div>`;
  const c=$('#chat');if(c)c.scrollTop=c.scrollHeight;
  if(b.phase==='spell'){const g=$('#botg');if(g)g.focus({preventScroll:true})}
@@ -907,7 +1005,7 @@ async function cardPdf(){
 function backupAge(){return settings.lastBackup?Math.floor((Date.now()-settings.lastBackup)/864e5):null}
 function backupNote(){const a=backupAge(),has=Object.keys(entries).length;if(a===null)return has?'<div class="warn">Not backed up yet. 還沒備份過，建議現在備份一次。</div>':'';return a>7?`<div class="warn">Last backup: ${a} days ago. 已經 ${a} 天沒備份了。</div>`:`<p class="zh" style="margin:8px 0 0">Last backup 上次備份：${a===0?'today 今天':a+' days ago '+a+' 天前'}</p>`}
 async function backup(){
- const data=JSON.stringify({app:'lwd',v:2,settings,entries,cards}),name='diary-backup-'+ymd(today())+'.json';
+ const data=JSON.stringify({app:'lwd',v:3,settings,entries,cards,weeks}),name='diary-backup-'+ymd(today())+'.json';
  const done=async()=>{settings.lastBackup=Date.now();await saveSettings();toast('Backed up. 備份完成。');render()};
  try{const f=new File([data],name,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Diary backup 日記備份'});await done();return}}
  catch(e){if(e&&e.name==='AbortError')return}
@@ -955,7 +1053,13 @@ async function pdf(){
   doc.setFontSize(11);doc.text('My Weekly Journal  -  '+clean(kid.name)+'  -  '+clean(B.range),M,9);return 20};
  const C0=M,C1=M+18,C2=M+18+112,CE=PW-M,PAD=2.2;
  const thead=yy=>{doc.setFillColor(243,246,255);doc.rect(C0,yy,CE-C0,7,'F');doc.setDrawColor(...BLUE);doc.setLineWidth(.6);doc.line(C0,yy,CE,yy);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...BLUE);doc.text('Day',C0+PAD,yy+4.8);doc.text('What I wrote',C1+PAD,yy+4.8);doc.text('Corrections',C2+PAD,yy+4.8);return yy+7};
- let y=header(true);y=thead(y);
+ let y=header(true);
+ const TC=weeks[weekKey(kid,mon)]||null;
+ const sugBox=(t,size,bold)=>{const sg=[{t,i:1,b:bold?1:0}],w=PW-2*M-8,h=rich(sg,M+4,0,w,size,1.45,false)+6;if(y+h+4>BOT){doc.addPage();y=header(false)}
+  doc.setDrawColor(138,147,171);doc.setLineWidth(.35);doc.roundedRect(M,y,PW-2*M,h,1.5,1.5);doc.setFillColor(255,255,255);doc.setFont('helvetica','italic');doc.setFontSize(7.5);const lab='suggested';const lw=doc.getTextWidth(lab)+3;doc.rect(PW-M-lw-6,y-1.6,lw+3,3.2,'F');doc.setTextColor(91,101,128);doc.text(lab,PW-M-lw-4.5,y+1);
+  rich(sg,M+4,y+3,w,size,1.45,true);y+=h+4};
+ if(TC)sugBox(TC.title,15,1);
+ y=thead(y);
  const corrSegs=r=>r.none?[]:r.fx.length?r.fx.flatMap((f,k)=>[{t:(k?'\n':'')+f.n+'. ',c:GREY,b:1},...(f.w?[{t:f.w,c:RED,strike:1}]:[]),...(f.w&&f.r?[{t:' -> ',c:GREY}]:[]),{t:(f.w?'':'+ ')+f.r,c:GRN,b:1},{t:fixNote(f),c:GREY}]):r.checked?[{t:'No mistakes!',c:GRN,b:1}]:[{t:'-',c:GREY}];
  for(const r of B.rows){
   const ws=r.none?[{t:'(no entry)',c:[152,162,189]}]:r.segs.map(g=>g.sup?{sup:g.sup}:{t:g.t,u:g.u?RED:null});
@@ -972,6 +1076,7 @@ async function pdf(){
   for(const r of bet){const t=r.better,lt=t.toLowerCase(),rg=[];(r.ups||[]).forEach(u=>{const p=lt.indexOf(u.p.toLowerCase());if(p>=0&&!rg.some(q=>p<q.e&&p+u.p.length>q.s))rg.push({s:p,e:p+u.p.length})});rg.sort((a,b)=>a.s-b.s);
    const sg=[{t:DAYL[r.i]+': ',b:1}];let c=0;rg.forEach(q=>{sg.push({t:t.slice(c,q.s),i:1});sg.push({t:t.slice(q.s,q.e),i:1,u:ORG,wv:1});c=q.e});sg.push({t:t.slice(c),i:1});
    const h=rich(sg,M,0,PW-2*M,10.5,1.5,false);if(y+h>BOT){doc.addPage();y=header(false)}rich(sg,M,y,PW-2*M,10.5,1.5,true);y+=h+1.2}}
+ if(TC){y+=3;sugBox(TC.closing,11,0)}
  sec('This week');
  const line=sg=>{const h=rich(sg,M,0,PW-2*M,10,1.5,false);if(y+h>BOT){doc.addPage();y=header(false)}rich(sg,M,y,PW-2*M,10,1.5,true);y+=h};
  if(Object.keys(B.cnt).length)line([{t:'To practise: ',b:1},{t:Object.entries(B.cnt).map(([k,v])=>TYPES[k][0]+' x'+v).join('  |  ')}]);
@@ -987,7 +1092,7 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('focusout',e=>{if(e.target.id==='ta')st.caret=e.target.selectionEnd});
 document.addEventListener('change',e=>{
- if(e.target.id==='imp'&&e.target.files[0]){const f=e.target.files[0];f.text().then(t=>{const o=JSON.parse(t);if(o.app!=='lwd')throw 0;settings={...o.settings,apiKey:settings.apiKey||o.settings.apiKey||''};entries={...entries,...o.entries};if(o.cards)Object.keys(o.cards).forEach(k=>{const m={};[...(cards[k]||[]),...o.cards[k]].forEach(c=>{const x=m[c.w.toLowerCase()];m[c.w.toLowerCase()]=x?{...x,n:Math.max(x.n,c.n),ok:x.ok||c.ok}:c});cards[k]=Object.values(m)});lsSave();toast('Restored. 已還原。');render()}).catch(()=>toast('Not a diary backup file. 不是正確的備份檔。'))}
+ if(e.target.id==='imp'&&e.target.files[0]){const f=e.target.files[0];f.text().then(t=>{const o=JSON.parse(t);if(o.app!=='lwd')throw 0;settings={...o.settings,apiKey:settings.apiKey||o.settings.apiKey||''};entries={...entries,...o.entries};if(o.weeks)weeks={...o.weeks,...weeks};if(o.cards)Object.keys(o.cards).forEach(k=>{const m={};[...(cards[k]||[]),...o.cards[k]].forEach(c=>{const x=m[c.w.toLowerCase()];m[c.w.toLowerCase()]=x?{...x,n:Math.max(x.n,c.n),ok:x.ok||c.ok}:c});cards[k]=Object.values(m)});lsSave();toast('Restored. 已還原。');render()}).catch(()=>toast('Not a diary backup file. 不是正確的備份檔。'))}
  if(e.target.id==='ag'&&st.edit){const a=+e.target.value;st.edit.age=a;if(!st.edit.tL)st.edit.level=sugLevel(a);if(!st.edit.tM)st.edit.mode=sugMode(a);render()}
 });
 document.addEventListener('keydown',e=>{if(st.view==='pin'&&!e.target.closest('input,textarea')){if(/^[0-9]$/.test(e.key)){pinKey(e.key);return}if(e.key==='Backspace'){pinKey('del');return}}if(e.key==='Escape'){if($('.botp2'))act('botClose');else if(st.rv)act('rvclose');else closeSheet()}if(e.key==='Enter'&&e.target.id==='pin')act('pin');if(e.key==='Enter'&&e.target.id==='botq'){e.preventDefault();act('botAsk')}if(e.key==='Enter'&&e.target.id==='botg'){e.preventDefault();act('botCheck')}if(e.key==='Enter'&&e.target.id==='cg'){e.preventDefault();act('cardCheck')}});
@@ -1076,7 +1181,12 @@ async function act(a,v){
  case 'betterDone':{if(canSpeak)speechSynthesis.cancel();const past=st.view==='pastOne';st.rv=null;closeSheet();if(past){render();break}await markReviewed();saveDraft();break}
  case 'setZh':settings.zh=v;await saveSettings();render();loadZh();break;
  case 'togglePy':settings.py=!settings.py;await saveSettings();render();loadZh();break;
- case 'avpick':$('#sheet').innerHTML=`<div class="sheetbg" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2>Pick your avatar 選一個頭像</h2>${avGrid(kidBy(st.kid).avatar,'setav')}<button class="btn ghost full" data-a="close" style="margin-top:8px">Close 關閉</button></div></div>`;break;
+ case 'guideTog':st.guideOpen=!st.guideOpen;break;
+ case 'setOpener':settings.opener=v;await saveSettings();render();break;
+ case 'setVg':settings.vg=v;await saveSettings();pickVoice();render();say(v==='m'?'Hello! I am the boy voice.':'Hello! I am the girl voice.');break;
+ case 'setVr':settings.vr=v;await saveSettings();render();say('This is how fast I speak.');break;
+ case 'setbuddy':{const k=kidBy(st.kid);if(k){k.buddy=v;await saveSettings()}closeSheet();render();break}
+ case 'avpick':$('#sheet').innerHTML=`<div class="sheetbg" data-a="close"><div class="sheet" role="dialog" aria-modal="true"><h2>Pick your avatar 選一個頭像</h2>${avGrid(kidBy(st.kid).avatar,'setav')}<h2 style="margin-top:18px">My buddy 我的小夥伴</h2><p class="zh" style="margin-top:-4px">Your buddy helps you spell. 小夥伴會幫你拼字。</p>${budGrid(kidBy(st.kid).buddy)}<button class="btn ghost full" data-a="close" style="margin-top:8px">Close 關閉</button></div></div>`;break;
  case 'setav':{const k=kidBy(st.kid);if(k){k.avatar=v;await saveSettings()}closeSheet();render();break}
  case 'pickA':st.edit.avatar=v;render();break;
  case 'savekey':settings.apiKey=($('#key')||{}).value.trim();await saveSettings();toast('Saved. 已儲存。');render();break;
