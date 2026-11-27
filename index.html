@@ -109,9 +109,9 @@ input.t,select.t{width:100%;min-height:52px;border-radius:14px;border:2px solid 
 .pad{display:grid;grid-template-columns:repeat(3,72px);gap:16px 28px;justify-content:center;-webkit-user-select:none;user-select:none}.pad button{width:72px;height:72px;border-radius:50%;background:var(--card);border:1px solid var(--line);font:400 28px system-ui,-apple-system,sans-serif;color:var(--ink)}.pad button:active{background:var(--line)}.pad button[data-v=del]{border:none;background:none;font-size:24px;color:var(--mut)}
 .a4wrap{position:relative;overflow:hidden;border-radius:6px;box-shadow:0 8px 24px rgba(20,30,70,.14);background:#fff}
 .a4{width:794px;padding:0 0 40px;background:#fff;color:#1b2033;transform-origin:0 0;position:absolute;top:0;left:0;font:15px/1.5 system-ui,-apple-system,sans-serif}
-.a4 .hd{background:#2f5bea;color:#fff;padding:14px 48px 12px;display:flex;justify-content:space-between;align-items:flex-end}.a4 .hd b{font:800 24px ui-rounded,sans-serif;display:block}.a4 .hd span{font-size:14px;opacity:.9}
-.a4 .bd{padding:12px 48px 0}
-.a4 .tb{display:grid;grid-template-columns:84px minmax(0,1fr) 210px;border-top:2px solid #2f5bea}
+.a4 .hd{background:#2f5bea;color:#fff;padding:14px 40px 12px;display:flex;justify-content:space-between;align-items:flex-end}.a4 .hd b{font:800 24px ui-rounded,sans-serif;display:block}.a4 .hd span{font-size:14px;opacity:.9}
+.a4 .bd{padding:12px 40px 0}
+.a4 .tb{display:grid;grid-template-columns:72px minmax(0,1fr) 186px;border-top:2px solid #2f5bea}
 .a4 .tb>div{padding:6px 8px;border-bottom:1px solid #dde4f3}.a4 .th{font-weight:800;font-size:13px;color:#2f5bea;background:#f3f6ff}
 .a4 .dy b{display:block;font-size:16px}.a4 .dy span{font-size:12px;color:#7a839c;display:block}
 .a4 .wr{font:15px/1.45 ui-rounded,system-ui,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}.a4 .wr u{text-decoration:underline #e0464b 2px;text-underline-offset:3px}.a4 sup{color:#e0464b;font-weight:800;font-size:11px;margin-left:1px}
@@ -119,7 +119,7 @@ input.t,select.t{width:100%;min-height:52px;border-radius:14px;border:2px solid 
 .a4 h4{font:800 16px ui-rounded,sans-serif;color:#2f5bea;margin:14px 0 6px;border-bottom:1.5px solid #dde4f3;padding-bottom:3px}
 .a4 .bt2 p{margin:0 0 4px;font:italic 14px/1.45 Georgia,serif}.a4 .bt2 b{font-style:normal;font-family:system-ui,sans-serif}.a4 .bt2 u{text-decoration:underline wavy #e08a24 1.5px;text-underline-offset:4px}
 .a4 .th2{display:flex;gap:8px;margin-bottom:6px}.a4 .th2 div{position:relative;width:150px}.a4 .th2 svg{width:150px;height:auto;display:block;border:1px solid #c9d1e6}.a4 .th2 b{position:absolute;top:3px;left:3px;background:#fff;border:1px solid #2b2b2b;border-radius:50%;width:18px;height:18px;font-size:11px;display:grid;place-items:center}
-.a4 .sug{position:relative;border:1px solid #c3c9d8;border-radius:6px;padding:7px 12px 6px;margin:4px 0 8px;color:#1b2033}.a4 .sug .sl{position:absolute;top:-9px;right:10px;background:#fff;padding:0 6px;font:italic 11px system-ui;color:#5b6580}
+.a4 .sug{margin:2px 0 4px;font:italic 14px/1.45 Georgia,serif;color:#1b2033}.a4 .sug span{text-decoration:underline dashed #8a93ab 1px;text-underline-offset:3px}.a4 .sug .x{position:absolute;top:-9px;right:10px;background:#fff;padding:0 6px;font:italic 11px system-ui;color:#5b6580}
 .a4 .sm{font-size:14px;margin:3px 0}.a4 .ln{border-bottom:1px solid #c9d1e6;height:24px}
 .mini2{display:flex;gap:10px;margin-top:4px}.mini2 button{flex:1;background:var(--card);border-radius:14px;padding:10px 12px;text-align:center;box-shadow:0 1px 0 var(--line);min-height:56px}.mini2 b{display:block;font-size:15px;color:var(--blue)}.mini2 span{font-size:12px;color:var(--mut)}.mini2 .due{background:var(--yelS)}.mini2 .due span{color:light-dark(#8a6400,#ffd23f);font-weight:700}
 .wkbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
@@ -143,6 +143,7 @@ input.t,select.t{width:100%;min-height:52px;border-radius:14px;border:2px solid 
 .pics2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pics2 .pc{background:var(--card);border-radius:16px;padding:8px;box-shadow:0 1px 0 var(--line)}.pics2 svg{width:100%;height:auto;border-radius:10px;display:block}.pics2 .lb{font-weight:800;font-size:14px;margin:6px 2px 0}.pics2 .lb span{color:var(--mut);font-weight:600}
 .wlist{display:flex;flex-wrap:wrap;gap:8px}.wlist button{background:var(--card);border-radius:14px;padding:8px 12px;text-align:left;box-shadow:0 1px 0 var(--line)}.wlist b{display:block;font:700 18px ui-rounded,sans-serif}.wlist span{font-size:13px;color:var(--mut)}
 .tl button{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;padding:12px 4px;border-top:1px solid var(--line);align-items:baseline}.tl button:first-child{border-top:0}.tl b{font:700 18px/1.4 ui-rounded,sans-serif}.tl span{font-size:14px;color:var(--mut);text-align:right;flex:none;max-width:45%}
+.thb{width:auto!important;padding:0 12px;font:800 14px system-ui,sans-serif;white-space:nowrap}.thm small{font-weight:600;opacity:.8}.thm .btn{height:auto;padding:10px}
 .tl.sen button{display:block}.tl.sen span{display:block;text-align:left;max-width:none}
 .lad{margin-top:12px;font-weight:800;font-size:14px}.lad .bar{margin-top:6px}
 .lvl{background:var(--okS);color:var(--ok);border-radius:16px;padding:14px 16px;margin-bottom:14px;font-weight:800;display:flex;gap:10px;align-items:center}
@@ -522,7 +523,7 @@ function kidEntries(kid){return Object.values(entries).filter(e=>e.kid===kid.id)
 function readyUp(kid){if(kid.level>=3)return false;const l=kidEntries(kid).slice(0,5);if(l.length<5)return false;const g=LEVELS[kid.level].goal;return l.every(e=>e.words>=g)&&l.reduce((s,e)=>s+((e.firstFb&&e.firstFb.issues.length)||0),0)/5<=1.5}
 function topicFor(kid,date){return TOPICS[hash(date+kid.id)%TOPICS.length]}
 function avatar(k,i,size){if(k.avatar&&AVS[k.avatar])return `<div class="av" style="${size?'width:'+size+'px;height:'+size+'px;margin:0':''}"><svg viewBox="0 0 100 100">${AVS[k.avatar]}</svg></div>`;return `<div class="av" style="background:${COLORS[i%COLORS.length]}${size?';width:'+size+'px;height:'+size+'px;font-size:'+size/2.2+'px;margin:0':''}">${esc((k.name||'?')[0].toUpperCase())}</div>`}
-function top(title,sub,back){return `<header class="top"><div class="in">${back?`<button class="ib" data-a="${back}" aria-label="Back">${BACK}</button>`:''}<h1>${esc(title)}${sub?`<small>${esc(sub)}</small>`:''}</h1></div></header>`}
+function top(title,sub,back,right){return `<header class="top"><div class="in">${back?`<button class="ib" data-a="${back}" aria-label="Back">${BACK}</button>`:''}<h1>${esc(title)}${sub?`<small>${esc(sub)}</small>`:''}</h1>${right||''}</div></header>`}
 
 /* ---------- views ---------- */
 function vWho(){
@@ -554,8 +555,110 @@ function vHome(){
  ${main}
  <div class="row" style="flex-wrap:nowrap">${past?`<button class="btn sec" style="flex:1" data-a="lookback">Look back 回顧</button>`:''}<button class="btn sec" style="flex:1" data-a="cards">Word cards 單字卡${kidCards().length?' · '+kidCards().length:''}</button></div></main>${tabs('home')}`;
 }
+const THEME_UP=[
+/* Basketball */{
+w2:[['dribble the ball','運球'],['make a layup','上籃'],['get a rebound','搶籃板'],['block a shot','蓋火鍋'],['miss the shot','沒投進'],['the coach','教練'],['cheer for my team','為我們隊加油']],
+s2:[['I dribbled past two players.','我運球過了兩個人。'],['I missed the first shot, but I got the rebound.','第一球沒進，但我搶到籃板。'],['Then I made a layup!','然後我上籃得分！'],['The coach told us to pass more.','教練叫我們多傳球。'],['Everyone cheered when we scored.','我們得分時大家都在歡呼。']],
+w3:[['work as a team','團隊合作'],['the final score','最後比分'],['tie the game','追平比分'],['in the last minute','在最後一分鐘'],['out of breath','喘不過氣'],['practise my shooting','練習投籃'],['never give up','永不放棄']],
+s3:[['The game was tied, and there was only one minute left.','比分打平，只剩一分鐘。'],['I was out of breath, but I kept running.','我喘不過氣，但還是繼續跑。'],['My teammate passed to me, and I scored the winning basket!','隊友傳給我，我投進致勝一球！'],['Even though we lost last week, we never gave up.','雖然上週輸了，我們沒有放棄。'],['I want to practise my shooting every day.','我想每天練習投籃。']]},
+/* Football */{
+w2:[['dribble past','帶球過人'],['take a corner kick','踢角球'],['save the ball','撲救'],['the referee','裁判'],['blow the whistle','吹哨'],['a penalty kick','罰球'],['score a header','頭球得分']],
+s2:[['I dribbled past a defender.','我帶球過了一個後衛。'],['The referee blew the whistle.','裁判吹了哨。'],['We got a penalty kick.','我們得到一個罰球。'],['The goalkeeper saved the ball with his hands.','守門員用手撲住了球。'],['My friend scored a header!','我朋友頭球進了！']],
+w3:[['the first half','上半場'],['come from behind','反敗為勝'],['a close game','難分高下的比賽'],['shake hands','握手'],['play fair','公平比賽'],['muddy shoes','沾滿泥的鞋'],['proud of my team','為隊伍驕傲']],
+s3:[['We were losing at the end of the first half.','上半場結束時我們落後。'],['In the second half, we came from behind and won 3 to 2.','下半場我們反敗為勝，三比二贏了。'],['It was a close game, so everyone was nervous.','比賽很接近，大家都很緊張。'],['After the game, we shook hands with the other team.','比賽後我們和對手握手。'],['My shoes were muddy, but I was proud of my team.','我的鞋都是泥，但我為隊伍驕傲。']]},
+/* Swimming */{
+w2:[['swim a lap','游一圈'],['do the backstroke','仰泳'],['dive in','跳水入池'],['the deep end','深水區'],['take a shower','沖澡'],['a swimming cap','泳帽'],['swim underwater','潛水游']],
+s2:[['I swam two laps without stopping.','我不停地游了兩圈。'],['I learned to do the backstroke today.','今天我學了仰泳。'],['I was scared of the deep end at first.','我一開始很怕深水區。'],['I swam underwater like a fish.','我像魚一樣在水下游。'],['We took a shower after swimming.','游完泳我們去沖澡。']],
+w3:[['faster than before','比以前快'],['a swimming lesson','游泳課'],['breathe to the side','側面換氣'],['my muscles ached','肌肉痠痛'],['feel brave','覺得勇敢'],['a race against','和…比賽'],['the cold water','冰冷的水']],
+s3:[['The water was so cold that I started to shiver.','水冷到我開始發抖。'],['My coach taught me how to breathe to the side.','教練教我怎麼側面換氣。'],['I had a race against my brother, and I won by a little.','我和弟弟比賽，我贏了一點點。'],['I swam faster than before, so I felt really brave.','我游得比以前快，覺得自己很勇敢。'],['After the lesson, my legs ached, but I was happy.','下課後我腿痠，但很開心。']]},
+/* Birthday party */{
+w2:[['decorate the room','佈置房間'],['blow up balloons','吹氣球'],['wrap a present','包禮物'],['a birthday card','生日卡'],['play party games','玩派對遊戲'],['a party hat','派對帽'],['say thank you','說謝謝']],
+s2:[['We blew up lots of colorful balloons.','我們吹了很多彩色氣球。'],['I wrapped a present for my friend.','我幫朋友包了一份禮物。'],['I wrote a birthday card for him.','我為他寫了一張生日卡。'],['We played party games and laughed a lot.','我們玩派對遊戲，笑得很開心。'],['Everyone wore a funny party hat.','每個人都戴了好笑的派對帽。']],
+w3:[['a surprise party','驚喜派對'],['keep a secret','保守秘密'],['turn off the lights','關燈'],['shout Surprise!','大喊驚喜！'],['a big smile','大大的笑容'],['the best day ever','最棒的一天'],['look forward to','期待']],
+s3:[['We planned a surprise party for Mom, so we had to keep it a secret.','我們為媽媽辦驚喜派對，所以要保密。'],['When she came home, we turned on the lights and shouted Surprise!','她回家時我們開燈大喊驚喜！'],['She had a big smile on her face.','她臉上露出大大的笑容。'],['She said it was the best day ever.','她說這是最棒的一天。'],['I am already looking forward to my own birthday.','我已經在期待我自己的生日了。']]},
+/* Supermarket */{
+w2:[['on sale','特價'],['the frozen food','冷凍食品'],['weigh the apples','秤蘋果'],['a long line','排長隊'],['a shopping basket','購物籃'],['choose a snack','挑零食'],['check the price','看價錢']],
+s2:[['The strawberries were on sale today.','今天草莓特價。'],['I weighed the apples for Mom.','我幫媽媽秤蘋果。'],['There was a long line at the counter.','櫃檯前排了長長的隊。'],['I chose one snack for the weekend.','我挑了一個週末吃的零食。'],['I checked the price before I put it in the basket.','放進籃子前我先看價錢。']],
+w3:[['compare the prices','比較價錢'],['cheaper than','比…便宜'],['a shopping list','購物清單'],['run out of','用完了'],['healthy food','健康食物'],['save money','省錢'],['self-checkout','自助結帳']],
+s3:[['We ran out of milk, so we went to the supermarket after dinner.','牛奶喝完了，所以晚飯後我們去超市。'],['I compared the prices and found a cheaper one.','我比較價錢，找到比較便宜的。'],['Mom said we should buy more healthy food.','媽媽說我們應該多買健康食物。'],['I wanted chocolate, but I followed the shopping list.','我想買巧克力，但我照著清單買。'],['We paid at the self-checkout, and I scanned everything.','我們在自助結帳付錢，東西都是我掃的。']]},
+/* At a restaurant */{
+w2:[['the waiter','服務生'],['wait for a table','等位子'],['spicy food','辣的食物'],['a bowl of rice','一碗飯'],['take away','打包帶走'],['delicious','好吃的'],['ask for the bill','請服務生結帳']],
+s2:[['We waited for a table for twenty minutes.','我們等了二十分鐘才有位子。'],['The waiter brought us some tea.','服務生給我們倒了茶。'],['The chicken was too spicy for me.','雞肉對我來說太辣了。'],['Everything was delicious.','每樣都很好吃。'],['We took the leftovers home.','我們把剩菜打包回家。']],
+w3:[['my favorite dish','我最愛的菜'],['try something new','嘗試新東西'],['it tasted like','吃起來像'],['crispy on the outside','外脆'],['soft on the inside','內軟'],['leave room for dessert','留肚子吃甜點'],['a special day','特別的日子']],
+s3:[['To celebrate Grandma\'s birthday, we went to a fancy restaurant.','為了慶祝奶奶生日，我們去了一家高級餐廳。'],['I decided to try something new instead of my favorite dish.','我決定試新的菜，而不是點我最愛的。'],['The fish was crispy on the outside and soft on the inside.','魚外面脆脆的，裡面軟軟的。'],['It tasted a little like sweet and sour pork.','它吃起來有點像糖醋排骨。'],['I left room for dessert because I wanted ice cream.','我留了肚子吃甜點，因為我想吃冰淇淋。']]},
+/* A rainy day */{
+w2:[['thunder and lightning','打雷閃電'],['pouring rain','傾盆大雨'],['a wet floor','濕滑的地板'],['look out of the window','看窗外'],['a raincoat','雨衣'],['soaking wet','濕透了'],['the rain stopped','雨停了']],
+s2:[['There was thunder and lightning last night.','昨晚打雷又閃電。'],['I wore my yellow raincoat to school.','我穿黃色雨衣上學。'],['My shoes were soaking wet.','我的鞋子濕透了。'],['I looked out of the window and watched the rain.','我看著窗外的雨。'],['When the rain stopped, we saw a rainbow!','雨停後我們看到彩虹！']],
+w3:[['a gloomy day','陰沉的一天'],['the sound of the rain','雨聲'],['stay dry','保持乾爽'],['a cozy blanket','舒服的毯子'],['cancel the trip','取消出遊'],['make the best of it','往好處想'],['the air smelled fresh','空氣聞起來很清新']],
+s3:[['It was a gloomy day, so our trip to the beach was cancelled.','天氣陰沉，所以去海邊的行程取消了。'],['At first I was upset, but we decided to make the best of it.','一開始我很失望，但我們決定往好處想。'],['We read books under a cozy blanket and listened to the sound of the rain.','我們蓋著毯子看書，聽雨聲。'],['Later, the rain stopped and the air smelled fresh.','後來雨停了，空氣聞起來很清新。'],['In the end, it was a nice and quiet day.','最後，這是安靜又美好的一天。']]},
+/* At the park */{
+w2:[['ride my bike','騎腳踏車'],['fly a kite','放風箏'],['the playground','遊樂場'],['a sunny afternoon','晴朗的下午'],['chase the pigeons','追鴿子'],['sit on a bench','坐在長椅上'],['pick up rubbish','撿垃圾']],
+s2:[['It was a sunny afternoon, so we went to the park.','那是晴朗的下午，所以我們去公園。'],['I rode my bike around the lake.','我繞著湖騎腳踏車。'],['My brother flew a kite, and it went very high.','弟弟放風箏，飛得好高。'],['We chased the pigeons, but they flew away.','我們追鴿子，但牠們飛走了。'],['Grandpa sat on a bench and watched us.','爺爺坐在長椅上看著我們。']],
+w3:[['the fresh air','新鮮空氣'],['make new friends','交新朋友'],['take turns','輪流'],['the tallest slide','最高的滑梯'],['scared but excited','又怕又興奮'],['a perfect place for','很適合…的地方'],['lose track of time','忘了時間']],
+s3:[['I met a boy at the park, and we quickly became friends.','我在公園認識一個男孩，我們很快就成了朋友。'],['We took turns on the tallest slide.','我們輪流溜最高的滑梯。'],['I was scared but excited when I went down.','滑下來時我又怕又興奮。'],['We played so much that we lost track of time.','我們玩到忘了時間。'],['The park is a perfect place for a weekend.','公園是週末的好去處。']]},
+/* Cooking */{
+w2:[['boil the water','燒開水'],['fry the eggs','煎蛋'],['add some salt','加點鹽'],['mix it together','混在一起'],['smell good','聞起來很香'],['a recipe','食譜'],['wash the dishes','洗碗']],
+s2:[['We followed a recipe to make fried rice.','我們照著食譜做炒飯。'],['I fried the eggs in a pan.','我在鍋裡煎蛋。'],['Dad added some salt and mixed it together.','爸爸加了點鹽，再攪拌在一起。'],['The kitchen smelled so good.','廚房好香。'],['After dinner, I washed the dishes.','晚餐後我洗了碗。']],
+w3:[['for the first time','第一次'],['be careful with','小心…'],['the hot oil','熱油'],['taste a little bland','有點淡'],['proud of myself','為自己驕傲'],['ask for a second bowl','再要一碗'],['cook by myself','自己做飯']],
+s3:[['For the first time, I made noodles by myself.','我第一次自己煮麵。'],['Mom told me to be careful with the hot oil.','媽媽叫我小心熱油。'],['It tasted a little bland, so I added more sauce.','吃起來有點淡，所以我多加了醬汁。'],['My brother liked it so much that he asked for a second bowl.','弟弟太喜歡了，又要了一碗。'],['I felt really proud of myself.','我覺得很為自己驕傲。']]},
+/* Taking the subway */{
+w2:[['change lines','轉線'],['a subway map','地鐵路線圖'],['the next stop','下一站'],['give my seat to','讓座給'],['mind the gap','小心月台間隙'],['the doors are closing','車門要關了'],['an escalator','手扶梯']],
+s2:[['We looked at the subway map to find our way.','我們看地鐵圖找路。'],['We changed lines at a big station.','我們在一個大站轉線。'],['I gave my seat to an old lady.','我讓座給一位老奶奶。'],['The doors were closing, so we ran in quickly.','車門要關了，我們趕快跑進去。'],['We took the escalator up to the street.','我們搭手扶梯上到街上。']],
+w3:[['rush hour','尖峰時間'],['squeeze in','擠進去'],['miss our stop','坐過站'],['take the wrong exit','走錯出口'],['ask for directions','問路'],['on time','準時'],['faster than a car','比車子快']],
+s3:[['It was rush hour, so we had to squeeze into the train.','那時是尖峰時間，我們只好擠上車。'],['We were talking so much that we almost missed our stop.','我們聊太多，差點坐過站。'],['Then we took the wrong exit and had to ask for directions.','後來又走錯出口，只好問路。'],['Luckily, we still got there on time.','幸好我們還是準時到了。'],['I think the subway is faster than a car.','我覺得地鐵比車子快。']]},
+/* Seeing the doctor */{
+w2:[['have a fever','發燒'],['a sore throat','喉嚨痛'],['take my temperature','量體溫'],['open my mouth','張開嘴巴'],['take some medicine','吃藥'],['the waiting room','候診室'],['feel better','感覺好一點']],
+s2:[['I had a fever and a sore throat.','我發燒，喉嚨也痛。'],['We waited in the waiting room for a long time.','我們在候診室等了很久。'],['The nurse took my temperature.','護士幫我量體溫。'],['The doctor asked me to open my mouth.','醫生叫我張開嘴巴。'],['After taking the medicine, I felt better.','吃了藥後我感覺好一點。']],
+w3:[['get a check-up','做健康檢查'],['listen to my heart','聽我的心跳'],['a little nervous','有點緊張'],['it did not hurt','一點也不痛'],['the doctor explained','醫生解釋'],['drink plenty of water','多喝水'],['get enough sleep','睡飽']],
+s3:[['I went to the doctor for a check-up, and I was a little nervous.','我去做健康檢查，有點緊張。'],['The doctor used a stethoscope to listen to my heart.','醫生用聽診器聽我的心跳。'],['I had to get a shot, but it did not hurt much.','我要打針，但不怎麼痛。'],['The doctor explained that I should drink plenty of water.','醫生說我要多喝水。'],['She also said I need to get enough sleep.','她還說我要睡飽。']]},
+/* At the zoo */{
+w2:[['a tall giraffe','高高的長頸鹿'],['a sleepy lion','想睡的獅子'],['feed the animals','餵動物'],['take photos','拍照'],['a long neck','長脖子'],['swing from tree to tree','在樹間盪來盪去'],['a zoo map','動物園地圖']],
+s2:[['The giraffe had a very long neck.','長頸鹿的脖子好長。'],['The lion was sleeping in the sun.','獅子在太陽下睡覺。'],['The monkeys swung from tree to tree.','猴子在樹間盪來盪去。'],['I took lots of photos of the pandas.','我拍了很多熊貓的照片。'],['We used a map to find the penguins.','我們用地圖找企鵝。']],
+w3:[['my favorite animal','我最喜歡的動物'],['in the wild','在野外'],['protect the animals','保護動物'],['look after','照顧'],['as big as','和…一樣大'],['learn about','學到關於…'],['a zookeeper','動物園管理員']],
+s3:[['My favorite animal was the elephant because it was as big as a car.','我最喜歡大象，因為牠和車子一樣大。'],['A zookeeper told us how they look after the animals.','管理員告訴我們他們怎麼照顧動物。'],['I learned that pandas eat bamboo for many hours a day.','我知道熊貓一天花很多小時吃竹子。'],['Some animals are in danger in the wild.','有些動物在野外有危險。'],['We should protect them and keep their homes clean.','我們應該保護牠們，保持牠們的家乾淨。']]},
+/* Chinese New Year */{
+w2:[['red envelopes','紅包'],['set off fireworks','放煙火'],['visit my relatives','拜訪親戚'],['eat dumplings','吃餃子'],['wear new clothes','穿新衣服'],['clean the house','大掃除'],['Happy New Year','新年快樂']],
+s2:[['We cleaned the house before the New Year.','新年前我們大掃除。'],['I wore new clothes on the first day.','初一我穿了新衣服。'],['We visited our relatives and ate dumplings.','我們去拜訪親戚，吃餃子。'],['Grandma gave me a red envelope.','奶奶給我一個紅包。'],['At night we watched the fireworks.','晚上我們看煙火。']],
+w3:[['the whole family','全家人'],['a big dinner','豐盛的晚餐'],['stay up late','熬夜'],['wish them good health','祝他們身體健康'],['the lion dance','舞獅'],['a lucky year','幸運的一年'],['my favorite holiday','我最喜歡的節日']],
+s3:[['On New Year\'s Eve, the whole family had a big dinner together.','除夕夜全家人一起吃團圓飯。'],['I stayed up late to welcome the new year.','我熬夜迎接新年。'],['When I got a red envelope, I wished Grandpa good health.','拿紅包時，我祝爺爺身體健康。'],['We watched a lion dance on the street, and it was so loud!','我們在街上看舞獅，好大聲！'],['Chinese New Year is my favorite holiday because everyone is together.','過年是我最喜歡的節日，因為大家都在一起。']]},
+/* Cleaning my room */{
+w2:[['make my bed','整理床鋪'],['sweep the floor','掃地'],['put away my toys','把玩具收好'],['fold my clothes','摺衣服'],['take out the trash','倒垃圾'],['a messy room','亂七八糟的房間'],['under the bed','床底下']],
+s2:[['My room was very messy.','我的房間好亂。'],['I put away my toys and folded my clothes.','我把玩具收好，衣服摺好。'],['I swept the floor and found a lost sock.','我掃地時找到一隻不見的襪子。'],['I found my pencil under the bed.','我在床底下找到我的鉛筆。'],['Then I took out the trash.','然後我去倒垃圾。']],
+w3:[['it took me an hour','花了我一小時'],['throw away','丟掉'],['give away','送人'],['too small for me','對我來說太小'],['neat and tidy','整齊乾淨'],['easier to find','比較好找'],['keep it clean','保持乾淨']],
+s3:[['It took me an hour to clean my whole room.','我花了一小時整理整個房間。'],['I gave away some books that were too easy for me.','我把太簡單的書送給別人。'],['I threw away old papers I did not need.','我丟掉不需要的舊紙張。'],['Now my room is neat and tidy, and things are easier to find.','現在我的房間整齊乾淨，東西也比較好找。'],['I will try to keep it clean every day.','我會試著每天保持乾淨。']]},
+/* Pets */{
+w2:[['walk the dog','遛狗'],['wag its tail','搖尾巴'],['brush its fur','梳毛'],['clean the cage','清籠子'],['feed my fish','餵魚'],['soft and fluffy','又軟又蓬'],['play fetch','玩丟接球']],
+s2:[['I walked the dog after school.','放學後我去遛狗。'],['He wagged his tail when he saw me.','他看到我就搖尾巴。'],['We played fetch in the park.','我們在公園玩丟接球。'],['I brushed the cat\'s soft and fluffy fur.','我幫貓梳又軟又蓬的毛。'],['I cleaned the rabbit\'s cage.','我清了兔子的籠子。']],
+w3:[['take care of','照顧'],['a big responsibility','很大的責任'],['jump onto my lap','跳到我腿上'],['it seemed happy','它看起來很開心'],['my best friend','我最好的朋友'],['every single day','每一天'],['I wish I had','我希望我有']],
+s3:[['Having a pet is a big responsibility.','養寵物是很大的責任。'],['I have to take care of my cat every single day.','我每一天都要照顧我的貓。'],['When I sat down, she jumped onto my lap and purred.','我一坐下，她就跳到我腿上呼嚕呼嚕。'],['She seemed happy because I played with her.','她看起來很開心，因為我陪她玩。'],['She is like my best friend.','她就像我最好的朋友。']]},
+/* Camping */{
+w2:[['put up a tent','搭帳篷'],['a sleeping bag','睡袋'],['make a campfire','生營火'],['roast marshmallows','烤棉花糖'],['a flashlight','手電筒'],['go hiking','去健行'],['look at the stars','看星星']],
+s2:[['We put up our tent near a river.','我們在河邊搭帳篷。'],['Dad made a campfire, and we roasted marshmallows.','爸爸生營火，我們烤棉花糖。'],['At night, we looked at the stars.','晚上我們看星星。'],['I used a flashlight to find the bathroom.','我用手電筒找廁所。'],['I slept in a warm sleeping bag.','我睡在溫暖的睡袋裡。']],
+w3:[['in the middle of the night','半夜'],['strange noises','奇怪的聲音'],['a little scared','有點害怕'],['the sun came up','太陽出來了'],['the beautiful view','美麗的景色'],['far away from the city','遠離城市'],['an adventure','冒險']],
+s3:[['In the middle of the night, I heard strange noises outside the tent.','半夜我聽到帳篷外有奇怪的聲音。'],['I was a little scared, but it was only the wind.','我有點害怕，但原來只是風。'],['When the sun came up, we hiked to the top of the hill.','太陽出來後，我們爬到山頂。'],['The view was so beautiful that I took many photos.','景色美到我拍了很多照片。'],['Camping far away from the city felt like a real adventure.','在遠離城市的地方露營，像真正的冒險。']]},
+/* Taking a plane */{
+w2:[['check in','辦登機'],['a boarding pass','登機證'],['go through security','過安檢'],['fasten my seat belt','繫好安全帶'],['take off','起飛'],['a window seat','靠窗的位子'],['land safely','安全降落']],
+s2:[['We checked in and got our boarding passes.','我們辦了登機，拿到登機證。'],['We went through security quickly.','我們很快過了安檢。'],['I sat in a window seat.','我坐在靠窗的位子。'],['I fastened my seat belt before the plane took off.','起飛前我繫好安全帶。'],['The plane landed safely at night.','飛機晚上安全降落。']],
+w3:[['above the clouds','在雲上面'],['my ears popped','耳朵嗡嗡響'],['a long flight','長途飛行'],['watch a movie','看電影'],['the flight attendant','空服員'],['a little bumpy','有點顛簸'],['a different country','另一個國家']],
+s3:[['It was a long flight, so I watched two movies.','這是長途飛行，所以我看了兩部電影。'],['When we were above the clouds, everything looked white and soft.','在雲上面時，一切都白白軟軟的。'],['The ride was a little bumpy, and my ears popped.','飛機有點顛簸，我耳朵嗡嗡響。'],['A kind flight attendant gave me some juice.','一位親切的空服員給我果汁。'],['I was excited to visit a different country.','我很興奮能去另一個國家。']]},
+/* Sports day */{
+w2:[['run a race','賽跑'],['the finish line','終點線'],['a relay race','接力賽'],['pass the baton','傳接力棒'],['win a medal','得到獎牌'],['cheer loudly','大聲加油'],['the long jump','跳遠']],
+s2:[['I ran a race with my classmates.','我和同學賽跑。'],['In the relay race, I passed the baton to my friend.','接力賽時我把棒子交給朋友。'],['Everyone cheered loudly for our class.','大家為我們班大聲加油。'],['I did the long jump for the first time.','我第一次跳遠。'],['Our class won a gold medal!','我們班拿到金牌！']],
+w3:[['take first place','得第一名'],['come in second','得第二名'],['almost fell','差點跌倒'],['catch up with','追上'],['try my best','盡全力'],['the whole school','全校'],['next year','明年']],
+s3:[['In the relay race, I almost fell, but I kept running.','接力賽時我差點跌倒，但我繼續跑。'],['I caught up with the boy in front of me.','我追上前面的男生。'],['Our class came in second, so we were a little sad.','我們班得第二名，所以有點難過。'],['But the teacher said we tried our best.','但老師說我們已經盡力了。'],['Next year, I want to take first place.','明年我想拿第一名。']]},
+/* The library */{
+w2:[['borrow a book','借書'],['return the books','還書'],['a library card','借書證'],['be quiet','保持安靜'],['a comic book','漫畫書'],['find a seat','找位子'],['the children\'s section','兒童區']],
+s2:[['I borrowed three books from the library.','我在圖書館借了三本書。'],['I used my library card.','我用了我的借書證。'],['We had to be quiet inside.','在裡面要保持安靜。'],['I found a comic book about space.','我找到一本關於太空的漫畫。'],['I returned my old books first.','我先還了舊書。']],
+w3:[['a chapter book','章節書'],['could not stop reading','停不下來'],['the main character','主角'],['find out what happens','想知道結果'],['the end of the story','故事結局'],['recommend it to','推薦給'],['learn new words','學新單字']],
+s3:[['I borrowed a chapter book, and I could not stop reading it.','我借了一本章節書，看到停不下來。'],['The main character was a brave girl who traveled to the moon.','主角是一個勇敢的女孩，她去了月球。'],['I wanted to find out what happened at the end of the story.','我想知道故事最後怎麼了。'],['I learned some new words while I was reading.','我讀的時候學了一些新單字。'],['I would recommend it to my friends.','我會推薦給我的朋友。']]},
+/* Staying home sick */{
+w2:[['catch a cold','感冒'],['a runny nose','流鼻涕'],['a headache','頭痛'],['stay in bed','躺在床上'],['drink warm water','喝溫水'],['miss school','沒去上學'],['sleep a lot','睡很多']],
+s2:[['I caught a cold and had a runny nose.','我感冒了，一直流鼻涕。'],['I had a headache, so I stayed in bed.','我頭痛，所以躺在床上。'],['Mom gave me warm water and soup.','媽媽給我溫水和湯。'],['I missed school for one day.','我一天沒去上學。'],['I slept a lot and felt better.','我睡了很多，感覺好一點。']],
+w3:[['feel terrible','覺得很難受'],['could not taste anything','吃不出味道'],['so bored','好無聊'],['miss my friends','想念朋友'],['catch up on','補上'],['get well soon','早日康復'],['wash my hands more','多洗手']],
+s3:[['I felt terrible because I could not taste anything.','我很難受，吃什麼都沒味道。'],['Staying home all day was so boring, and I missed my friends.','整天在家好無聊，我很想念朋友。'],['My friend sent me a card that said Get well soon.','朋友寄給我一張寫著早日康復的卡片。'],['When I went back to school, I had to catch up on my homework.','回到學校後，我要補上功課。'],['From now on, I will wash my hands more often.','從現在起，我會更常洗手。']]}
+];
 const TI={home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/></svg>',pics:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-5-5-9 8"/></svg>',theme:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19V5M9 7h6"/></svg>'};
-function tabs(a){return `<nav class="tabs">${[['home','寫日記 Write'],['pics','看圖 Pictures'],['theme','本週主題 Theme']].map(([k,l])=>`<button class="${a===k?'on':''}" data-a="tab" data-v="${k}">${TI[k]}${l}</button>`).join('')}</nav>`}
+function tabs(a){return `<nav class="tabs">${[['home','寫日記'],['pics','看圖'],['theme','本週主題']].map(([k,l])=>`<button class="${a===k?'on':''}" data-a="tab" data-v="${k}">${TI[k]}${l}</button>`).join('')}</nav>`}
 function vPics(){
  const kid=kidBy(st.kid),t=ymd(today()),p=pairFor(t),si=PAIRS.indexOf(p);
  const mine=[entries[eid(kid.id,t)],entries[eid(kid.id,t)+'_p']].find(e=>e&&picPair(e.pic)&&e.pic.set===si);
@@ -566,14 +669,28 @@ function vPics(){
  ${mine?`<button class="btn pri full" data-a="picOpen">Read or edit my story 看看 / 修改</button>`:`<div class="row" style="flex-wrap:nowrap"><button class="btn sec" style="flex:1;padding:0 6px" data-a="picWrite" data-v="L">Picture 1<br><small>寫第 1 張</small></button><button class="btn sec" style="flex:1;padding:0 6px" data-a="picWrite" data-v="R">Picture 2<br><small>寫第 2 張</small></button></div><button class="btn pri full" style="margin-top:10px" data-a="picWrite" data-v="LR">1 + 2 · Tell the whole story 兩張連著寫</button>`}
  <p class="zh" style="margin:10px 0 0">Good for weekends, or any day you want to write more. 適合週末寫，平日想多寫也可以。</p></div></main>${tabs('pics')}`;
 }
+function thItem(k){const[t,l]=k.split('-').map(Number),T0=THEMES[t];return l===1?{t,l,th:T0,w:T0.w,s:T0.s}:{t,l,th:T0,w:THEME_UP[t]['w'+l],s:THEME_UP[t]['s'+l]}}
+function thPick(T,mode){
+ const td=ymd(today()),wk=ymd(addDays(today(),-7)),L=T.learned,cur=T.cur,ct=+cur.split('-')[0],N=THEMES.length;
+ const top=t=>{let n=0;for(let l=1;l<=3;l++)if(L[t+'-'+l])n=l;return n};
+ const ups=[],upsAny=[],fresh=[];
+ for(let j=1;j<=N;j++){const t=(ct+j)%N,n=top(t);if(n===0)fresh.push(t+'-1');else if(n<3){const k=t+'-'+(n+1);if(k===cur)continue;upsAny.push([L[t+'-'+n],k]);if(L[t+'-'+n]<=wk)ups.push([L[t+'-'+n],k])}}
+ ups.sort((a,b)=>a[0]<b[0]?-1:1);upsAny.sort((a,b)=>a[0]<b[0]?-1:1);
+ const fr=fresh.filter(k=>k!==cur),U=ups.map(x=>x[1]),UA=upsAny.map(x=>x[1]);
+ const order=mode==='new'?[fr,U,UA]:(+cur.split('-')[1]>1?[fr,U,UA]:[U,fr,UA]);
+ for(const o of order)if(o.length)return o[0];
+ T.learned={};return ((ct+1)%N)+'-1';
+}
 function themeState(){const T=settings.theme||(settings.theme={i:0,done:{},doneOn:''});const kids=settings.kids;
- if(T.doneOn&&T.doneOn<ymd(today())&&kids.length&&kids.every(k=>T.done[k.id])){T.i=(T.i+1)%THEMES.length;T.done={};T.doneOn='';saveSettings()}return T}
+ if(!T.cur){T.cur=(T.i||0)+'-1';T.learned=T.learned||{}}T.learned=T.learned||{};
+ if(T.doneOn&&T.doneOn<ymd(today())&&kids.length&&kids.every(k=>T.done[k.id])){T.learned[T.cur]=T.doneOn;T.cur=thPick(T,'auto');T.done={};T.doneOn='';saveSettings()}return T}
 function vTheme(){
- const T=themeState(),th=THEMES[T.i],kids=settings.kids,all=kids.length&&kids.every(k=>T.done[k.id]);
- return top(th.i+' '+th.e,'本週主題 · '+th.z+' · '+(T.i+1)+'/'+THEMES.length,'who')+`<main class="wrap">
- <p class="zh" style="margin:0 0 10px;text-align:center">Tap any word or sentence to hear it. 點詞或句子就會念。</p>
- <div class="card"><h2>Useful phrases 常用搭配詞</h2><div class="tl">${th.w.map(w=>`<button data-a="say" data-v="${esc(w[0])}"><b>${esc(w[0])}</b><span>${PY(w[1])}</span></button>`).join('')}</div></div>
- <div class="card"><h2>Useful sentences 實用句子</h2><div class="tl sen">${th.s.map((x,i)=>`<button data-a="say" data-v="${esc(x[0])}"><b>${i+1}. ${esc(x[0])}</b><span>${PY(x[1])}</span></button>`).join('')}</div></div>
+ const T=themeState(),it=thItem(T.cur),th=it.th,kids=settings.kids,all=kids.length&&kids.every(k=>T.done[k.id]);
+ const menu=st.thMenu?`<div class="card thm">${it.l<3?`<button class="btn pri full" data-a="thLevel">${esc(th.e)} · Level ${it.l+1}<br><small>${esc(th.z)} 進階第 ${it.l+1} 級</small></button>`:''}<button class="btn sec full" style="margin-top:${it.l<3?10:0}px" data-a="thNew">New theme<br><small>換一個新主題</small></button></div>`:'';
+ return top(th.i+' '+th.e,'本週主題 · '+th.z+' · Level '+it.l+' '+'★'.repeat(it.l)+'☆'.repeat(3-it.l),'who',`<button class="ib thb" data-a="thMenu" aria-label="Change">${st.thMenu?'✕':'Next ›'}</button>`)+`<main class="wrap">${menu}
+ <p class="zh" style="margin:0 0 10px;text-align:center">Tap any word or sentence to hear it.</p>
+ <div class="card"><h2>Useful phrases 常用搭配詞</h2><div class="tl">${it.w.map(w=>`<button data-a="say" data-v="${esc(w[0])}"><b>${esc(w[0])}</b><span>${PY(w[1])}</span></button>`).join('')}</div></div>
+ <div class="card"><h2>Useful sentences 實用句子</h2><div class="tl sen">${it.s.map((x,i)=>`<button data-a="say" data-v="${esc(x[0])}"><b>${i+1}. ${esc(x[0])}</b><span>${PY(x[1])}</span></button>`).join('')}</div></div>
  <div class="card"><h2>Done? 完成了嗎？</h2><p class="zh" style="margin-top:-4px">When everyone is done, a new theme comes the next day. 大家都完成後，隔天換新主題。</p>
  <div class="row">${kids.map(k=>`<button class="btn ${T.done[k.id]?'pri':'sec'}" style="flex:1" data-a="themeDone" data-v="${esc(k.id)}">${T.done[k.id]?'✓':'☐'} ${esc(k.name)}</button>`).join('')}</div>
  ${all?'<div class="banner">Great job, everyone! New theme tomorrow. 大家都完成了，明天換新主題！</div>':''}</div></main>${tabs('theme')}`;
@@ -735,7 +852,7 @@ function weekBook(kid,mon){
 }
 function fixNote(f){return f.t==='capital'?' (capital)':f.t==='punctuation'?' (punctuation)':!f.w?' (add)':!f.r?' (delete)':''}
 function a4HTML(kid,B){
- const TC=weeks[weekKey(kid,B.mon)]||null,box=(t,big)=>`<div class="sug"><span class="sl">✎ suggested</span><div style="${big?'font:italic 700 16px Georgia,serif':'font:italic 14px/1.45 Georgia,serif'}">${esc(t)}</div></div>`,tBox=TC?box(TC.title,1):st.tcBusy?'<div class="sug" style="color:#98a2bd">Writing a title… 正在想標題…</div>':'',hasB=B.rows.some(r=>r.better);
+ const TC=weeks[weekKey(kid,B.mon)]||null,box=t=>`<p class="sug"><span>${esc(t)}</span></p>`,tBox=TC?box(TC.title):st.tcBusy?'<p class="sug" style="color:#98a2bd">Writing a title… 正在想標題…</p>':'',hasB=B.rows.some(r=>r.better);
  const segH=sg=>sg.map(x=>x.sup?`<sup>${esc(x.sup)}</sup>`:x.u?`<u>${esc(x.t)}</u>`:esc(x.t)).join('');
  return `<div class="hd"><div><b>My Weekly Journal</b><span>${esc(B.range)}</span></div><div style="text-align:right"><b style="font-size:20px">${esc(kid.name)}</b><span>${LEVELS[kid.level].name} · ${B.n}/5 days · ${B.words} words · ${B.fixes} fix${B.fixes===1?'':'es'}</span></div></div>
  <div class="bd">${hasB?'':tBox}<div class="tb"><div class="th">Day</div><div class="th">What I wrote</div><div class="th">Corrections</div>
@@ -743,7 +860,7 @@ function a4HTML(kid,B){
   <div class="wr">${r.pic?`<div class="th2">${r.pic.pick!=='R'?`<div>${r.pic.pick==='LR'?'<b>1</b>':''}${PAIRS[r.pic.set].a}</div>`:''}${r.pic.pick!=='L'?`<div>${r.pic.pick==='LR'?'<b>2</b>':''}${PAIRS[r.pic.set].b}</div>`:''}</div>`:''}${r.none?'<span style="color:#98a2bd">(no entry)</span>':segH(r.segs)}</div>
   <div class="cr">${r.none?'':r.fx.length?r.fx.map(f=>`<div><span class="n">${f.n}.</span> ${f.w?`<span class="w">${esc(f.w)}</span>`:''}${f.w&&f.r?' → ':''}<span class="r">${f.w?'':'+ '}${esc(f.r)}</span><span class="n" style="font-weight:600">${fixNote(f)}</span></div>`).join(''):r.checked?'<div style="color:#178a57;font-weight:800">✓ No mistakes</div>':'<div style="color:#98a2bd">–</div>'}</div>`).join('')}</div>
  ${hasB?`<h4>A better way — my week</h4>${tBox}<div class="bt2">${B.rows.filter(r=>r.better).map(r=>`<p><b>${DAYL[r.i]}:</b> ${betterHTML(r.better,r.ups,false).replace(/<span class="wav">/g,'<u>').replace(/<\/span>/g,'</u>')}</p>`).join('')}</div>`:''}
- ${TC?`<div style="margin-top:8px">${box(TC.closing,0)}</div>`:''}
+ ${TC?box(TC.closing):''}
  ${B.newW.length?`<div class="sm"><b>New words:</b> ${esc(B.newW.join(', '))}</div>`:''}
  <div class="sm" style="margin-top:8px"><b>Teacher’s comment:</b></div><div class="ln"></div><div class="ln"></div></div>`;
 }
@@ -1185,7 +1302,7 @@ async function pdf(){
  try{toast('Making PDF… 產生中');await loadPdf()}catch(e){toast('Could not load the PDF tool. Check the internet. PDF 工具載入失敗，請檢查網路。');return}
  const kid=kidBy(st.kid),mon=addDays(monday(today()),st.wk*7),B=weekBook(kid,mon);
  const TH={};for(const r of B.rows)if(r.pic){const p=PAIRS[r.pic.set];if(r.pic.pick!=='R')TH[r.pic.set+'a']=TH[r.pic.set+'a']||await svgPng(p.a);if(r.pic.pick!=='L')TH[r.pic.set+'b']=TH[r.pic.set+'b']||await svgPng(p.b)}
- const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),PW=210,M=14,BOT=284;
+ const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),PW=210,M=12,BOT=286;
  const clean=t=>String(t||'').replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/[–—]/g,'-').replace(/…/g,'...').replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g,'');
  const BLUE=[47,91,234],INK=[27,32,51],GREY=[122,131,156],RED=[224,70,75],GRN=[23,138,87],ORG=[224,138,36];
  /* rich text: segs [{t,c,b,i,u:[rgb],strike,sup}] ; returns height */
@@ -1196,11 +1313,12 @@ async function pdf(){
    if(g.sup){doc.setFont('helvetica','bold');doc.setFontSize(size*.6);const sw=doc.getTextWidth(g.sup);if(draw){doc.setTextColor(...RED);doc.text(g.sup,cx+.2,cy+lh*.45)}cx+=sw+.6;continue}
    const parts=clean(g.t).split(/(\s+)/);
    for(const p of parts){if(!p)continue;setF(g);
-    if(/^\s+$/.test(p)){if(p.includes('\n')){cx=x;cy+=lh;lines++;continue}if(cx>x)cx+=doc.getTextWidth(' ');continue}
+    if(/^\s+$/.test(p)){if(p.includes('\n')){cx=x;cy+=lh;lines++;continue}if(cx>x){const sw=doc.getTextWidth(' ');if(draw&&g.ds){doc.setDrawColor(...g.ds);doc.setLineWidth(.2);const yb=cy+lh*.84;for(let px=cx;px<cx+sw;px+=1.1)doc.line(px,yb,Math.min(px+.6,cx+sw),yb)}cx+=sw}continue}
     let ww=doc.getTextWidth(p);if(cx+ww>x+w&&cx>x){cx=x;cy+=lh;lines++}
     if(draw){doc.setTextColor(...(g.c||INK));doc.text(p,cx,cy+lh*.72);
      if(g.u&&g.wv){doc.setDrawColor(...g.u);doc.setLineWidth(.3);const yb=cy+lh*.84;let px=cx,up=true;while(px<cx+ww){const nx=Math.min(px+.9,cx+ww);doc.line(px,up?yb:yb+.55,nx,up?yb+.55:yb);px=nx;up=!up}}
      else if(g.u){doc.setDrawColor(...g.u);doc.setLineWidth(.45);doc.line(cx,cy+lh*.82,cx+ww,cy+lh*.82)}
+     else if(g.ds){doc.setDrawColor(...g.ds);doc.setLineWidth(.2);const yb=cy+lh*.84;for(let px=cx;px<cx+ww;px+=1.1)doc.line(px,yb,Math.min(px+.6,cx+ww),yb)}
      if(g.strike){doc.setDrawColor(...(g.c||INK));doc.setLineWidth(.3);doc.line(cx,cy+lh*.55,cx+ww,cy+lh*.55)}}
     cx+=ww}}
   return lines*lh;
@@ -1210,15 +1328,13 @@ async function pdf(){
    doc.setFont('helvetica','bold');doc.setFontSize(13);doc.text(clean(kid.name),PW-M,10,{align:'right'});doc.setFont('helvetica','normal');doc.setFontSize(9.5);
    doc.text(LEVELS[kid.level].name+'  |  '+B.n+'/5 days  |  '+B.words+' words  |  '+B.fixes+' fix'+(B.fixes===1?'':'es'),PW-M,15.5,{align:'right'});return 23}
   doc.setFontSize(10.5);doc.text('My Weekly Journal  -  '+clean(kid.name)+'  -  '+clean(B.range),M,8);return 17};
- const C0=M,C1=M+18,C2=M+18+112,CE=PW-M,PAD=1.6;
+ const C0=M,C1=M+15,CE=PW-M,C2=CE-48,PAD=1.6;
  const thead=yy=>{doc.setFillColor(243,246,255);doc.rect(C0,yy,CE-C0,7,'F');doc.setDrawColor(...BLUE);doc.setLineWidth(.6);doc.line(C0,yy,CE,yy);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...BLUE);doc.text('Day',C0+PAD,yy+4.8);doc.text('What I wrote',C1+PAD,yy+4.8);doc.text('Corrections',C2+PAD,yy+4.8);return yy+7};
  let y=header(true);
  const TC=weeks[weekKey(kid,mon)]||null;
- const sugBox=(t,size,bold)=>{const sg=[{t,i:1,b:bold?1:0}],w=PW-2*M-8,h=rich(sg,M+4,0,w,size,1.4,false)+4.4;if(y+h+3>BOT){doc.addPage();y=header(false)}
-  doc.setDrawColor(190,196,210);doc.setLineWidth(.25);doc.roundedRect(M,y,PW-2*M,h,1.5,1.5);doc.setFillColor(255,255,255);doc.setFont('helvetica','italic');doc.setFontSize(7.5);const lab='suggested';const lw=doc.getTextWidth(lab)+3;doc.rect(PW-M-lw-6,y-1.6,lw+3,3.2,'F');doc.setTextColor(91,101,128);doc.text(lab,PW-M-lw-4.5,y+1);
-  rich(sg,M+4,y+2.2,w,size,1.4,true);y+=h+3};
+ const aiLine=t=>{const sg=[{t,i:1,ds:[138,147,171]}],h=rich(sg,M,0,PW-2*M,10,1.38,false);if(y+h>BOT){doc.addPage();y=header(false)}rich(sg,M,y,PW-2*M,10,1.38,true);y+=h+.8};
  const bet=B.rows.filter(r=>r.better);
- if(TC&&!bet.length)sugBox(TC.title,12,1);
+ if(TC&&!bet.length){aiLine(TC.title);y+=1}
  y=thead(y);
  const corrSegs=r=>r.none?[]:r.fx.length?r.fx.flatMap((f,k)=>[{t:(k?'\n':'')+f.n+'. ',c:GREY,b:1},...(f.w?[{t:f.w,c:RED,strike:1}]:[]),...(f.w&&f.r?[{t:' -> ',c:GREY}]:[]),{t:(f.w?'':'+ ')+f.r,c:GRN,b:1},{t:fixNote(f),c:GREY}]):r.checked?[{t:'No mistakes!',c:GRN,b:1}]:[{t:'-',c:GREY}];
  for(const r of B.rows){
@@ -1234,11 +1350,11 @@ async function pdf(){
   rich(ws,C1+PAD,y+PAD+thH,C2-C1-2*PAD,10.5,1.38,true);rich(corrSegs(r),C2+PAD,y+PAD,CE-C2-2*PAD,8.3,1.35,true);
   doc.setDrawColor(221,228,243);doc.setLineWidth(.3);doc.line(C0,y+rh,CE,y+rh);doc.line(C1,y,C1,y+rh);doc.line(C2,y,C2,y+rh);y+=rh}
  const sec=t=>{if(y+14>BOT){doc.addPage();y=header(false)}y+=4;doc.setFont('helvetica','bold');doc.setFontSize(11.5);doc.setTextColor(...BLUE);doc.text(t,M,y+4);y+=5.5;doc.setDrawColor(221,228,243);doc.setLineWidth(.4);doc.line(M,y,PW-M,y);y+=2.5};
- if(bet.length){sec('A better way - my week');if(TC){y+=1.5;sugBox(TC.title,12,1)}
+ if(bet.length){sec('A better way - my week');if(TC){y+=.5;aiLine(TC.title);y+=.6}
   for(const r of bet){const t=r.better,lt=t.toLowerCase(),rg=[];(r.ups||[]).forEach(u=>{const p=lt.indexOf(u.p.toLowerCase());if(p>=0&&!rg.some(q=>p<q.e&&p+u.p.length>q.s))rg.push({s:p,e:p+u.p.length})});rg.sort((a,b)=>a.s-b.s);
    const sg=[{t:DAYL[r.i]+': ',b:1}];let c=0;rg.forEach(q=>{sg.push({t:t.slice(c,q.s),i:1});sg.push({t:t.slice(q.s,q.e),i:1,u:ORG,wv:1});c=q.e});sg.push({t:t.slice(c),i:1});
    const h=rich(sg,M,0,PW-2*M,10,1.38,false);if(y+h>BOT){doc.addPage();y=header(false)}rich(sg,M,y,PW-2*M,10,1.38,true);y+=h+.8}}
- if(TC){y+=2;sugBox(TC.closing,10,0)}
+ if(TC){y+=.4;aiLine(TC.closing)}
  y+=2;
  const line=sg=>{const h=rich(sg,M,0,PW-2*M,10,1.4,false);if(y+h>BOT){doc.addPage();y=header(false)}rich(sg,M,y,PW-2*M,10,1.4,true);y+=h};
  if(B.newW.length)line([{t:'New words: ',b:1},{t:B.newW.join(', ')}]);
@@ -1346,6 +1462,9 @@ async function act(a,v){
  case 'say':say(v);break;
  case 'picWrite':openWrite(ymd(today()),{set:PAIRS.indexOf(pairFor(ymd(today()))),pick:v});break;
  case 'picOpen':{const k=kidBy(st.kid),t=ymd(today()),si=PAIRS.indexOf(pairFor(t)),b=eid(k.id,t),id=[b,b+'_p'].find(i=>entries[i]&&picPair(entries[i].pic)&&entries[i].pic.set===si);if(id){const e=entries[id];Object.assign(st,{view:'write',caret:null,bot:null,guideOpen:false,eidW:id,date:t,draft:e.text,fb:e.fb?{...e.fb,text:e.text}:null,pic:e.pic,typeMs:0,last:0});render()}break}
+ case 'thMenu':{st.thMenu=!st.thMenu;render();break}
+ case 'thLevel':{const T=themeState(),it=thItem(T.cur);if(it.l<3){T.learned[T.cur]=T.learned[T.cur]||ymd(today());T.cur=it.t+'-'+(it.l+1);T.done={};T.doneOn=''}st.thMenu=false;await saveSettings();render();scrollTo(0,0);break}
+ case 'thNew':{const T=themeState();if(T.doneOn)T.learned[T.cur]=T.doneOn;T.cur=thPick(T,'new');T.done={};T.doneOn='';st.thMenu=false;await saveSettings();render();scrollTo(0,0);break}
  case 'themeDone':{const T=themeState();T.done[v]=!T.done[v];T.doneOn=settings.kids.every(k=>T.done[k.id])?ymd(today()):'';await saveSettings();render();break}
  case 'guideTog':st.guideOpen=!st.guideOpen;break;
  case 'setOpener':settings.opener=v;await saveSettings();render();break;
