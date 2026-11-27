@@ -118,6 +118,7 @@ input.t,select.t{width:100%;min-height:52px;border-radius:14px;border:2px solid 
 .a4 h4{font:800 16px ui-rounded,sans-serif;color:#2f5bea;margin:22px 0 6px;border-bottom:1.5px solid #dde4f3;padding-bottom:4px}
 .a4 .bt2 p{margin:0 0 6px;font:italic 15.5px/1.6 Georgia,serif}.a4 .bt2 b{font-style:normal;font-family:system-ui,sans-serif}.a4 .bt2 u{text-decoration:underline wavy #e08a24 1.5px;text-underline-offset:4px}
 .a4 .sm{font-size:14px;margin:3px 0}.a4 .ln{border-bottom:1px solid #c9d1e6;height:28px}
+.mini2{display:flex;gap:10px;margin-top:4px}.mini2 button{flex:1;background:var(--card);border-radius:14px;padding:10px 12px;text-align:left;box-shadow:0 1px 0 var(--line);min-height:56px}.mini2 b{display:block;font-size:15px;color:var(--blue)}.mini2 span{font-size:12px;color:var(--mut)}.mini2 .due{background:var(--yelS)}.mini2 .due span{color:light-dark(#8a6400,#ffd23f);font-weight:700}
 .wkbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .load{padding:80px 20px;text-align:center;color:var(--mut);font-weight:700}
 .av{overflow:hidden}.av svg{width:100%;height:100%;display:block}
@@ -493,7 +494,7 @@ function wordDiff(A,B){
  fl();return G;
 }
 function diffMarks(text,issues){
- const out=[],used=[],rx=w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+ issues=withSplits(text,issues);const out=[],used=[],rx=w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
  (issues||[]).forEach((x,idx)=>{
   const W=String(x.wrong||'').trim().split(/\s+/).filter(Boolean),Rw=String(x.right||'').trim().split(/\s+/).filter(Boolean);
   if(!W.length&&!Rw.length)return;const G=wordDiff(W,Rw);if(!G.length)return;
@@ -523,7 +524,7 @@ function weekBook(kid,mon){
   const f=e.firstFb||e.fb||null,text=e.original||e.text||'',iss=(f&&f.issues)||[];
   const D=diffMarks(text,iss);const segs=[];let c=0;D.loc.forEach(r=>{if(r.s<c)return;if(r.s>c)segs.push({t:text.slice(c,r.s)});if(r.e>r.s)segs.push({t:text.slice(r.s,r.e),u:1});segs.push({sup:String(r.n)});c=r.e});segs.push({t:text.slice(c)});
   const fx=D.all.map(o=>({n:o.n,w:o.w,r:o.r,t:o.type}));
-  const b=(f&&f.better)||(e.fb&&e.fb.better)||'',ups=(f&&f.better?f.ups:(e.fb&&e.fb.ups))||[];
+  const b=(f&&f.better)||(e.fb&&e.fb.better)||'',ups=cleanUps({ups:(f&&f.better?f.ups:(e.fb&&e.fb.ups))||[],better:b,star:null},text).ups;
   fx.forEach(o=>{cnt[o.t]=(cnt[o.t]||0)+1});fixes+=fx.length;
   return {d:w.d,i,segs,fx,checked:!!f,makeup:!!e.makeup,better:b,ups}});
  const end=addDays(mon,6),newW=(cards[kid.id]||[]).filter(c=>c.first>=ymd(mon)&&c.first<=ymd(end)).map(c=>c.w);
@@ -538,7 +539,7 @@ function a4HTML(kid,B){
  ${B.rows.map(r=>`<div class="dy"><b>${DAYS[r.i]}</b><span>${r.d.getMonth()+1}/${r.d.getDate()}</span>${r.i>4?'<span>bonus</span>':''}${r.makeup?'<span>make-up</span>':''}</div>
   <div class="wr">${r.none?'<span style="color:#98a2bd">(no entry)</span>':segH(r.segs)}</div>
   <div class="cr">${r.none?'':r.fx.length?r.fx.map(f=>`<div><span class="n">${f.n}.</span> ${f.w?`<span class="w">${esc(f.w)}</span>`:''}${f.w&&f.r?' → ':''}<span class="r">${f.w?'':'+ '}${esc(f.r)}</span><span class="n" style="font-weight:600">${fixNote(f)}</span></div>`).join(''):r.checked?'<div style="color:#178a57;font-weight:800">✓ No mistakes</div>':'<div style="color:#98a2bd">–</div>'}</div>`).join('')}</div>
- ${B.rows.some(r=>r.better)?`<h4>A better way — my week</h4><div class="bt2">${B.rows.filter(r=>r.better).map(r=>`<p><b>${DAYL[r.i]}:</b> ${betterHTML(r.better,r.ups,false).replace(/<span class="wav">/g,'<u>').replace(/<\/span>/g,'</u>')}</p>`).join('')}</div>`:''}
+ ${B.rows.some(r=>r.better)?`<h4>A better way — my week</h4><div class="sm" style="color:#7a839c;margin:-2px 0 6px"><u style="text-decoration:underline wavy #e08a24 1.5px;text-underline-offset:4px">wavy line</u> = nice words to learn: linking words, describing words, feelings</div><div class="bt2">${B.rows.filter(r=>r.better).map(r=>`<p><b>${DAYL[r.i]}:</b> ${betterHTML(r.better,r.ups,false).replace(/<span class="wav">/g,'<u>').replace(/<\/span>/g,'</u>')}</p>`).join('')}</div>`:''}
  <h4>This week</h4>${Object.keys(B.cnt).length?`<div class="sm"><b>To practise:</b> ${Object.entries(B.cnt).map(([k,v])=>TYPES[k][0]+' ×'+v).join(' · ')}</div>`:''}${B.newW.length?`<div class="sm"><b>New words:</b> ${esc(B.newW.join(', '))}</div>`:''}
  <div class="sm" style="margin-top:10px"><b>Teacher’s comment:</b></div><div class="ln"></div><div class="ln"></div></div>`;
 }
@@ -549,8 +550,7 @@ function vWeek(){
  <div class="wkbar"><button class="ib" style="background:var(--card);color:var(--ink)" data-a="wk" data-v="-1" aria-label="Previous week">${BACK}</button><b style="flex:1;text-align:center">${esc(B.range)}</b><button class="ib" style="background:var(--card);color:var(--ink);transform:scaleX(-1)" data-a="wk" data-v="1" ${st.wk>=0?'disabled':''} aria-label="Next week">${BACK}</button></div>
  <div class="a4wrap" id="a4w"><div class="a4" id="a4">${a4HTML(kid,B)}</div></div>
  <p class="zh" style="text-align:center">This is exactly what prints on A4. Pinch to zoom. 這就是印出來的樣子，可以用兩指放大。</p>
- ${B.n?`<button class="btn sec full" data-a="redoWeek" ${st.redo?'disabled':''}>${st.redo?'Updating… 更新中 '+st.redo:'Redo “A better way” for this week 用新規則重新產生本週的更好寫法'}</button>`:''}
- ${(backupAge()===null||backupAge()>7)&&Object.keys(entries).length?`<div class="warn">${backupAge()===null?'Not backed up yet. 還沒備份過。':'Last backup '+backupAge()+' days ago. 已經 '+backupAge()+' 天沒備份。'}<button class="btn sec full" style="margin-top:8px" data-a="export">Back up now 順便備份</button></div>`:''}</main>
+ <div class="mini2">${B.n?`<button data-a="redoWeek" ${st.redo?'disabled':''}><b>${st.redo?'Updating… '+st.redo:'↻ Redo better way'}</b><span>${st.redo?'更新中':'重新產生更好的寫法'}</span></button>`:''}<button data-a="export" class="${(backupAge()===null||backupAge()>7)&&Object.keys(entries).length?'due':''}"><b>⤓ Back up</b><span>備份${backupAge()===null?' · 還沒備份過':backupAge()>7?' · '+backupAge()+'天未備份':' · '+(backupAge()===0?'今天已備份':backupAge()+'天前')}</span></button></div></main>
  <div class="dock"><div class="in"><button class="btn pri" data-a="pdf">Download PDF 下載</button></div></div>`;
 }
 function fitA4(){const w=$('#a4w'),a=$('#a4');if(!w||!a)return;const k=w.clientWidth/794;a.style.transform=`scale(${k})`;w.style.height=Math.ceil(a.offsetHeight*k)+'px'}
@@ -585,14 +585,15 @@ function betterRules(kid){
   2:`LEVEL 2 (about 7-8 years old): easy everyday words, sentences of at most 14 words, 2 small upgrades (an easy describing word, a linking word like and then / because / after that, or a simple feeling). At most 1.4 times the words of the entry.`,
   3:`LEVEL 3 (about 9-10 years old): natural, smooth English a good 9-year-old could write; 3 upgrades (a vivid but common describing word, linking words, a feeling or detail, a varied sentence opener). No rare or fancy words. At most 1.5 times the words of the entry.`};
  return `"better" is a smoother, nicer version of the whole entry written at the child's OWN level, not above it: ${L[kid.level]||L[2]} Build "better" on top of the corrected entry: keep EVERY correction (the same past tense, spelling and capitals) and never bring back a mistake. Things that already happened stay in the past tense. Keep the same meaning and the child's own ideas and events (e.g. "I went to the park" must not become "I want to go to the park"); do not invent new events.
-"upgrades": the upgraded words in "better", each copied EXACTLY as it appears in "better" (2 to 6 words each), with "zh": a short ${ZHN()} note on why it is nicer (max 18 characters).
-"star": the single nicest sentence from "better" for the child to remember, copied exactly, with "zh": its meaning in ${ZHN()}.`}
+"upgrades": EVERY real upgrade in "better" that the child can learn and reuse, copied EXACTLY as it appears in "better" (1 to 5 words each, never a whole sentence). A real upgrade is: a linking word that joins ideas (because, so, after that, when, before, but, although, then); a more vivid describing word replacing a plain one (happy -> excited, fun -> exciting, good -> delicious); a feeling or sense detail (I felt proud, it smelled yummy); a time or order opener (After school, In the morning, Finally). NOT an upgrade: words the child already wrote, or only adding really / very / so. Each has "zh": a short ${ZHN()} note saying which kind of upgrade it is and why (max 18 characters).
+"star": the single nicest sentence from "better" that contains at least one upgrade, copied exactly, with "zh": its meaning in ${ZHN()}.`}
 function buildPrompt(kid,text){
  const tp=topicFor(kid,st.date),voc=vocabFor(kid.level,hash(st.date+kid.id)).map(w=>w[0]),strict=kid.mode==='strict',max=kid.level===1?3:strict?6:5;
  return `You are a kind, encouraging English teacher checking a short diary entry written by a ${kid.age}-year-old child who is learning English as a second language.
 Correction mode: ${strict?'STRICT':'SIMPLE'}.
 SIMPLE mode flags only: spelling mistakes; verb tense mistakes (a diary about today should use the past tense for finished actions); a missing capital letter at the start of a sentence or for "I"; a missing full stop or question mark at the end of a sentence. Ignore everything else.
 STRICT mode flags all of those plus grammar mistakes (articles, plurals, subject-verb agreement, word order, missing words, prepositions).
+Check EVERY verb: anything that already happened must be in the past tense (go -> went, write -> wrote). A word wrongly split into two (home work -> homework, foot ball -> football, birth day -> birthday) is a spelling mistake.
 Flag at most ${max} mistakes, the most important first. If the same mistake repeats, flag it once.
 Return ONLY a JSON object, no other text:
 {"issues":[{"type":"spelling|tense|capital|punctuation|grammar","wrong":"the exact wrong words copied from the entry (1-4 words)","right":"the corrected words","tip":"very short tip in simple English, max 8 words","tipZh":"short note in ${ZHN()}, max 15 characters"}],
@@ -625,11 +626,21 @@ function keepFixes(nb,issues){
   o=o.replace(new RegExp('\\b'+cw.replace(/'/g,"\\'")+'\\b','g'),cr)});return o};
  const better=fix(nb.better);return {...nb,better,ups:(nb.ups||[]).map(u=>({...u,p:fix(u.p)})).filter(u=>better.toLowerCase().includes(u.p.toLowerCase())),star:nb.star?{...nb.star,en:fix(nb.star.en)}:null};
 }
+const SPLITS={'home work':'homework','foot ball':'football','basket ball':'basketball','base ball':'baseball','birth day':'birthday','class room':'classroom','class mate':'classmate','class mates':'classmates','play ground':'playground','bed room':'bedroom','bath room':'bathroom','some thing':'something','some one':'someone','some times':'sometimes','any one':'anyone','any thing':'anything','every one':'everyone','every thing':'everything','every day':'everyday','no body':'nobody','to day':'today','to morrow':'tomorrow','to night':'tonight','up stairs':'upstairs','down stairs':'downstairs','break fast':'breakfast','week end':'weekend','after noon':'afternoon','sun day':'Sunday','water melon':'watermelon','straw berry':'strawberry','butter fly':'butterfly','snow man':'snowman','rain bow':'rainbow','sun flower':'sunflower','pop corn':'popcorn','sun glasses':'sunglasses','in side':'inside','out side':'outside','grand ma':'grandma','grand pa':'grandpa','tooth brush':'toothbrush','note book':'notebook','school bag':'schoolbag','home made':'homemade','him self':'himself','my self':'myself','your self':'yourself','can not':'cannot','in to':'into'};
+function withSplits(text,issues){const out=[...(issues||[])];const t=String(text||'');
+ for(const k in SPLITS){if(k==='every day'||k==='in to'||k==='in side'||k==='out side')continue;const re=new RegExp('\\b'+k.replace(' ','\\s+')+'\\b','gi');let m;while((m=re.exec(t))){const w=m[0];if(out.some(x=>x.wrong&&x.wrong.toLowerCase().replace(/\s+/g,' ').includes(k)))break;const right=/^[A-Z]/.test(w)?SPLITS[k][0].toUpperCase()+SPLITS[k].slice(1):SPLITS[k];out.push({type:'spelling',wrong:w,right,tip:'Write it as one word.',tipZh:'這是一個字，要連在一起寫'});break}}
+ return out}
+const WEAKW=new Set('really very so too just quite pretty a an the it was is i my to and of'.split(' '));
+function cleanUps(nb,orig){if(!nb||!nb.ups)return nb;const ow=new Set(String(orig||'').toLowerCase().match(/[a-z']+/g)||[]);
+ const ups=nb.ups.filter(u=>{const ws=(u.p.toLowerCase().match(/[a-z']+/g)||[]);const nw=ws.filter(w=>!ow.has(w));return nw.length&&nw.some(w=>!WEAKW.has(w))});
+ let star=nb.star;if(star&&star.en&&!ups.some(u=>star.en.toLowerCase().includes(u.p.toLowerCase()))){const ss=splitS(nb.better);const hit=ups.length&&ss.find(x=>x.toLowerCase().includes(ups[0].p.toLowerCase()));star=hit?{en:hit,zh:''}:null}
+ return {...nb,ups,star}}
 function norm(r,text){
  const s=v=>typeof v==='string'?v:'';
- const issues=(Array.isArray(r&&r.issues)?r.issues:[]).filter(x=>x&&TYPES[x.type]&&s(x.wrong)).map(x=>({type:x.type,wrong:s(x.wrong),right:s(x.right),tip:s(x.tip),tipZh:s(x.tipZh)})).slice(0,6);
+ const issues=(Array.isArray(r&&r.issues)?r.issues:[]).filter(x=>x&&TYPES[x.type]&&s(x.wrong)).map(x=>({type:x.type,wrong:s(x.wrong),right:s(x.right),tip:s(x.tip),tipZh:s(x.tipZh)})).slice(0,8);
  const sentences=(Array.isArray(r&&r.sentences)?r.sentences:[]).filter(x=>x&&s(x.before)&&s(x.after)).map(x=>({before:s(x.before),after:s(x.after)})).slice(0,8);
- return {issues,sentences,...keepFixes(normBetter(r),issues),corrected:s(r&&r.corrected),praise:s(r&&r.praise)||'Nice work!',praiseZh:s(r&&r.praiseZh),next:s(r&&r.next),nextZh:s(r&&r.nextZh),text};
+ const iss2=withSplits(text,issues);
+ return {issues:iss2,sentences,...cleanUps(keepFixes(normBetter(r),iss2),text),corrected:s(r&&r.corrected),praise:s(r&&r.praise)||'Nice work!',praiseZh:s(r&&r.praiseZh),next:s(r&&r.next),nextZh:s(r&&r.nextZh),text};
 }
 function entryFrom(text,fb){
  const kid=kidBy(st.kid),id=eid(kid.id,st.date),old=entries[id]||{},voc=vocabFor(kid.level,hash(st.date+kid.id));
@@ -659,7 +670,7 @@ ${betterRules(kid)}
 The child's entry: <<${e.text}>>
 ${e.fb&&e.fb.corrected&&e.fb.issues&&e.fb.issues.length?`The corrected entry (start from this one and keep all of these fixes): <<${e.fb.corrected}>>
 Fixes that must stay: ${e.fb.issues.map(x=>`"${x.wrong}" -> "${x.right}"`).join('; ')}`:''}`);
- const nb=keepFixes(normBetter(r),e.fb&&e.fb.issues);if(!nb.better)throw {code:'http'};return nb;
+ const nb=cleanUps(keepFixes(normBetter(r),withSplits(e.text,e.fb&&e.fb.issues)),e.text);if(!nb.better)throw {code:'http'};return nb;
 }
 async function redoWeek(){
  const kid=kidBy(st.kid),mon=addDays(monday(today()),st.wk*7),list=weekInfo(kid,mon).filter(w=>w.e).map(w=>w.e);
@@ -676,7 +687,7 @@ ${betterRules(kid)}
 The child's entry: <<${e.text}>>
 ${e.fb&&e.fb.corrected&&e.fb.issues&&e.fb.issues.length?`The corrected entry (start from this one and keep all of these fixes): <<${e.fb.corrected}>>
 Fixes that must stay: ${e.fb.issues.map(x=>`"${x.wrong}" -> "${x.right}"`).join('; ')}`:''}`);
-  const nb=keepFixes(normBetter(r),e.fb&&e.fb.issues);if(!nb.better)throw {code:'http'};const of=e.fb||{issues:[],corrected:''};let vs=(of.versions||(of.better?[{better:of.better,ups:of.ups||[],star:of.star||null}]:[])).slice(-4);vs=[...vs,{better:nb.better,ups:nb.ups,star:nb.star}];await useVersion(e,vs,vs.length-1)}
+  const nb=cleanUps(keepFixes(normBetter(r),withSplits(e.text,e.fb&&e.fb.issues)),e.text);if(!nb.better)throw {code:'http'};const of=e.fb||{issues:[],corrected:''};let vs=(of.versions||(of.better?[{better:of.better,ups:of.ups||[],star:of.star||null}]:[])).slice(-4);vs=[...vs,{better:nb.better,ups:nb.ups,star:nb.star}];await useVersion(e,vs,vs.length-1)}
  catch(err){toast(AIERR[err&&err.code]||'Could not make it. Try again. 產生失敗，再試一次。')}
  st.regen=false;render();
 }
@@ -922,7 +933,7 @@ async function pdf(){
   doc.setDrawColor(221,228,243);doc.setLineWidth(.3);doc.line(C0,y+rh,CE,y+rh);doc.line(C1,y,C1,y+rh);doc.line(C2,y,C2,y+rh);y+=rh}
  const sec=t=>{if(y+14>BOT){doc.addPage();y=header(false)}y+=6;doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(...BLUE);doc.text(t,M,y+4);y+=6;doc.setDrawColor(221,228,243);doc.setLineWidth(.4);doc.line(M,y,PW-M,y);y+=2.5};
  const bet=B.rows.filter(r=>r.better);
- if(bet.length){sec('A better way - my week');
+ if(bet.length){sec('A better way - my week');rich([{t:'wavy line',c:GREY,u:ORG,wv:1},{t:' = nice words to learn: linking words, describing words, feelings',c:GREY}],M,y,PW-2*M,8.5,1.4,true);y+=5.5;
   for(const r of bet){const t=r.better,lt=t.toLowerCase(),rg=[];(r.ups||[]).forEach(u=>{const p=lt.indexOf(u.p.toLowerCase());if(p>=0&&!rg.some(q=>p<q.e&&p+u.p.length>q.s))rg.push({s:p,e:p+u.p.length})});rg.sort((a,b)=>a.s-b.s);
    const sg=[{t:DAYL[r.i]+': ',b:1}];let c=0;rg.forEach(q=>{sg.push({t:t.slice(c,q.s),i:1});sg.push({t:t.slice(q.s,q.e),i:1,u:ORG,wv:1});c=q.e});sg.push({t:t.slice(c),i:1});
    const h=rich(sg,M,0,PW-2*M,10.5,1.5,false);if(y+h>BOT){doc.addPage();y=header(false)}rich(sg,M,y,PW-2*M,10.5,1.5,true);y+=h+1.2}}
