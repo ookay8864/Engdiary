@@ -549,6 +549,7 @@ function vWeek(){
  <div class="wkbar"><button class="ib" style="background:var(--card);color:var(--ink)" data-a="wk" data-v="-1" aria-label="Previous week">${BACK}</button><b style="flex:1;text-align:center">${esc(B.range)}</b><button class="ib" style="background:var(--card);color:var(--ink);transform:scaleX(-1)" data-a="wk" data-v="1" ${st.wk>=0?'disabled':''} aria-label="Next week">${BACK}</button></div>
  <div class="a4wrap" id="a4w"><div class="a4" id="a4">${a4HTML(kid,B)}</div></div>
  <p class="zh" style="text-align:center">This is exactly what prints on A4. Pinch to zoom. 這就是印出來的樣子，可以用兩指放大。</p>
+ ${B.n?`<button class="btn sec full" data-a="redoWeek" ${st.redo?'disabled':''}>${st.redo?'Updating… 更新中 '+st.redo:'Redo “A better way” for this week 用新規則重新產生本週的更好寫法'}</button>`:''}
  ${(backupAge()===null||backupAge()>7)&&Object.keys(entries).length?`<div class="warn">${backupAge()===null?'Not backed up yet. 還沒備份過。':'Last backup '+backupAge()+' days ago. 已經 '+backupAge()+' 天沒備份。'}<button class="btn sec full" style="margin-top:8px" data-a="export">Back up now 順便備份</button></div>`:''}</main>
  <div class="dock"><div class="in"><button class="btn pri" data-a="pdf">Download PDF 下載</button></div></div>`;
 }
@@ -652,6 +653,21 @@ async function saveDraft(){
 }
 
 async function useVersion(e,vs,vi){const v=vs[vi];const fb={...(e.fb||{issues:[],corrected:''}),...v,versions:vs,vi};await saveEntry({...e,fb})}
+async function makeBetter(kid,e){
+ const r=await aiJson(`You are a kind English teacher. A ${kid.age}-year-old child learning English wrote this diary entry. Return ONLY a json object {"better":"...","upgrades":[{"phrase":"...","zh":"..."}],"star":{"en":"...","zh":"..."}}.
+${betterRules(kid)}
+The child's entry: <<${e.text}>>
+${e.fb&&e.fb.corrected&&e.fb.issues&&e.fb.issues.length?`The corrected entry (start from this one and keep all of these fixes): <<${e.fb.corrected}>>
+Fixes that must stay: ${e.fb.issues.map(x=>`"${x.wrong}" -> "${x.right}"`).join('; ')}`:''}`);
+ const nb=keepFixes(normBetter(r),e.fb&&e.fb.issues);if(!nb.better)throw {code:'http'};return nb;
+}
+async function redoWeek(){
+ const kid=kidBy(st.kid),mon=addDays(monday(today()),st.wk*7),list=weekInfo(kid,mon).filter(w=>w.e).map(w=>w.e);
+ if(!list.length)return;if(!settings.apiKey){toast(AIERR.nokey);return}
+ let ok=0;for(let i=0;i<list.length;i++){st.redo=`${i+1}/${list.length}`;render();
+  try{const e=entries[list[i].id],nb=await makeBetter(kid,e);const ff={...(e.firstFb||e.fb||{issues:[],corrected:''}),...nb};await saveEntry({...e,firstFb:ff});ok++}catch(err){}}
+ st.redo='';render();toast(ok===list.length?'Updated! 本週已更新。':`Updated ${ok}/${list.length}. 有幾篇失敗，可以再按一次。`);
+}
 async function regen(){
  const kid=kidBy(st.kid),e=entries[eid(kid.id,st.pastDate)];if(!e)return;if(!settings.apiKey){toast(AIERR.nokey);return}
  st.regen=true;render();
@@ -998,6 +1014,7 @@ async function act(a,v){
  case 'upwhy':{const f=st.rv?st.fb:(st.view==='pastOne'?(entries[eid(st.kid,st.pastDate)]||{}).fb:st.fb);const u=f&&f.ups&&f.ups[+v];if(u){toast(u.p+'：'+(u.zh||''));say(u.p)}break}
  case 'sayStar':{const f=st.view==='pastOne'&&!st.rv?(entries[eid(st.kid,st.pastDate)]||{}).fb:st.fb;if(f&&f.star)say(f.star.en);break}
  case 'regen':regen();break;
+ case 'redoWeek':redoWeek();break;
  case 'bver':{const e=entries[eid(st.kid,st.pastDate)];const f=e&&e.fb;if(!f||!f.versions)break;const vi=Math.max(0,Math.min(f.versions.length-1,(f.vi??f.versions.length-1)+(+v)));await useVersion(e,f.versions,vi);render();break}
  case 'selday':st.sel=v;render();break;
  case 'lookback':st.view='past';render();break;
