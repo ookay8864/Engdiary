@@ -116,7 +116,7 @@ input.t,select.t{width:100%;min-height:52px;border-radius:14px;border:2px solid 
 .a4 .wr{font:17px/1.65 ui-rounded,system-ui,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}.a4 .wr u{text-decoration:underline #e0464b 2px;text-underline-offset:3px}.a4 sup{color:#e0464b;font-weight:800;font-size:11px;margin-left:1px}
 .a4 .cr{font-size:13.5px;line-height:1.55}.a4 .cr div{overflow-wrap:anywhere}.a4 .cr .n{color:#7a839c;font-weight:800}.a4 .cr .w{color:#e0464b;text-decoration:line-through}.a4 .cr .r{color:#178a57;font-weight:800}
 .a4 h4{font:800 16px ui-rounded,sans-serif;color:#2f5bea;margin:22px 0 6px;border-bottom:1.5px solid #dde4f3;padding-bottom:4px}
-.a4 .bt2 p{margin:0 0 6px;font:italic 15.5px/1.6 Georgia,serif}.a4 .bt2 b{font-style:normal;font-family:system-ui,sans-serif}.a4 .bt2 u{text-decoration:underline #e08a24 1.5px;text-underline-offset:3px}
+.a4 .bt2 p{margin:0 0 6px;font:italic 15.5px/1.6 Georgia,serif}.a4 .bt2 b{font-style:normal;font-family:system-ui,sans-serif}.a4 .bt2 u{text-decoration:underline wavy #e08a24 1.5px;text-underline-offset:4px}
 .a4 .sm{font-size:14px;margin:3px 0}.a4 .ln{border-bottom:1px solid #c9d1e6;height:28px}
 .wkbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .load{padding:80px 20px;text-align:center;color:var(--mut);font-weight:700}
@@ -391,7 +391,7 @@ function vPastOne(){
  const why=iss[st.psel];
  const mine=`<div class="card"><div class="lab2">My writing 我寫的${iss.length?' · <span style="font-weight:600">Tap a yellow word 點黃色的字看說明</span>':''}</div>
   <div class="pen" style="margin-top:6px">${P?P.html.replace(/data-a="why"/g,'data-a="pwhy"'):esc(e.text)}</div>
-  ${P&&P.miss.length?`<div class="pen" style="font-size:18px;margin-top:6px">${P.miss.map(i=>`<button class="mk ${i===st.psel?'sel':''}" data-a="pwhy" data-v="${i}">${fixHTML(iss[i].wrong,iss[i].right)}</button>`).join(' ')}</div>`:''}
+  ${P&&P.miss.length?`<div class="pen" style="font-size:18px;margin-top:6px">${P.miss.map(m=>`<button class="mk ${m.idx===st.psel?'sel':''}" data-a="pwhy" data-v="${m.idx}">${m.w?fixHTML(m.w,m.r):'<span class="up">+ '+esc(m.r)+'</span>'}</button>`).join(' ')}</div>`:''}
   ${why?`<div class="why" style="background:var(--bg);margin-top:10px"><b><span style="color:var(--red)">${esc(why.wrong)}</span> → <span style="color:var(--ok)">${esc(why.right)}</span></b> <span class="mut">${PY(why.tipZh||why.tip||'')}</span></div>`:''}
   ${fb&&!iss.length?`<div class="praise" style="margin:10px 0 0">${STAR}<div>No mistakes! 這天全對！</div></div>`:''}</div>`;
  const vs=(fb&&fb.versions)||[],vi=fb&&fb.vi!=null?fb.vi:vs.length-1;
@@ -485,6 +485,30 @@ function vEdit(){
  <button class="btn pri full" style="margin-top:8px" data-a="savekid">Save 儲存</button>
  ${e.id?`<button class="btn ghost danger full" style="margin-top:8px" data-a="delkid">${st.confirmDel?'Tap again to delete this child 再按一次確認刪除':'Delete child 刪除'}</button>`:''}</div></main>`;
 }
+function wordDiff(A,B){
+ const n=A.length,m=B.length,T=Array.from({length:n+1},()=>new Array(m+1).fill(0));
+ for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)T[i][j]=A[i]===B[j]?T[i+1][j+1]+1:Math.max(T[i+1][j],T[i][j+1]);
+ const G=[];let i=0,j=0,c=null;const fl=()=>{if(c){G.push(c);c=null}};
+ while(i<n||j<m){if(i<n&&j<m&&A[i]===B[j]){fl();i++;j++}else if(j<m&&(i>=n||T[i][j+1]>=T[i+1][j])){c=c||{a:i,ae:i,b:[]};c.b.push(B[j]);j++}else{c=c||{a:i,ae:i,b:[]};c.ae=i+1;i++}}
+ fl();return G;
+}
+function diffMarks(text,issues){
+ const out=[],used=[],rx=w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+ (issues||[]).forEach((x,idx)=>{
+  const W=String(x.wrong||'').trim().split(/\s+/).filter(Boolean),Rw=String(x.right||'').trim().split(/\s+/).filter(Boolean);
+  if(!W.length&&!Rw.length)return;const G=wordDiff(W,Rw);if(!G.length)return;
+  let toks=null;if(W.length){const re=new RegExp(W.map(rx).join('\\s+'),'gi');let m;
+   while((m=re.exec(text))){const s0=m.index,tk=[],r2=/\S+/g;let t;while((t=r2.exec(m[0])))tk.push({s:s0+t.index,e:s0+t.index+t[0].length});
+    if(!used.some(u=>tk.some(k=>k.s<u.e&&k.e>u.s))){toks=tk;break}if(!m[0].length)re.lastIndex++}}
+  G.forEach(g=>{const w=W.slice(g.a,g.ae).join(' '),r=g.b.join(' ');
+   let type=x.type;if(w&&r&&w.toLowerCase()===r.toLowerCase())type='capital';else if(w&&r.startsWith(w)&&/^[.!?,]+$/.test(r.slice(w.length)))type='punctuation';
+   let s=null,e=null;
+   if(toks){if(g.ae>g.a){s=toks[g.a].s;e=toks[g.ae-1].e}else{const k=toks[g.a];s=e=k?k.s:toks[toks.length-1].e}}
+   else if(w){const m2=new RegExp('\\b'+w.split(' ').map(rx).join('\\s+')+'\\b','i').exec(text);if(m2&&!used.some(u=>m2.index<u.e&&m2.index+m2[0].length>u.s)){s=m2.index;e=s+m2[0].length}}
+   if(s!=null&&e>s)used.push({s,e});out.push({idx,type,w,r,s,e,tip:x.tip,tipZh:x.tipZh})})});
+ const loc=out.filter(o=>o.s!=null).sort((a,b)=>a.s-b.s||a.e-b.e),un=out.filter(o=>o.s==null);
+ const all=[...loc,...un];all.forEach((o,k)=>o.n=k+1);return {loc,un,all};
+}
 function locateMarks(text,issues){
  const rg=[],lt=text.toLowerCase();
  issues.forEach((x,i)=>{if(!x.wrong)return;const c=core(x.wrong,x.right);let p=text.indexOf(x.wrong);if(p<0)p=lt.indexOf(x.wrong.toLowerCase());
@@ -496,23 +520,24 @@ function locateMarks(text,issues){
 function weekBook(kid,mon){
  const days=weekInfo(kid,mon).filter((w,i)=>i<5||w.e);let words=0,fixes=0,n=0;const cnt={};
  const rows=days.map(w=>{const i=dIdx(w.d),e=w.e;if(!e)return {d:w.d,i,none:true};n++;words+=e.words||wc(e.text||'');
-  const f=e.firstFb||e.fb||null,text=e.original||e.text||'',iss=(f&&f.issues)||[];iss.forEach(x=>{cnt[x.type]=(cnt[x.type]||0)+1});fixes+=iss.length;
-  const L=locateMarks(text,iss);const segs=[];let c=0;L.rg.forEach(r=>{if(r.s>c)segs.push({t:text.slice(c,r.s)});if(r.e>r.s)segs.push({t:text.slice(r.s,r.e),u:1});segs.push({sup:String(L.num[r.i])});c=Math.max(c,r.e)});segs.push({t:text.slice(c)});
-  const fx=iss.map((x,k)=>({n:L.num[k],w:x.wrong,r:x.right,t:x.type})).sort((a,b)=>a.n-b.n);
-  const b=(e.fb&&e.fb.better)||(f&&f.better)||'',ups=(e.fb&&e.fb.ups)||(f&&f.ups)||[];
+  const f=e.firstFb||e.fb||null,text=e.original||e.text||'',iss=(f&&f.issues)||[];
+  const D=diffMarks(text,iss);const segs=[];let c=0;D.loc.forEach(r=>{if(r.s<c)return;if(r.s>c)segs.push({t:text.slice(c,r.s)});if(r.e>r.s)segs.push({t:text.slice(r.s,r.e),u:1});segs.push({sup:String(r.n)});c=r.e});segs.push({t:text.slice(c)});
+  const fx=D.all.map(o=>({n:o.n,w:o.w,r:o.r,t:o.type}));
+  const b=(f&&f.better)||(e.fb&&e.fb.better)||'',ups=(f&&f.better?f.ups:(e.fb&&e.fb.ups))||[];
+  fx.forEach(o=>{cnt[o.t]=(cnt[o.t]||0)+1});fixes+=fx.length;
   return {d:w.d,i,segs,fx,checked:!!f,makeup:!!e.makeup,better:b,ups}});
  const end=addDays(mon,6),newW=(cards[kid.id]||[]).filter(c=>c.first>=ymd(mon)&&c.first<=ymd(end)).map(c=>c.w);
  const last=days.length?days[days.length-1].d:addDays(mon,4);
  return {rows,n,words,fixes,cnt,newW,range:fmt(mon)+' – '+fmt(last)+', '+last.getFullYear(),plan:Math.max(5,days.length)};
 }
-function fixNote(f){return f.t==='capital'?' (capital)':f.t==='punctuation'?' (full stop)':''}
+function fixNote(f){return f.t==='capital'?' (capital)':f.t==='punctuation'?' (full stop)':!f.w?' (add)':!f.r?' (delete)':''}
 function a4HTML(kid,B){
  const segH=sg=>sg.map(x=>x.sup?`<sup>${esc(x.sup)}</sup>`:x.u?`<u>${esc(x.t)}</u>`:esc(x.t)).join('');
  return `<div class="hd"><div><b>My Weekly Journal</b><span>${esc(B.range)}</span></div><div style="text-align:right"><b style="font-size:20px">${esc(kid.name)}</b><span>${LEVELS[kid.level].name} · ${B.n}/5 days · ${B.words} words · ${B.fixes} fix${B.fixes===1?'':'es'}</span></div></div>
  <div class="bd"><div class="tb"><div class="th">Day</div><div class="th">What I wrote</div><div class="th">Corrections</div>
  ${B.rows.map(r=>`<div class="dy"><b>${DAYS[r.i]}</b><span>${r.d.getMonth()+1}/${r.d.getDate()}</span>${r.i>4?'<span>bonus</span>':''}${r.makeup?'<span>make-up</span>':''}</div>
   <div class="wr">${r.none?'<span style="color:#98a2bd">(no entry)</span>':segH(r.segs)}</div>
-  <div class="cr">${r.none?'':r.fx.length?r.fx.map(f=>`<div><span class="n">${f.n}.</span> <span class="w">${esc(f.w)}</span> → <span class="r">${esc(f.r)}</span><span class="n" style="font-weight:600">${fixNote(f)}</span></div>`).join(''):r.checked?'<div style="color:#178a57;font-weight:800">✓ No mistakes</div>':'<div style="color:#98a2bd">–</div>'}</div>`).join('')}</div>
+  <div class="cr">${r.none?'':r.fx.length?r.fx.map(f=>`<div><span class="n">${f.n}.</span> ${f.w?`<span class="w">${esc(f.w)}</span>`:''}${f.w&&f.r?' → ':''}<span class="r">${f.w?'':'+ '}${esc(f.r)}</span><span class="n" style="font-weight:600">${fixNote(f)}</span></div>`).join(''):r.checked?'<div style="color:#178a57;font-weight:800">✓ No mistakes</div>':'<div style="color:#98a2bd">–</div>'}</div>`).join('')}</div>
  ${B.rows.some(r=>r.better)?`<h4>A better way — my week</h4><div class="bt2">${B.rows.filter(r=>r.better).map(r=>`<p><b>${DAYL[r.i]}:</b> ${betterHTML(r.better,r.ups,false).replace(/<span class="wav">/g,'<u>').replace(/<\/span>/g,'</u>')}</p>`).join('')}</div>`:''}
  <h4>This week</h4>${Object.keys(B.cnt).length?`<div class="sm"><b>To practise:</b> ${Object.entries(B.cnt).map(([k,v])=>TYPES[k][0]+' ×'+v).join(' · ')}</div>`:''}${B.newW.length?`<div class="sm"><b>New words:</b> ${esc(B.newW.join(', '))}</div>`:''}
  <div class="sm" style="margin-top:10px"><b>Teacher’s comment:</b></div><div class="ln"></div><div class="ln"></div></div>`;
@@ -554,10 +579,13 @@ function insert(t){
  const before=ta.value.slice(0,s);const lead=before&&!/\s$/.test(before)?' ':'';
  ta.setRangeText(lead+t,s,en,'end');st.draft=ta.value;st.caret=ta.selectionEnd;updMeter();ta.focus();
 }
-function betterRules(kid){const strict=kid.mode==='strict',up=Math.min(3,kid.level+1);
- return `"better" is a polished, more beautiful version of the whole entry that a strong student one level above this child (${LEVELS[up].name}) could write. Build "better" on top of the corrected entry: keep EVERY correction (the same past tense, spelling and capitals) and never bring back a mistake. Things that already happened today stay in the past tense (went, liked, played). Keep the same meaning and the child's own ideas and events (e.g. "I went to the park" must not become "I want to go to the park"); do not invent big new events. It must be clearly richer than "corrected", not just fixed. Use ${strict?'3 to 4':'2'} of these upgrades: a more vivid adjective or adverb (fun -> super exciting); a linking word to join short sentences (and then, because, after that, so); a feeling or sense detail (I felt..., It smelled...); a different sentence opener (not always "I"). ${strict?'':'Keep it short and easy for a young child. '}
+function betterRules(kid){
+ const L={1:`LEVEL 1 (about 6 years old, beginner): use only very easy, common words a young child already knows (big, fun, happy, yummy, and, because, then). Short sentences of at most 10 words. Make only 1 or 2 small upgrades. Keep it almost as long as the child's entry (at most 1.3 times the words). The child must be able to read it alone.`,
+  2:`LEVEL 2 (about 7-8 years old): easy everyday words, sentences of at most 14 words, 2 small upgrades (an easy describing word, a linking word like and then / because / after that, or a simple feeling). At most 1.4 times the words of the entry.`,
+  3:`LEVEL 3 (about 9-10 years old): natural, smooth English a good 9-year-old could write; 3 upgrades (a vivid but common describing word, linking words, a feeling or detail, a varied sentence opener). No rare or fancy words. At most 1.5 times the words of the entry.`};
+ return `"better" is a smoother, nicer version of the whole entry written at the child's OWN level, not above it: ${L[kid.level]||L[2]} Build "better" on top of the corrected entry: keep EVERY correction (the same past tense, spelling and capitals) and never bring back a mistake. Things that already happened stay in the past tense. Keep the same meaning and the child's own ideas and events (e.g. "I went to the park" must not become "I want to go to the park"); do not invent new events.
 "upgrades": the upgraded words in "better", each copied EXACTLY as it appears in "better" (2 to 6 words each), with "zh": a short ${ZHN()} note on why it is nicer (max 18 characters).
-"star": the single most beautiful sentence from "better" for the child to remember, copied exactly, with "zh": its meaning in ${ZHN()}.`}
+"star": the single nicest sentence from "better" for the child to remember, copied exactly, with "zh": its meaning in ${ZHN()}.`}
 function buildPrompt(kid,text){
  const tp=topicFor(kid,st.date),voc=vocabFor(kid.level,hash(st.date+kid.id)).map(w=>w[0]),strict=kid.mode==='strict',max=kid.level===1?3:strict?6:5;
  return `You are a kind, encouraging English teacher checking a short diary entry written by a ${kid.age}-year-old child who is learning English as a second language.
@@ -623,7 +651,7 @@ async function saveDraft(){
  await saveEntry(entryFrom(text,null));toast('Saved! Great job. 完成了，好棒！');st.view='home';render();
 }
 
-async function useVersion(e,vs,vi){const v=vs[vi];const fb={...(e.fb||{issues:[],corrected:''}),...v,versions:vs,vi};const ff=e.firstFb?{...e.firstFb,better:v.better,ups:v.ups,star:v.star}:fb;await saveEntry({...e,fb,firstFb:ff})}
+async function useVersion(e,vs,vi){const v=vs[vi];const fb={...(e.fb||{issues:[],corrected:''}),...v,versions:vs,vi};await saveEntry({...e,fb})}
 async function regen(){
  const kid=kidBy(st.kid),e=entries[eid(kid.id,st.pastDate)];if(!e)return;if(!settings.apiKey){toast(AIERR.nokey);return}
  st.regen=true;render();
@@ -651,16 +679,10 @@ function core(w,r){
  return {off,cw,cr};
 }
 function penHTML(text,issues,sel){
- const rg=[],lt=text.toLowerCase();
- issues.forEach((x,i)=>{if(!x.wrong)return;const c=core(x.wrong,x.right);
-  let p=text.indexOf(x.wrong);if(p<0)p=lt.indexOf(x.wrong.toLowerCase());
-  while(p>=0){const s0=p+c.off,e0=s0+c.cw.length;if(!rg.some(r=>c.cw?(s0<r.e&&e0>r.s):(s0>r.s&&s0<r.e)))break;p=text.indexOf(x.wrong,p+1)}
-  if(p<0||!c.cr&&!c.cw)return;const s0=p+c.off;rg.push({s:s0,e:s0+c.cw.length,i,cw:c.cw,cr:c.cr})});
- rg.sort((a,b)=>a.s-b.s||a.e-b.e);let o='',c=0;
- for(const r of rg){if(r.s<c)continue;const inner=r.cw?fixHTML(text.slice(r.s,r.e),r.cr):`<span class="up">${esc(r.cr)}</span>`;
-  o+=esc(text.slice(c,r.s))+`<button class="mk ${r.i===sel?'sel':''}" data-a="why" data-v="${r.i}">${inner}</button>${r.cw?'':' '}`;c=r.e}
- const miss=issues.map((_,i)=>i).filter(i=>!rg.some(r=>r.i===i));
- return {html:o+esc(text.slice(c)),miss};
+ const D=diffMarks(text,issues);let o='',c=0;
+ for(const r of D.loc){if(r.s<c)continue;const inner=r.e>r.s?fixHTML(text.slice(r.s,r.e),r.r||'∅'):`<span class="up">${esc(r.r)}</span>`;
+  o+=esc(text.slice(c,r.s))+`<button class="mk ${r.idx===sel?'sel':''}" data-a="why" data-v="${r.idx}">${inner}</button>${r.e>r.s?'':' '}`;c=r.e}
+ return {html:o+esc(text.slice(c)),miss:D.un};
 }
 function betterHTML(t,ups,tap){
  const lt=t.toLowerCase(),rg=[];(ups||[]).forEach((u,i)=>{const p=lt.indexOf(u.p.toLowerCase());if(p<0||rg.some(r=>p<r.e&&p+u.p.length>r.s))return;rg.push({s:p,e:p+u.p.length,i})});
@@ -691,7 +713,7 @@ function renderReview(){
  if(r.mode==='pen'){
   const n=fb.issues.length,x=fb.issues[r.sel],P=n?penHTML(fb.text,fb.issues,r.sel):null;
   overlay(`<h2 style="margin-top:14px">${n?'Let’s fix it! 一起改改看':'Perfect! 全對！'}</h2><div class="zh">${n?`${n} thing${n>1?'s':''} to fix. Tap a yellow word to see why. 點黃色的字看說明。`:'Great job, no mistakes at all! 很棒，一個錯都沒有！'}</div>
-  <div class="card" style="margin-top:14px"><div class="pen">${n?P.html:esc(fb.text)}</div>${n&&P.miss.length?`<div class="lab" style="margin:12px 0 6px">Other fixes 其他修改</div><div class="pen" style="font-size:18px">${P.miss.map(i=>`<button class="mk ${i===r.sel?'sel':''}" data-a="why" data-v="${i}">${fixHTML(fb.issues[i].wrong,fb.issues[i].right)}</button>`).join(' ')}</div>`:''}</div>
+  <div class="card" style="margin-top:14px"><div class="pen">${n?P.html:esc(fb.text)}</div>${n&&P.miss.length?`<div class="lab" style="margin:12px 0 6px">Other fixes 其他修改</div><div class="pen" style="font-size:18px">${P.miss.map(m=>`<button class="mk ${m.idx===r.sel?'sel':''}" data-a="why" data-v="${m.idx}">${m.w?fixHTML(m.w,m.r):'<span class="up">+ '+esc(m.r)+'</span>'}</button>`).join(' ')}</div>`:''}</div>
   ${n?`<div class="why">${x?`<div><b style="font-size:18px"><span style="color:var(--red)">${esc(x.wrong)}</span> → <span style="color:var(--ok)">${esc(x.right)}</span></b> <span class="tag ${x.type==='tense'?'y':''}">${TYPES[x.type][0]} ${TYPES[x.type][1]}</span></div><div class="mut" style="margin-top:4px">${PY(x.tipZh||'')}${x.tipZh&&x.tip?' · ':''}${esc(x.tip||'')}</div>`:'<span class="mut">Tap a yellow word above. 點上面黃色的字，看看為什麼要這樣改。</span>'}</div>`:''}
   <div class="grow"></div><div class="acts"><button class="btn pri big" data-a="raStart">Next 下一步 ›</button></div>`);
   return;
@@ -858,7 +880,8 @@ async function pdf(){
     if(/^\s+$/.test(p)){if(p.includes('\n')){cx=x;cy+=lh;lines++;continue}if(cx>x)cx+=doc.getTextWidth(' ');continue}
     let ww=doc.getTextWidth(p);if(cx+ww>x+w&&cx>x){cx=x;cy+=lh;lines++}
     if(draw){doc.setTextColor(...(g.c||INK));doc.text(p,cx,cy+lh*.72);
-     if(g.u){doc.setDrawColor(...g.u);doc.setLineWidth(.45);doc.line(cx,cy+lh*.82,cx+ww,cy+lh*.82)}
+     if(g.u&&g.wv){doc.setDrawColor(...g.u);doc.setLineWidth(.3);const yb=cy+lh*.84;let px=cx,up=true;while(px<cx+ww){const nx=Math.min(px+.9,cx+ww);doc.line(px,up?yb:yb+.55,nx,up?yb+.55:yb);px=nx;up=!up}}
+     else if(g.u){doc.setDrawColor(...g.u);doc.setLineWidth(.45);doc.line(cx,cy+lh*.82,cx+ww,cy+lh*.82)}
      if(g.strike){doc.setDrawColor(...(g.c||INK));doc.setLineWidth(.3);doc.line(cx,cy+lh*.55,cx+ww,cy+lh*.55)}}
     cx+=ww}}
   return lines*lh;
@@ -871,7 +894,7 @@ async function pdf(){
  const C0=M,C1=M+18,C2=M+18+112,CE=PW-M,PAD=2.2;
  const thead=yy=>{doc.setFillColor(243,246,255);doc.rect(C0,yy,CE-C0,7,'F');doc.setDrawColor(...BLUE);doc.setLineWidth(.6);doc.line(C0,yy,CE,yy);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...BLUE);doc.text('Day',C0+PAD,yy+4.8);doc.text('What I wrote',C1+PAD,yy+4.8);doc.text('Corrections',C2+PAD,yy+4.8);return yy+7};
  let y=header(true);y=thead(y);
- const corrSegs=r=>r.none?[]:r.fx.length?r.fx.flatMap((f,k)=>[{t:(k?'\n':'')+f.n+'. ',c:GREY,b:1},{t:f.w,c:RED,strike:1},{t:' -> ',c:GREY},{t:f.r,c:GRN,b:1},{t:fixNote(f),c:GREY}]):r.checked?[{t:'No mistakes!',c:GRN,b:1}]:[{t:'-',c:GREY}];
+ const corrSegs=r=>r.none?[]:r.fx.length?r.fx.flatMap((f,k)=>[{t:(k?'\n':'')+f.n+'. ',c:GREY,b:1},...(f.w?[{t:f.w,c:RED,strike:1}]:[]),...(f.w&&f.r?[{t:' -> ',c:GREY}]:[]),{t:(f.w?'':'+ ')+f.r,c:GRN,b:1},{t:fixNote(f),c:GREY}]):r.checked?[{t:'No mistakes!',c:GRN,b:1}]:[{t:'-',c:GREY}];
  for(const r of B.rows){
   const ws=r.none?[{t:'(no entry)',c:[152,162,189]}]:r.segs.map(g=>g.sup?{sup:g.sup}:{t:g.t,u:g.u?RED:null});
   const h1=rich(ws,C1+PAD,0,C2-C1-2*PAD,11,1.5,false),h2=rich(corrSegs(r),C2+PAD,0,CE-C2-2*PAD,8.8,1.45,false);
@@ -885,7 +908,7 @@ async function pdf(){
  const bet=B.rows.filter(r=>r.better);
  if(bet.length){sec('A better way - my week');
   for(const r of bet){const t=r.better,lt=t.toLowerCase(),rg=[];(r.ups||[]).forEach(u=>{const p=lt.indexOf(u.p.toLowerCase());if(p>=0&&!rg.some(q=>p<q.e&&p+u.p.length>q.s))rg.push({s:p,e:p+u.p.length})});rg.sort((a,b)=>a.s-b.s);
-   const sg=[{t:DAYL[r.i]+': ',b:1}];let c=0;rg.forEach(q=>{sg.push({t:t.slice(c,q.s),i:1});sg.push({t:t.slice(q.s,q.e),i:1,u:ORG});c=q.e});sg.push({t:t.slice(c),i:1});
+   const sg=[{t:DAYL[r.i]+': ',b:1}];let c=0;rg.forEach(q=>{sg.push({t:t.slice(c,q.s),i:1});sg.push({t:t.slice(q.s,q.e),i:1,u:ORG,wv:1});c=q.e});sg.push({t:t.slice(c),i:1});
    const h=rich(sg,M,0,PW-2*M,10.5,1.5,false);if(y+h>BOT){doc.addPage();y=header(false)}rich(sg,M,y,PW-2*M,10.5,1.5,true);y+=h+1.2}}
  sec('This week');
  const line=sg=>{const h=rich(sg,M,0,PW-2*M,10,1.5,false);if(y+h>BOT){doc.addPage();y=header(false)}rich(sg,M,y,PW-2*M,10,1.5,true);y+=h};
