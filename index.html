@@ -15,6 +15,7 @@
 --red:light-dark(#e0464b,#ff7b7f);--redS:light-dark(#ffeceb,#3d1c22);--ok:light-dark(#178a57,#4fd39a);--okS:light-dark(#e4f7ee,#14352a);--org:light-dark(#d9730d,#ffae5c);--orgS:light-dark(#fff0e0,#3a2814)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
+html,body,button,a,label,input,select,textarea{touch-action:manipulation}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,'PingFang TC',sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none}
@@ -101,11 +102,11 @@ input.t,select.t{width:100%;min-height:52px;border-radius:14px;border:2px solid 
 .paper .lines div{border-bottom:1px solid #c9d1e6;height:26px}
 .banner{background:var(--okS);color:var(--ok);border-radius:14px;padding:12px 14px;font-weight:700;margin-top:12px}
 .list .it{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-top:1px solid var(--line);align-items:center}
-.pdots{display:flex;gap:18px;justify-content:center;margin:18px 0 4px}.pdots i{width:18px;height:18px;border-radius:50%;border:2.5px solid var(--blue)}.pdots i.on{background:var(--blue)}
-.pdots.err{animation:shake .35s}.pdots.err i{border-color:var(--red)}.pdots.err i.on{background:var(--red)}
+.pdots{display:flex;gap:14px;justify-content:center;min-height:16px;margin:4px 0}.pdots i{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--ink)}.pdots i.on{background:var(--ink)}
+.pdots.err{animation:shake .4s}
 @keyframes shake{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
-.perr{color:var(--red);font-weight:800;min-height:24px;margin:6px 0 10px}
-.pad{display:grid;grid-template-columns:repeat(3,76px);gap:16px 26px;justify-content:center}.pad button{width:76px;height:76px;border-radius:50%;background:var(--card);font:700 30px ui-rounded,sans-serif;box-shadow:0 1px 0 var(--line),0 4px 12px rgba(20,30,70,.06)}.pad button:active{background:var(--blueS)}
+.perr{color:var(--red);font-weight:700;min-height:22px;margin:8px 0 14px}
+.pad{display:grid;grid-template-columns:repeat(3,72px);gap:16px 28px;justify-content:center;-webkit-user-select:none;user-select:none}.pad button{width:72px;height:72px;border-radius:50%;background:var(--card);border:1px solid var(--line);font:400 28px system-ui,-apple-system,sans-serif;color:var(--ink)}.pad button:active{background:var(--line)}.pad button[data-v=del]{border:none;background:none;font-size:24px;color:var(--mut)}
 .a4wrap{position:relative;overflow:hidden;border-radius:6px;box-shadow:0 8px 24px rgba(20,30,70,.14);background:#fff}
 .a4{width:794px;padding:0 0 40px;background:#fff;color:#1b2033;transform-origin:0 0;position:absolute;top:0;left:0;font:15px/1.5 system-ui,-apple-system,sans-serif}
 .a4 .hd{background:#2f5bea;color:#fff;padding:22px 52px 18px;display:flex;justify-content:space-between;align-items:flex-end}.a4 .hd b{font:800 30px ui-rounded,sans-serif;display:block}.a4 .hd span{font-size:14px;opacity:.9}
@@ -435,27 +436,26 @@ function marked(text,issues){
 }
 function vPin(){
  const first=!settings.pin,conf=first&&st.pinFirst;
- const title=first?(conf?'Enter it again 再輸入一次':'Create a 4-digit PIN 設定 4 位數密碼'):'Enter PIN 輸入密碼';
- const n=(st.pinIn||'').length;
- return top('Parent 家長',first?'Kids can’t open parent settings without it. 孩子不知道密碼就進不去。':'','who')+`<main class="wrap" style="text-align:center">
- <h2 style="margin-top:20px">${title}</h2>
- <div class="pdots ${st.pinErr?'err':''}">${[0,1,2,3].map(i=>`<i class="${i<n?'on':''}"></i>`).join('')}</div>
- <p class="perr">${st.pinErr?esc(st.pinErr):'&nbsp;'}</p>
- <div class="pad">${['1','2','3','4','5','6','7','8','9','','0','del'].map(k=>k===''?'<span></span>':`<button data-a="pk" data-v="${k}" aria-label="${k==='del'?'Delete':k}">${k==='del'?'⌫':k}</button>`).join('')}</div></main>`;
+ const title=first?(conf?'再輸入一次 Enter it again':'設定家長密碼 Create a PIN'):'請輸入家長密碼';
+ return top('Parent 家長','','who')+`<main class="wrap" style="text-align:center"><div style="margin:28px 0 18px"><div style="font-size:36px">🔒</div><p class="mut" style="margin:6px 0 14px">${title}</p>
+ <div class="pdots" id="pdots">${[0,1,2,3].map(()=>'<i></i>').join('')}</div><div class="perr" id="perr"></div></div>
+ <div class="pad">${['1','2','3','4','5','6','7','8','9','','0','del'].map(k=>k===''?'<span></span>':`<button data-a="pk" data-v="${k}" aria-label="${k==='del'?'Delete':k}">${k==='del'?'⌫':k}</button>`).join('')}</div>
+ ${first?'<p class="zh" style="margin-top:18px">孩子不知道密碼就進不去家長頁。</p>':''}</main>`;
 }
+function pinPaint(err){const d=$('#pdots');if(!d)return;const n=(st.pinIn||'').length;d.innerHTML=[0,1,2,3].map(i=>`<i class="${i<n?'on':''}"></i>`).join('');d.classList.toggle('err',!!err);const e=$('#perr');if(e)e.textContent=err||''}
 async function pinKey(k){
  if(st.pinBusy)return;
- if(k==='del'){st.pinIn=(st.pinIn||'').slice(0,-1);render();return}
- if((st.pinIn||'').length>=4)return;st.pinIn=(st.pinIn||'')+k;st.pinErr='';render();
+ if(k==='del'){st.pinIn=(st.pinIn||'').slice(0,-1);pinPaint();return}
+ if((st.pinIn||'').length>=4)return;st.pinIn=(st.pinIn||'')+k;pinPaint();
  if(st.pinIn.length<4)return;
  const p=st.pinIn;st.pinBusy=true;
  if(!settings.pin){
-  if(!st.pinFirst){st.pinFirst=p;st.pinIn='';st.pinBusy=false;setTimeout(render,150);return}
+  if(!st.pinFirst){st.pinFirst=p;setTimeout(()=>{st.pinIn='';st.pinBusy=false;render()},200);return}
   if(p===st.pinFirst){settings.pin=p;st.pinFirst='';st.pinIn='';st.pinBusy=false;await saveSettings();st.parent=true;if(settings.kids.length)st.view='parent';else{newEdit();st.view='edit'}render();return}
-  st.pinErr='Not the same. Try again. 兩次不一樣，請重新設定。';st.pinFirst='';render();setTimeout(()=>{st.pinIn='';st.pinErr='';st.pinBusy=false;render()},1000);return}
+  pinPaint('兩次不一樣，請重新設定');setTimeout(()=>{st.pinFirst='';st.pinIn='';st.pinBusy=false;render()},900);return}
  if(p===settings.pin){st.pinIn='';st.pinBusy=false;st.parent=true;st.view='parent';setTimeout(render,120);return}
- st.pinErr='Wrong PIN 密碼錯誤';render();
- setTimeout(()=>{st.pinIn='';st.pinErr='';st.pinBusy=false;st.view='who';render()},1000);
+ pinPaint('密碼不正確');
+ setTimeout(()=>{st.pinIn='';st.pinBusy=false;st.view='who';render()},700);
 }
 function vParent(){
  return top('Parent 家長','Children, levels and weekly journals 孩子、難度、週記','who')+`<main class="wrap">
