@@ -123,7 +123,7 @@ ruby rt{font-size:.55em;color:var(--mut);font-weight:600}
 .botp2{position:fixed;z-index:13;left:0;right:0;bottom:var(--kb,0px);margin:auto;max-width:560px;height:min(68vh,calc(var(--vvh,100vh) - 24px));display:flex;flex-direction:column;background:var(--bg);border-radius:24px 24px 0 0;box-shadow:0 -10px 30px rgba(10,15,35,.18);animation:up .2s ease-out}
 .bhead{display:flex;align-items:center;gap:10px;padding:12px 14px 8px}
 .chat{flex:1;overflow:auto;padding:4px 14px 10px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
-.me{align-self:flex-end;background:var(--blue);color:#fff;border-radius:18px 18px 4px 18px;padding:10px 14px;max-width:80%;font-size:18px;overflow-wrap:anywhere}
+.cme{align-self:flex-end;background:var(--blue);color:#fff;border-radius:18px 18px 4px 18px;padding:10px 14px;max-width:80%;font-size:18px;overflow-wrap:anywhere}
 .ro{align-self:flex-start;background:var(--card);border-radius:18px 18px 18px 4px;padding:12px 14px;max-width:92%;box-shadow:0 1px 0 var(--line);overflow-wrap:anywhere}
 .ro.wide{align-self:stretch;max-width:none}
 .dots i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mut);margin-right:5px;animation:bl 1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
@@ -244,9 +244,23 @@ const avGrid=(cur,act)=>`<div class="avs">${AVID.map(a=>`<button class="${a===cu
 const canSpeak='speechSynthesis' in window;
 let VOICE=null;
 const NOVEL=/Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Fred|Junior|Kathy|Ralph|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley/i;
-function pickVoice(){if(!canSpeak)return;const vs=speechSynthesis.getVoices().filter(v=>/^en[-_](US|GB|AU|IE|CA)/i.test(v.lang)&&!NOVEL.test(v.name));let best=null,bs=-1;for(const v of vs){let sc=0;if(/premium/i.test(v.name))sc+=6;if(/enhanced|natural|neural/i.test(v.name))sc+=4;if(/Ava|Samantha|Zoe|Allison|Susan|Evan|Nathan|Serena|Daniel|Karen|Moira/i.test(v.name))sc+=2;if(/^en[-_]US/i.test(v.lang))sc+=1;if(sc>bs){bs=sc;best=v}}VOICE=best}
+function pickVoice(){if(!canSpeak)return;const vs=speechSynthesis.getVoices().filter(v=>/^en[-_](US|GB|AU|IE|CA)/i.test(v.lang)&&!NOVEL.test(v.name));let best=null,bs=-1;for(const v of vs){let sc=0;if(/premium/i.test(v.name))sc+=1;if(/enhanced|natural|neural/i.test(v.name))sc+=3;if(/Ava|Samantha|Zoe|Allison|Susan|Evan|Nathan|Serena|Daniel|Karen|Moira/i.test(v.name))sc+=2;if(/^en[-_]US/i.test(v.lang))sc+=1;if(sc>bs){bs=sc;best=v}}VOICE=best}
 if(canSpeak){pickVoice();try{speechSynthesis.addEventListener('voiceschanged',pickVoice)}catch(e){}}
-function say(list,done,rate=.8){if(!canSpeak){if(done)done();return}try{speechSynthesis.cancel();const arr=Array.isArray(list)?list:[list];let fired=false;const fin=()=>{if(!fired){fired=true;if(done)done()}};arr.forEach((t,i)=>{const u=new SpeechSynthesisUtterance(t);u.lang=VOICE?VOICE.lang:'en-US';if(VOICE)u.voice=VOICE;u.rate=rate;if(i===arr.length-1){u.onend=fin;u.onerror=fin}speechSynthesis.speak(u)});if(done)setTimeout(fin,2500+arr.join(' ').length*120)}catch(e){if(done)done()}}
+let VOICE_OK=null;window._utt=[];
+function say(list,done,rate=.8){
+ if(!canSpeak){if(done)done();return}
+ const arr=Array.isArray(list)?list:[list];let fired=false;const fin=()=>{if(!fired){fired=true;if(done)done()}};
+ const go=useV=>{let started=false;
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)speechSynthesis.cancel()}catch(e){}
+  window._utt=[];
+  arr.forEach((t,i)=>{const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(useV&&VOICE){u.voice=VOICE;u.lang=VOICE.lang}u.rate=rate;
+   u.onstart=()=>{started=true;if(useV)VOICE_OK=true};
+   u.onerror=()=>{if(useV&&!started){VOICE_OK=false;go(false)}else if(i===arr.length-1)fin()};
+   if(i===arr.length-1)u.onend=fin;window._utt.push(u);try{speechSynthesis.resume()}catch(e){}speechSynthesis.speak(u)});
+  if(useV&&VOICE_OK!==true)setTimeout(()=>{if(!started&&!fired&&VOICE_OK!==false){VOICE_OK=false;go(false)}},1500)};
+ try{go(!!VOICE&&VOICE_OK!==false)}catch(e){fin()}
+ if(done)setTimeout(fin,3500+arr.join(' ').length*120);
+}
 const speak=t=>say(t);
 const spellSay=w=>say([...w.toUpperCase().replace(/[^A-Z]/g,'')].join(', ')+'. '+w+'.',null,.7);
 let T2S=null,S2T=null;
@@ -414,7 +428,7 @@ function vParent(){
  <div class="card" style="margin-top:14px"><h2>Chinese 中文顯示</h2><div class="row"><button class="btn ${settings.zh==='simp'?'sec':'pri'}" style="flex:1" data-a="setZh" data-v="trad">繁體字</button><button class="btn ${settings.zh==='simp'?'pri':'sec'}" style="flex:1" data-a="setZh" data-v="simp">简体字</button></div>
  <div class="tg"><div><b>Pinyin on key words 重點字加拼音</b><div class="zh">e.g. 今天 with jīn tiān 顯示在字上面</div></div><button class="sw ${settings.py?'on':''}" data-a="togglePy" aria-label="Pinyin" aria-pressed="${settings.py?'true':'false'}"></button></div>
  <p class="zh" style="margin:10px 0 0">Needs internet the first time. 第一次切換需要網路載入。</p></div>
- <div class="card"><h2>Settings 設定</h2><div class="list"><div class="it"><span>Change PIN 更改密碼</span><button class="ghost" data-a="resetpin">Change ›</button></div>
+ <div class="card"><h2>Settings 設定</h2><div class="list"><div class="it"><span>Test sound 測試聲音</span><button class="ghost" data-a="testSound">Play ›</button></div><div class="it"><span>Change PIN 更改密碼</span><button class="ghost" data-a="resetpin">Change ›</button></div>
  </div></div>
  <div class="card"><h2>AI checking 批改設定</h2><p class="zh" style="margin-top:-4px">${settings.apiKey?'DeepSeek key saved ✓ 已儲存金鑰':'Paste your DeepSeek API key. 貼上 DeepSeek API 金鑰。'}</p>
  <input class="t" id="key" type="password" autocomplete="off" placeholder="sk-..." value="${esc(settings.apiKey||'')}"><div class="row" style="margin-top:10px"><button class="btn pri" style="flex:1" data-a="savekey">Save 儲存</button><button class="btn sec" data-a="testkey">Test 測試</button></div></div>
@@ -645,7 +659,7 @@ function addCard(w,zh,learned){const L=kidCards(),k=w.toLowerCase(),t=ymd(today(
  if(c){c.last=t;if(!learned)c.n=(c.n||1)+1;if(learned)c.ok=true;if(zh&&!c.zh)c.zh=zh}else{L.push({w,zh:zh||'',n:1,first:t,last:t,ok:!!learned})}lsSave()}
 function botNew(){const old=st.bot;st.bot={log:old?old.log:[{ro:'Hi! Which word can’t you spell? Tap the mic and say it.',zh:'嗨！哪個字不會拼？按麥克風說說看，用中文說最準喔。'}],phase:'ask',lang:old?old.lang:'zh',typing:false,listen:false,interim:''}}
 function bubble(x){
- if(x.me!=null)return `<div class="me">${esc(x.me)}</div>`;
+ if(x.me!=null)return `<div class="cme">${esc(x.me)}</div>`;
  if(x.card)return `<div class="ro" style="text-align:center;min-width:60%"><div class="spell" style="font-size:32px">${x.hide?esc(x.card.replace(/[^ ]/g,'_').split('').join(' ')):esc(x.card.toUpperCase().split('').join(' '))}</div><div style="font:700 20px ui-rounded,sans-serif">${x.hide?'':esc(x.card)+' · '}${PY(x.zh||'')}</div></div>`;
  return `<div class="ro"><b>${esc(x.ro||'')}</b>${x.zh?`<div class="zh">${PY(x.zh)}</div>`:''}</div>`;
 }
@@ -832,6 +846,7 @@ async function act(a,v){
  case 'week':st.kid=v;st.wk=0;st.view='week';render();break;
  case 'wk':st.wk=Math.min(0,st.wk+(+v));render();break;
  case 'pdf':pdf();break;
+ case 'testSound':if(!canSpeak){toast('This browser cannot speak. 這個瀏覽器不能發聲。');break}say('Hello! This is your diary. A, P, P, L, E. Apple.');toast('If you hear nothing, turn off silent mode. 沒聲音請關掉靜音、調大音量。');break;
  case 'bot':botNew();renderBot();break;
  case 'botAsk':botAsk();break;
  case 'botRecent':botAsk(v);break;
