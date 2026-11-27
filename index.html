@@ -580,11 +580,30 @@ function insert(t){
  const before=ta.value.slice(0,s);const lead=before&&!/\s$/.test(before)?' ':'';
  ta.setRangeText(lead+t,s,en,'end');st.draft=ta.value;st.caret=ta.selectionEnd;updMeter();ta.focus();
 }
+const BEX={
+1:`Child: "today i go to park. i play ball. it is fun. i like park."
+Better: "Today I went to the park. I played ball, and it was so much fun! I love the park."`,
+2:`Child: "Today I went to school. I eat lunch at school. The lunch is good. After school I play with my friend. I play football with my friend. It was fun."
+Better: "Today I went to school and ate a yummy lunch there. After school, I played football with my friend. It was really fun!"`,
+3:`Child: "I wake up in the moning to eat breakfast then I went to school I study in school in the afternoon I eat lunch then I went to sleep when we wake up we have sport class, it was not hot it was cold outside then I went home to eat dinner then I went to write home work then I went to sleep it was a good day."
+Better: "I woke up early and ate breakfast before school. After lunch we had a nap, and then we had PE. It was cold outside! In the evening I went home, ate dinner, did my homework and went to bed. It was a good day."
+
+Child: "Tomorrow I want to stay home because I want play at home and I don't need to go to school because I can only study and when I got home I need to write a lot of homework to play game or watch videos that is why I what to stay home."
+Better: "I want to stay home tomorrow. At school I can only study, but at home I can play. When I get home, I always have lots of homework before I can play games or watch videos. That's why I want to stay home!"`};
 function betterRules(kid){
- const L={1:`LEVEL 1 (about 6 years old, beginner): use only very easy, common words a young child already knows (big, fun, happy, yummy, and, because, then). Short sentences of at most 10 words. Make only 1 or 2 small upgrades. Keep it almost as long as the child's entry (at most 1.3 times the words). The child must be able to read it alone.`,
-  2:`LEVEL 2 (about 7-8 years old): easy everyday words, sentences of at most 14 words, 2 small upgrades (an easy describing word, a linking word like and then / because / after that, or a simple feeling). At most 1.4 times the words of the entry.`,
-  3:`LEVEL 3 (about 9-10 years old): natural, smooth English a good 9-year-old could write; 3 upgrades (a vivid but common describing word, linking words, a feeling or detail, a varied sentence opener). No rare or fancy words. At most 1.5 times the words of the entry.`};
- return `"better" is a smoother, nicer version of the whole entry written at the child's OWN level, not above it: ${L[kid.level]||L[2]} Build "better" on top of the corrected entry: keep EVERY correction (the same past tense, spelling and capitals) and never bring back a mistake. Every action that already happened must be in the past tense in "better", even if the child's mistake was not in the fixes list, and verbs joined by and / then use the same tense (never "I write homework and I went to bed"). Avoid repeating the same words or sentence starts (I went... I went... I went...): combine them into smooth sentences with commas, and, then, after that (e.g. "I went to a family dinner, then to school. After that, I took a shower, wrote my homework and went to bed."). A combined sentence like this counts as an upgrade (linking words). Keep the same meaning and the child's own ideas and events (e.g. "I went to the park" must not become "I want to go to the park"); do not invent new events.
+ const L={1:`LEVEL 1 (about 6, beginner): only very easy, common words (big, fun, happy, yummy, love, and, because, then). Sentences of at most 10 words.`,
+  2:`LEVEL 2 (about 7-8): easy everyday words, sentences of at most 14 words.`,
+  3:`LEVEL 3 (about 9-10): natural, smooth English a good native 9-year-old would write. No rare or fancy words.`};
+ return `"better" is how a kind native-English teacher would rewrite the whole entry at the child's OWN level: ${L[kid.level]||L[2]}
+How to write "better":
+1. CUT FIRST: remove repeated ideas, repeated words and sentence starts (I went... I went...), and sentences that say the same thing twice (e.g. "It was not hot, it was cold outside" -> "It was cold outside."; do not say "I want to stay home" at both the start and the end unless it is a short, natural closing like "That's why I want to stay home!").
+2. Then join short choppy sentences with simple linking words, and swap a plain word for a better one only where it really helps.
+3. Sound like a real native child of that age, not a textbook. One clear idea per sentence; mix short and longer sentences; put time words where a native speaker would.
+4. LENGTH: ${kid.level===1?'about the same length as the child\'s entry':'never longer than the child\'s entry; if the entry is long or repeats itself, make "better" clearly shorter'}.
+5. Keep every correction (past tense, spelling, capitals) and never bring back a mistake. Everything that already happened is in the past tense, and verbs joined by and / then use the same tense. Keep the child's meaning and events; do not invent new events.
+Examples of the style we want:
+${BEX[kid.level]||BEX[2]}
+Before you answer, silently check "better": no repeated idea, no repeated sentence start, no extra sentence, tenses consistent, not too long, sounds natural. Fix it, then output only the final version.
 "upgrades": EVERY real upgrade in "better" that the child can learn and reuse, copied EXACTLY as it appears in "better" (1 to 5 words each, never a whole sentence). A real upgrade is: a linking word that joins ideas (because, so, after that, when, before, but, although, then); a more vivid describing word replacing a plain one (happy -> excited, fun -> exciting, good -> delicious); a feeling or sense detail (I felt proud, it smelled yummy); a time or order opener (After school, In the morning, Finally). NOT an upgrade: words the child already wrote, or only adding really / very / so. Each has "zh": a short ${ZHN()} note saying which kind of upgrade it is and why (max 18 characters).
 "star": the single nicest sentence from "better" that contains at least one upgrade, copied exactly, with "zh": its meaning in ${ZHN()}.`}
 function buildPrompt(kid,text){
@@ -654,7 +673,7 @@ async function check(){
  const text=st.draft.trim();if(wc(text)<2){toast('Write a little more first. 再多寫一點喔！');return}
  if(!settings.apiKey){toast(AIERR.nokey);return}
  st.checking=true;render();
- try{const kid=kidBy(st.kid);const r=await aiJson(buildPrompt(kid,text));st.fb=norm(r,text);await saveEntry(entryFrom(text,st.fb));st.rv={mode:'pen',sel:-1}}
+ try{const kid=kidBy(st.kid);const r=await aiJson(buildPrompt(kid,text));st.fb=norm(r,text);if(st.fb.better){const sh=cleanUps(keepFixes(await shorten(kid,text,{better:st.fb.better,ups:st.fb.ups,star:st.fb.star}),st.fb.issues),text);Object.assign(st.fb,sh)}await saveEntry(entryFrom(text,st.fb));st.rv={mode:'pen',sel:-1}}
  catch(e){toast(AIERR[e&&e.code]||'Could not check. Try again. 檢查失敗，請再試一次。')}
  st.checking=false;render();if(st.rv)renderReview();
 }
@@ -664,13 +683,19 @@ async function saveDraft(){
 }
 
 async function useVersion(e,vs,vi){const v=vs[vi];const fb={...(e.fb||{issues:[],corrected:''}),...v,versions:vs,vi};await saveEntry({...e,fb})}
+async function shorten(kid,orig,nb){
+ const ow=wc(orig),bw=wc(nb.better||''),lim=kid.level===1?Math.max(ow*1.3,ow+6):ow>60?ow:Math.max(ow*1.15,ow+6);
+ if(!nb.better||bw<=lim)return nb;
+ try{const r=await aiJson(`This rewrite of a child's diary is too long (${bw} words). Rewrite it in at most ${Math.floor(lim)} words: cut repeated ideas and extra sentences, keep the meaning, the past tenses and the child's level. Return ONLY a json object {"better":"...","upgrades":[{"phrase":"...","zh":"..."}],"star":{"en":"...","zh":"..."}} using the same rules for upgrades (exact phrases from better, zh notes in ${ZHN()}).
+Rewrite: <<${nb.better}>>`,900);const n2=normBetter(r);return n2.better&&wc(n2.better)<bw?n2:nb}catch(e){return nb}
+}
 async function makeBetter(kid,e){
  const r=await aiJson(`You are a kind English teacher. A ${kid.age}-year-old child learning English wrote this diary entry. Return ONLY a json object {"better":"...","upgrades":[{"phrase":"...","zh":"..."}],"star":{"en":"...","zh":"..."}}.
 ${betterRules(kid)}
 The child's entry: <<${e.text}>>
 ${e.fb&&e.fb.corrected&&e.fb.issues&&e.fb.issues.length?`The corrected entry (start from this one and keep all of these fixes): <<${e.fb.corrected}>>
 Fixes that must stay: ${e.fb.issues.map(x=>`"${x.wrong}" -> "${x.right}"`).join('; ')}`:''}`);
- const nb=cleanUps(keepFixes(normBetter(r),withSplits(e.text,e.fb&&e.fb.issues)),e.text);if(!nb.better)throw {code:'http'};return nb;
+ const iss=withSplits(e.text,e.fb&&e.fb.issues),nb=cleanUps(keepFixes(await shorten(kid,e.text,normBetter(r)),iss),e.text);if(!nb.better)throw {code:'http'};return nb;
 }
 async function redoWeek(){
  const kid=kidBy(st.kid),mon=addDays(monday(today()),st.wk*7),list=weekInfo(kid,mon).filter(w=>w.e).map(w=>w.e);
@@ -687,7 +712,7 @@ ${betterRules(kid)}
 The child's entry: <<${e.text}>>
 ${e.fb&&e.fb.corrected&&e.fb.issues&&e.fb.issues.length?`The corrected entry (start from this one and keep all of these fixes): <<${e.fb.corrected}>>
 Fixes that must stay: ${e.fb.issues.map(x=>`"${x.wrong}" -> "${x.right}"`).join('; ')}`:''}`);
-  const nb=cleanUps(keepFixes(normBetter(r),withSplits(e.text,e.fb&&e.fb.issues)),e.text);if(!nb.better)throw {code:'http'};const of=e.fb||{issues:[],corrected:''};let vs=(of.versions||(of.better?[{better:of.better,ups:of.ups||[],star:of.star||null}]:[])).slice(-4);vs=[...vs,{better:nb.better,ups:nb.ups,star:nb.star}];await useVersion(e,vs,vs.length-1)}
+  const nb=cleanUps(keepFixes(await shorten(kid,e.text,normBetter(r)),withSplits(e.text,e.fb&&e.fb.issues)),e.text);if(!nb.better)throw {code:'http'};const of=e.fb||{issues:[],corrected:''};let vs=(of.versions||(of.better?[{better:of.better,ups:of.ups||[],star:of.star||null}]:[])).slice(-4);vs=[...vs,{better:nb.better,ups:nb.ups,star:nb.star}];await useVersion(e,vs,vs.length-1)}
  catch(err){toast(AIERR[err&&err.code]||'Could not make it. Try again. 產生失敗，再試一次。')}
  st.regen=false;render();
 }
