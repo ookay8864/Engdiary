@@ -200,6 +200,13 @@ ruby rt{font-size:.55em;color:var(--mut);font-weight:600}
 .opts{display:grid;gap:10px;margin-top:12px}.opts button{background:var(--card);border-radius:16px;padding:12px 16px;text-align:left;min-height:56px;box-shadow:0 1px 0 var(--line)}.opts b{font:700 24px ui-rounded,sans-serif;display:block}
 .mic{display:flex;gap:8px;margin-top:10px}.mic .btn{flex:1;min-height:50px;font-size:16px}
 .tg{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px}.sw{width:56px;height:32px;border-radius:99px;background:var(--line);position:relative;flex:none}.sw:after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}.sw.on{background:var(--ok)}.sw.on:after{left:28px}
+.themeCard{background:var(--card);border-radius:22px;padding:16px}
+.themeCurrent{border-bottom:1px solid var(--line);padding-bottom:14px}.themeCurrent .lab{font-size:11px;color:var(--mut);font-weight:800}.themeCurrent b{display:block;font-size:20px;margin-top:4px}.themeCurrent p{margin:4px 0 0;color:var(--mut);font-size:12px}
+.themeSelect{margin-top:14px}.themeSelect label{display:block;font-size:12px;color:var(--mut);font-weight:800;margin:0 0 6px}.themeSelect select{width:100%;height:58px;border:1px solid var(--line);border-radius:16px;background:var(--bg);color:var(--ink);padding:0 12px;font-size:15px;font-weight:800}
+.themeLevels{display:flex;border-radius:14px;background:var(--bg);padding:4px;margin-top:10px}.themeLevels button{flex:1;height:40px;border-radius:11px;color:var(--mut);font-weight:800}.themeLevels button.on{background:#26304d;color:#fff}
+.themeKids{display:flex;gap:8px;margin-top:14px}.themeKids div{flex:1;border-radius:13px;background:var(--bg);padding:9px;text-align:center;font-size:12px;font-weight:800;color:var(--mut)}.themeKids div.done{background:var(--okS);color:var(--ok)}
+.themeStatus{margin-top:12px;border-radius:14px;background:var(--yelS);padding:10px 12px;color:light-dark(#7f795f,#e8dba5);font-size:12px}
+.themeActions{display:flex;gap:8px;margin-top:12px}.themeActions button{height:48px;border-radius:15px;font-weight:900}.themeActions .cancel{flex:1;background:var(--bg);color:var(--mut)}.themeActions .save{flex:1.4;background:#26304d;color:#fff}
 .pen{font:21px/2.1 ui-rounded,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}
 .pen .mk{border:0;background:var(--yelS);border-radius:8px;padding:0 5px;font:inherit;line-height:1.5;color:inherit}
 .pen .mk.sel{outline:3px solid var(--yel)}
@@ -503,7 +510,7 @@ function ladderUpdate(kid,text){
 /* ---------- state & storage ---------- */
 let settings={pin:'',kids:[]},entries={},cards={},weeks={},ready=false,mode='loading',note='';
 
-const st={view:'who',kid:null,date:null,draft:'',fb:null,checking:false,parent:false,wk:0,pic:null,typeMs:0,last:0,edit:null,pinIn:'',confirmDel:false};
+const st={view:'who',kid:null,date:null,draft:'',fb:null,checking:false,parent:false,wk:0,pic:null,typeMs:0,last:0,edit:null,pinIn:'',confirmDel:false,themePick:null,themeLevel:null};
 const kidBy=id=>settings.kids.find(k=>k.id===id);
 const eid=(k,d)=>'e_'+k+'_'+d;
 function lsLoad(){try{const o=JSON.parse(localStorage.getItem('lwd1')||'{}');if(o.settings)settings=o.settings;if(o.entries)entries=o.entries;if(o.cards)cards=o.cards;if(o.weeks)weeks=o.weeks}catch(e){}}
@@ -794,10 +801,13 @@ function vParent(){
  ${readyUp(k)?`<div class="banner">Ready for ${LEVELS[k.level+1].name}? The last 5 entries met the goal with few mistakes. 最近 5 篇都達標、錯誤很少，可以考慮升級。<br><button class="btn sec" style="margin-top:8px;min-height:44px" data-a="levelup" data-v="${esc(k.id)}">Level up 升級</button></div>`:''}
  <div class="row" style="margin-top:12px"><button class="btn pri" style="flex:1" data-a="week" data-v="${esc(k.id)}">Weekly journal 週記</button><button class="btn sec" data-a="editkid" data-v="${esc(k.id)}">Edit 編輯</button></div></div>`}).join('')}
  <button class="btn sec full" data-a="editkid" data-v="">+ Add a child 新增孩子</button>
- ${(()=>{const T=themeState(),it=thItem(T.cur),th=it.th,all=settings.kids.length&&settings.kids.every(k=>T.done[k.id]);return `<div class="card"><h2>Weekly theme 本週主題</h2><p class="zh" style="margin-top:-4px">${esc(th.e)} · ${esc(th.z)} · Level ${it.l}</p><p class="mut" style="margin:8px 0">Only parents can change the theme. 主題只能由家長更換。</p>
- <div class="row">${settings.kids.map(k=>`<button class="btn ${T.done[k.id]?'pri':'sec'}" style="flex:1" data-a="themeDone" data-v="${esc(k.id)}">${T.done[k.id]?'✓':'☐'} ${esc(k.name)}</button>`).join('')}</div>
- ${all?'<div class="banner" style="margin-top:10px">Great job, everyone! New theme tomorrow. 大家都完成了，明天換新主題！</div>':''}
- <div class="row" style="margin-top:10px">${it.l<3?`<button class="btn pri" style="flex:1" data-a="thLevel">Next level 下一級</button>`:''}<button class="btn sec" style="flex:${it.l<3?'1':'auto'}" data-a="thNew">Change theme 換主題</button></div></div>`})()}
+ ${(()=>{const T=themeState(),it=thItem(T.cur),cur=it.th,all=settings.kids.length&&settings.kids.every(k=>T.done[k.id]),pick=st.themePick==null?it.t:+st.themePick,level=st.themeLevel==null?it.l:+st.themeLevel,picked=thItem(pick+'-'+level);
+ return `<div class="card" style="padding:16px"><h2>Weekly theme 本週主題</h2><div class="themeCard" style="margin-top:10px"><div class="themeCurrent"><span class="lab">CURRENT 目前主題</span><b>${esc(picked.th.i)} ${esc(picked.th.e)} ${esc(picked.th.z)}</b><p>目前選用 Level ${level} · ${level===1?'基礎練習':level===2?'中階練習':'進階練習'}</p></div>
+ <div class="themeSelect"><label for="themePick">更換主題</label><select id="themePick">${THEMES.map((th,i)=>`<option value="${i}" ${i===pick?'selected':''}>${esc(th.i)} ${esc(th.e)} · ${esc(th.z)}</option>`).join('')}</select></div>
+ <div class="themeSelect"><label>選擇等級</label><div class="themeLevels">${[1,2,3].map(l=>`<button class="${l===level?'on':''}" data-a="themeLevel" data-v="${l}" ${l===level?'aria-pressed="true"':''}>${l}</button>`).join('')}</div></div>
+ <div class="themeKids">${settings.kids.map(k=>`<div class="${T.done[k.id]?'done':''}">${T.done[k.id]?'✓':'○'} ${esc(k.name)}</div>`).join('')}</div>
+ <div class="themeStatus">${all?'Great job! Everyone is done. 大家都完成了。':'When everyone is done, the next theme starts tomorrow. 兩位都完成後，明天自動換主題。'}</div>
+ <div class="themeActions"><button class="cancel" data-a="themeCancel">取消</button><button class="save" data-a="themeApply">套用主題</button></div></div></div>`})()}
  <div class="card" style="margin-top:14px"><h2>Daily openers 每日開頭</h2><p class="zh" style="margin-top:-4px">Each day starts with a fixed opener so the week reads as one journal. 每天自動帶好開頭，一週連成一篇。</p><div class="choice">${Object.entries(OPENERS).map(([k,o])=>`<button data-a="setOpener" data-v="${k}" class="${(settings.opener||'A')===k?'on':''}"><b>${k} · ${o.n}</b><p>${esc(o.d.slice(0,3).join(' … '))}…</p></button>`).join('')}</div></div>
  <div class="card"><h2>Voice 聲音</h2><div class="row"><button class="btn ${(settings.vg||'f')==='f'?'pri':'sec'}" style="flex:1" data-a="setVg" data-v="f">Female 女聲</button><button class="btn ${settings.vg==='m'?'pri':'sec'}" style="flex:1" data-a="setVg" data-v="m">Male 男聲</button></div>
  <div class="row" style="margin-top:10px">${[['slow','Slow 慢'],['normal','Normal 正常'],['fast','Fast 快']].map(([k,l])=>`<button class="btn ${(settings.vr||'normal')===k?'pri':'sec'}" style="flex:1;font-size:15px;padding:0 6px" data-a="setVr" data-v="${k}">${l}</button>`).join('')}</div>
@@ -1392,6 +1402,7 @@ document.addEventListener('focusout',e=>{if(e.target.id==='ta')st.caret=e.target
 document.addEventListener('change',e=>{
  if(e.target.id==='imp'&&e.target.files[0]){const f=e.target.files[0];f.text().then(t=>{const o=JSON.parse(t);if(o.app!=='lwd')throw 0;settings={...o.settings,apiKey:settings.apiKey||o.settings.apiKey||''};entries={...entries,...o.entries};if(o.weeks)weeks={...o.weeks,...weeks};if(o.cards)Object.keys(o.cards).forEach(k=>{const m={};[...(cards[k]||[]),...o.cards[k]].forEach(c=>{const x=m[c.w.toLowerCase()];m[c.w.toLowerCase()]=x?{...x,n:Math.max(x.n,c.n),ok:x.ok||c.ok}:c});cards[k]=Object.values(m)});lsSave();toast('Restored. 已還原。');render()}).catch(()=>toast('Not a diary backup file. 不是正確的備份檔。'))}
  if(e.target.id==='ag'&&st.edit){const a=+e.target.value;st.edit.age=a;if(!st.edit.tL)st.edit.level=sugLevel(a);if(!st.edit.tM)st.edit.mode=sugMode(a);render()}
+ if(e.target.id==='themePick'){st.themePick=e.target.value;render()}
 });
 document.addEventListener('keydown',e=>{if(st.view==='pin'&&!e.target.closest('input,textarea')){if(/^[0-9]$/.test(e.key)){pinKey(e.key);return}if(e.key==='Backspace'){pinKey('del');return}}if(e.key==='Escape'){if($('.botp2'))act('botClose');else if(st.rv)act('rvclose');else closeSheet()}if(e.key==='Enter'&&e.target.id==='pin')act('pin');if(e.key==='Enter'&&e.target.id==='botq'){e.preventDefault();act('botAsk')}if(e.key==='Enter'&&e.target.id==='botg'){e.preventDefault();act('botCheck')}if(e.key==='Enter'&&e.target.id==='cg'){e.preventDefault();act('cardCheck')}});
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;if(t.dataset.a==='close'&&t.classList.contains('sheetbg')&&e.target!==t)return;if(t.dataset.a==='botBg'&&e.target!==t)return;act(t.dataset.a,t.dataset.v)});
@@ -1488,6 +1499,9 @@ async function act(a,v){
  case 'thLevel':if(!st.parent)break;{const T=themeState(),it=thItem(T.cur);if(it.l<3){T.learned[T.cur]=T.learned[T.cur]||ymd(today());T.cur=it.t+'-'+(it.l+1);T.done={};T.doneOn=''}st.thMenu=false;await saveSettings();render();scrollTo(0,0);break}
  case 'thNew':if(!st.parent)break;{const T=themeState();if(T.doneOn)T.learned[T.cur]=T.doneOn;T.cur=thPick(T,'new');T.done={};T.doneOn='';st.thMenu=false;await saveSettings();render();scrollTo(0,0);break}
  case 'themeDone':if(!st.parent)break;{const T=themeState();T.done[v]=!T.done[v];T.doneOn=settings.kids.every(k=>T.done[k.id])?ymd(today()):'';await saveSettings();render();break}
+ case 'themeLevel':if(!st.parent)break;st.themeLevel=+v;render();break;
+ case 'themeCancel':st.themePick=null;st.themeLevel=null;render();break;
+ case 'themeApply':if(!st.parent)break;{const T=themeState(),it=thItem(T.cur),pick=st.themePick==null?it.t:+st.themePick,level=st.themeLevel==null?it.l:+st.themeLevel;T.cur=pick+'-'+level;T.done={};T.doneOn='';st.themePick=null;st.themeLevel=null;await saveSettings();toast('Theme updated. 主題已套用。');render();scrollTo(0,0);break}
  case 'guideTog':st.guideOpen=!st.guideOpen;break;
  case 'setOpener':settings.opener=v;await saveSettings();render();break;
  case 'setVg':settings.vg=v;await saveSettings();pickVoice();render();say(v==='m'?'Hello! I am the boy voice.':'Hello! I am the girl voice.');break;
