@@ -40,6 +40,18 @@ h2{font:700 20px/1.2 ui-rounded,'PingFang TC',sans-serif;margin:0 0 8px}
 .kidcard{background:var(--card);border-radius:22px;overflow:hidden;box-shadow:0 6px 18px rgba(20,30,70,.07)}
 .kid{width:100%;background:none;border-radius:0;padding:22px 12px 12px;text-align:center}
 .kidreport{width:calc(100% - 20px);min-height:44px;margin:8px 10px 10px;border-radius:14px;background:var(--blueS);color:var(--blue);font-weight:800;font-size:15px}
+.cWelcome{display:flex;justify-content:space-between;align-items:flex-start;margin:4px 2px 18px}
+.cWelcome h2{font-size:25px;margin:0}.cWelcome p{margin:5px 0 0;color:var(--mut);font-size:13px}
+.cDate{width:64px;height:64px;border-radius:20px;background:#26304d;color:#fff;text-align:center;padding-top:10px;flex:none}
+.cDate b{display:block;font-size:20px}.cDate span{font-size:10px;color:#c8cfe0}
+.cKid{width:100%;height:118px;border:0;border-radius:22px;padding:12px 14px;display:grid;grid-template-columns:94px 1fr 30px;align-items:center;text-align:left;margin-bottom:12px;background:var(--card);box-shadow:0 8px 22px rgba(47,61,105,.07)}
+.cAvatar{width:82px;height:82px;border-radius:18px;background:#dfe8fb;color:#4e67a2;display:grid;place-items:center;font-size:38px;font-weight:900}.cAvatar.pink{background:#f5e1e7;color:#ad657a}
+.cKid b{display:block;font-size:21px}.cKid small{display:block;margin-top:5px;color:var(--mut)}
+.cChev{color:#9da5b7;font-size:24px}
+.cReport{position:relative;margin-top:14px;border-radius:24px;background:#26304d;padding:17px;color:#fff}
+.cReport b{display:block;font-size:17px}.cReport p{margin:5px 0 13px;color:#c1c8dc;font-size:12px}
+.cReportKids{display:flex;gap:8px}.cReportKids button{flex:1;height:46px;border:0;border-radius:14px;background:#fff;color:#26304d;font-weight:900}
+.cParent{display:block;margin:18px auto 0;min-height:44px;color:var(--mut);font-weight:800}
 .av{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;margin:0 auto 10px;color:#fff;font:800 36px ui-rounded,'PingFang TC',sans-serif}
 .kid b{display:block;font:700 22px ui-rounded,'PingFang TC',sans-serif}
 .tag{display:inline-block;font-size:12px;font-weight:800;padding:3px 9px;border-radius:99px;background:var(--blueS);color:var(--blue)}
@@ -530,8 +542,12 @@ function top(title,sub,back,right){return `<header class="top"><div class="in">$
 /* ---------- views ---------- */
 function vWho(){
  if(!settings.kids.length)return top('Little Writers','英文小作家日記')+`<main class="wrap"><div class="card"><h2>Welcome! 歡迎</h2><p class="mut">A parent sets things up first: make a PIN and add each child. 請家長先設定密碼並新增孩子。</p><button class="btn pri full" data-a="parent">Parent setup 家長設定</button></div>${note?`<p class="mut">${esc(note)}</p>`:''}</main>`;
- return top('Who is writing?','今天誰要寫日記？')+`<main class="wrap"><div class="kids">${settings.kids.map((k,i)=>`<div class="kidcard"><button class="kid" data-a="kid" data-v="${esc(k.id)}">${avatar(k,i)}<b>${esc(k.name)}</b><span class="tag">${LEVELS[k.level].name}</span></button><button class="kidreport" data-a="kidweek" data-v="${esc(k.id)}">📖 Weekly journal 週記</button></div>`).join('')}</div>
- ${note?`<p class="mut">${esc(note)}</p>`:''}<div style="text-align:center;margin-top:28px"><button class="ghost" data-a="parent">Parent 家長 ›</button></div>
+ const d=today();
+ return top('Welcome back','Choose your diary')+`<main class="wrap">
+ <div class="cWelcome"><div><h2>Choose a name</h2><p>選擇你的日記</p></div><div class="cDate"><b>${d.getDate()}</b><span>${d.toLocaleString('en',{month:'short'}).toUpperCase()}</span></div></div>
+ ${settings.kids.map((k,i)=>`<button class="cKid" data-a="kid" data-v="${esc(k.id)}"><div class="cAvatar ${i%2?'pink':''}">${esc((k.name||'?')[0].toUpperCase())}</div><div><b>${esc(k.name)}</b><small>${LEVELS[k.level].name} · 開始今天的日記</small></div><span class="cChev">›</span></button>`).join('')}
+ ${settings.kids.length?`<div class="cReport"><b>My Weekly Journal 我的週記</b><p>選擇孩子，瀏覽整週的日記與更好的寫法。</p><div class="cReportKids">${settings.kids.map(k=>`<button data-a="kidweek" data-v="${esc(k.id)}">${esc(k.name)}</button>`).join('')}</div></div>`:''}
+ ${note?`<p class="mut">${esc(note)}</p>`:''}<button class="cParent ghost" data-a="parent">Parent 家長專區 ›</button>
  </main>`;
 }
 const DAYZ=['週一','週二','週三','週四','週五','週六','週日'];
