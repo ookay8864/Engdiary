@@ -204,7 +204,8 @@ ruby rt{font-size:.55em;color:var(--mut);font-weight:600}
 .themeCurrent{border-bottom:1px solid var(--line);padding-bottom:14px}.themeCurrent .lab{font-size:11px;color:var(--mut);font-weight:800}.themeCurrent b{display:block;font-size:20px;margin-top:4px}.themeCurrent p{margin:4px 0 0;color:var(--mut);font-size:12px}
 .themeSelect{margin-top:14px}.themeSelect label{display:block;font-size:12px;color:var(--mut);font-weight:800;margin:0 0 6px}.themeSelect select{width:100%;height:58px;border:1px solid var(--line);border-radius:16px;background:var(--bg);color:var(--ink);padding:0 12px;font-size:15px;font-weight:800}
 .themeLevels{display:flex;border-radius:14px;background:var(--bg);padding:4px;margin-top:10px}.themeLevels button{flex:1;height:40px;border-radius:11px;color:var(--mut);font-weight:800}.themeLevels button.on{background:#26304d;color:#fff}
-.themeKids{display:flex;gap:8px;margin-top:14px}.themeKids div{flex:1;border-radius:13px;background:var(--bg);padding:9px;text-align:center;font-size:12px;font-weight:800;color:var(--mut)}.themeKids div.done{background:var(--okS);color:var(--ok)}
+.themeKids{display:flex;gap:8px;margin-top:14px}.themeKids div{flex:1;border-radius:13px;background:var(--bg);padding:9px;text-align:center;font-size:12px;font-weight:800;color:var(--mut)}.themeKids div.done{background:var(--okS);color:var(--ok)}.themeKids b,.themeKids span{display:block}.themeKids span{font-size:11px}
+.themeDoneBtn{width:100%;height:auto;min-height:60px;margin-top:12px;flex-direction:column;gap:2px;line-height:1.25}.themeDoneBtn small{font-size:13px;font-weight:700;opacity:.9}.themeDoneBtn.done{background:var(--ok);color:#fff}
 .themeStatus{margin-top:12px;border-radius:14px;background:var(--yelS);padding:10px 12px;color:light-dark(#7f795f,#e8dba5);font-size:12px}
 .themeActions{display:flex;gap:8px;margin-top:12px}.themeActions button{height:48px;border-radius:15px;font-weight:900}.themeActions .cancel{flex:1;background:var(--bg);color:var(--mut)}.themeActions .save{flex:1.4;background:#26304d;color:#fff}
 .pen{font:21px/2.1 ui-rounded,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -711,12 +712,16 @@ function themeState(){const T=settings.theme||(settings.theme={i:0,done:{},doneO
  if(!T.cur){T.cur=(T.i||0)+'-1';T.learned=T.learned||{}}T.learned=T.learned||{};
  if(T.doneOn&&T.doneOn<ymd(today())&&kids.length&&kids.every(k=>T.done[k.id])){T.learned[T.cur]=T.doneOn;T.cur=thPick(T,'auto');T.done={};T.doneOn='';saveSettings()}return T}
 function vTheme(){
- const T=themeState(),it=thItem(T.cur),th=it.th,kids=settings.kids,all=kids.length&&kids.every(k=>T.done[k.id]);
+ const T=themeState(),it=thItem(T.cur),th=it.th,kids=settings.kids,me=kidBy(st.kid),mineDone=!!(me&&T.done[me.id]),all=kids.length>0&&kids.every(k=>T.done[k.id]);
+ const otherDone=kids.filter(k=>k.id!==st.kid&&T.done[k.id]).map(k=>esc(k.name));
+ const status=all?'Great job! Everyone is done. The next theme starts tomorrow. 大家都完成了，明天一起進入下一個主題！':mineDone?`Nice work! Waiting for ${kids.filter(k=>!T.done[k.id]).map(k=>esc(k.name)).join(' and ')}. 你已完成，等其他人也完成。`:otherDone.length?`${otherDone.join(' and ')} finished this theme. Your turn! ${otherDone.join('、')}已完成，轮到你了！`:'Learn the words, then mark this theme complete. 学会这些单词后，打勾此主题已完成。';
+ const progress=kids.map(k=>`<div class="${T.done[k.id]?'done':''}"><b>${esc(k.name)}</b><span>${T.done[k.id]?'✓ Done 已完成':'○ Not yet 未完成'}</span></div>`).join('');
+ const doneButton=me?`<button class="btn pri full themeDoneBtn ${mineDone?'done':''}" data-a="themeDone" data-v="${esc(me.id)}" aria-pressed="${mineDone}"><span>${mineDone?'✓ Theme completed':'Mark this theme complete'}</span><small>${mineDone?'已完成，再点可取消':'打勾此主题已完成'}</small></button>`:'';
  return top(th.i+' '+th.e,'本週主題 · '+th.z+' · Level '+it.l+' '+'★'.repeat(it.l)+'☆'.repeat(3-it.l),'who')+`<main class="wrap">
  <p class="zh" style="margin:0 0 10px;text-align:center">Tap any word or sentence to hear it.</p>
  <div class="card"><h2>Useful phrases 常用搭配詞</h2><div class="tl">${it.w.map(w=>`<button data-a="say" data-v="${esc(w[0])}"><b>${esc(w[0])}</b><span>${PY(w[1])}</span></button>`).join('')}</div></div>
  <div class="card"><h2>Useful sentences 實用句子</h2><div class="tl sen">${it.s.map((x,i)=>`<button data-a="say" data-v="${esc(x[0])}"><b>${i+1}. ${esc(x[0])}</b><span>${PY(x[1])}</span></button>`).join('')}</div></div>
- <div class="card"><h2>Theme status 主題進度</h2><p class="zh" style="margin-top:-4px">${all?'Great job, everyone! New theme tomorrow. 大家都完成了，明天換新主題！':'When everyone is done, a new theme comes automatically. 大家完成後會自動換到下一個主題。'}</p></div></main>${tabs('theme')}`;
+ <div class="card"><h2>Theme status 主題進度</h2><div class="themeKids">${progress}</div>${doneButton}<p class="zh" style="margin:12px 0 0">${status}</p></div></main>${tabs('theme')}`;
 }
 function vPast(){
  const kid=kidBy(st.kid),list=kidEntries(kid),groups={};
@@ -1498,7 +1503,7 @@ async function act(a,v){
  case 'thMenu':if(!st.parent)break;{st.thMenu=!st.thMenu;render();break}
  case 'thLevel':if(!st.parent)break;{const T=themeState(),it=thItem(T.cur);if(it.l<3){T.learned[T.cur]=T.learned[T.cur]||ymd(today());T.cur=it.t+'-'+(it.l+1);T.done={};T.doneOn=''}st.thMenu=false;await saveSettings();render();scrollTo(0,0);break}
  case 'thNew':if(!st.parent)break;{const T=themeState();if(T.doneOn)T.learned[T.cur]=T.doneOn;T.cur=thPick(T,'new');T.done={};T.doneOn='';st.thMenu=false;await saveSettings();render();scrollTo(0,0);break}
- case 'themeDone':if(!st.parent)break;{const T=themeState();T.done[v]=!T.done[v];T.doneOn=settings.kids.every(k=>T.done[k.id])?ymd(today()):'';await saveSettings();render();break}
+ case 'themeDone':{const kidId=st.parent?v:st.kid;if(!kidBy(kidId))break;const T=themeState();T.done[kidId]=!T.done[kidId];T.doneOn=settings.kids.length&&settings.kids.every(k=>T.done[k.id])?ymd(today()):'';await saveSettings();render();break}
  case 'themeLevel':if(!st.parent)break;st.themeLevel=+v;render();break;
  case 'themeCancel':st.themePick=null;st.themeLevel=null;render();break;
  case 'themeApply':if(!st.parent)break;{const T=themeState(),it=thItem(T.cur),pick=st.themePick==null?it.t:+st.themePick,level=st.themeLevel==null?it.l:+st.themeLevel;T.cur=pick+'-'+level;T.done={};T.doneOn='';st.themePick=null;st.themeLevel=null;await saveSettings();toast('Theme updated. 主題已套用。');render();scrollTo(0,0);break}
