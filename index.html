@@ -689,14 +689,11 @@ function themeState(){const T=settings.theme||(settings.theme={i:0,done:{},doneO
  if(T.doneOn&&T.doneOn<ymd(today())&&kids.length&&kids.every(k=>T.done[k.id])){T.learned[T.cur]=T.doneOn;T.cur=thPick(T,'auto');T.done={};T.doneOn='';saveSettings()}return T}
 function vTheme(){
  const T=themeState(),it=thItem(T.cur),th=it.th,kids=settings.kids,all=kids.length&&kids.every(k=>T.done[k.id]);
- const menu=st.thMenu?`<div class="card thm">${it.l<3?`<button class="btn pri full" data-a="thLevel">${esc(th.e)} · Level ${it.l+1}<br><small>${esc(th.z)} 進階第 ${it.l+1} 級</small></button>`:''}<button class="btn sec full" style="margin-top:${it.l<3?10:0}px" data-a="thNew">New theme<br><small>換一個新主題</small></button></div>`:'';
- return top(th.i+' '+th.e,'本週主題 · '+th.z+' · Level '+it.l+' '+'★'.repeat(it.l)+'☆'.repeat(3-it.l),'who',`<button class="ib thb" data-a="thMenu" aria-label="Change">${st.thMenu?'✕':'Next ›'}</button>`)+`<main class="wrap">${menu}
+ return top(th.i+' '+th.e,'本週主題 · '+th.z+' · Level '+it.l+' '+'★'.repeat(it.l)+'☆'.repeat(3-it.l),'who')+`<main class="wrap">
  <p class="zh" style="margin:0 0 10px;text-align:center">Tap any word or sentence to hear it.</p>
  <div class="card"><h2>Useful phrases 常用搭配詞</h2><div class="tl">${it.w.map(w=>`<button data-a="say" data-v="${esc(w[0])}"><b>${esc(w[0])}</b><span>${PY(w[1])}</span></button>`).join('')}</div></div>
  <div class="card"><h2>Useful sentences 實用句子</h2><div class="tl sen">${it.s.map((x,i)=>`<button data-a="say" data-v="${esc(x[0])}"><b>${i+1}. ${esc(x[0])}</b><span>${PY(x[1])}</span></button>`).join('')}</div></div>
- <div class="card"><h2>Done? 完成了嗎？</h2><p class="zh" style="margin-top:-4px">When everyone is done, a new theme comes the next day. 大家都完成後，隔天換新主題。</p>
- <div class="row">${kids.map(k=>`<button class="btn ${T.done[k.id]?'pri':'sec'}" style="flex:1" data-a="themeDone" data-v="${esc(k.id)}">${T.done[k.id]?'✓':'☐'} ${esc(k.name)}</button>`).join('')}</div>
- ${all?'<div class="banner">Great job, everyone! New theme tomorrow. 大家都完成了，明天換新主題！</div>':''}</div></main>${tabs('theme')}`;
+ <div class="card"><h2>Theme status 主題進度</h2><p class="zh" style="margin-top:-4px">${all?'Great job, everyone! New theme tomorrow. 大家都完成了，明天換新主題！':'When everyone is done, a new theme comes automatically. 大家完成後會自動換到下一個主題。'}</p></div></main>${tabs('theme')}`;
 }
 function vPast(){
  const kid=kidBy(st.kid),list=kidEntries(kid),groups={};
@@ -781,6 +778,10 @@ function vParent(){
  ${readyUp(k)?`<div class="banner">Ready for ${LEVELS[k.level+1].name}? The last 5 entries met the goal with few mistakes. 最近 5 篇都達標、錯誤很少，可以考慮升級。<br><button class="btn sec" style="margin-top:8px;min-height:44px" data-a="levelup" data-v="${esc(k.id)}">Level up 升級</button></div>`:''}
  <div class="row" style="margin-top:12px"><button class="btn pri" style="flex:1" data-a="week" data-v="${esc(k.id)}">Weekly journal 週記</button><button class="btn sec" data-a="editkid" data-v="${esc(k.id)}">Edit 編輯</button></div></div>`}).join('')}
  <button class="btn sec full" data-a="editkid" data-v="">+ Add a child 新增孩子</button>
+ ${(()=>{const T=themeState(),it=thItem(T.cur),th=it.th,all=settings.kids.length&&settings.kids.every(k=>T.done[k.id]);return `<div class="card"><h2>Weekly theme 本週主題</h2><p class="zh" style="margin-top:-4px">${esc(th.e)} · ${esc(th.z)} · Level ${it.l}</p><p class="mut" style="margin:8px 0">Only parents can change the theme. 主題只能由家長更換。</p>
+ <div class="row">${settings.kids.map(k=>`<button class="btn ${T.done[k.id]?'pri':'sec'}" style="flex:1" data-a="themeDone" data-v="${esc(k.id)}">${T.done[k.id]?'✓':'☐'} ${esc(k.name)}</button>`).join('')}</div>
+ ${all?'<div class="banner" style="margin-top:10px">Great job, everyone! New theme tomorrow. 大家都完成了，明天換新主題！</div>':''}
+ <div class="row" style="margin-top:10px">${it.l<3?`<button class="btn pri" style="flex:1" data-a="thLevel">Next level 下一級</button>`:''}<button class="btn sec" style="flex:${it.l<3?'1':'auto'}" data-a="thNew">Change theme 換主題</button></div></div>`})()}
  <div class="card" style="margin-top:14px"><h2>Daily openers 每日開頭</h2><p class="zh" style="margin-top:-4px">Each day starts with a fixed opener so the week reads as one journal. 每天自動帶好開頭，一週連成一篇。</p><div class="choice">${Object.entries(OPENERS).map(([k,o])=>`<button data-a="setOpener" data-v="${k}" class="${(settings.opener||'A')===k?'on':''}"><b>${k} · ${o.n}</b><p>${esc(o.d.slice(0,3).join(' … '))}…</p></button>`).join('')}</div></div>
  <div class="card"><h2>Voice 聲音</h2><div class="row"><button class="btn ${(settings.vg||'f')==='f'?'pri':'sec'}" style="flex:1" data-a="setVg" data-v="f">Female 女聲</button><button class="btn ${settings.vg==='m'?'pri':'sec'}" style="flex:1" data-a="setVg" data-v="m">Male 男聲</button></div>
  <div class="row" style="margin-top:10px">${[['slow','Slow 慢'],['normal','Normal 正常'],['fast','Fast 快']].map(([k,l])=>`<button class="btn ${(settings.vr||'normal')===k?'pri':'sec'}" style="flex:1;font-size:15px;padding:0 6px" data-a="setVr" data-v="${k}">${l}</button>`).join('')}</div>
@@ -1467,10 +1468,10 @@ async function act(a,v){
  case 'say':say(v);break;
  case 'picWrite':openWrite(ymd(today()),{set:PAIRS.indexOf(pairFor(ymd(today()))),pick:v});break;
  case 'picOpen':{const k=kidBy(st.kid),t=ymd(today()),si=PAIRS.indexOf(pairFor(t)),b=eid(k.id,t),id=[b,b+'_p'].find(i=>entries[i]&&picPair(entries[i].pic)&&entries[i].pic.set===si);if(id){const e=entries[id];Object.assign(st,{view:'write',caret:null,bot:null,guideOpen:false,eidW:id,date:t,draft:e.text,fb:e.fb?{...e.fb,text:e.text}:null,pic:e.pic,typeMs:0,last:0});render()}break}
- case 'thMenu':{st.thMenu=!st.thMenu;render();break}
- case 'thLevel':{const T=themeState(),it=thItem(T.cur);if(it.l<3){T.learned[T.cur]=T.learned[T.cur]||ymd(today());T.cur=it.t+'-'+(it.l+1);T.done={};T.doneOn=''}st.thMenu=false;await saveSettings();render();scrollTo(0,0);break}
- case 'thNew':{const T=themeState();if(T.doneOn)T.learned[T.cur]=T.doneOn;T.cur=thPick(T,'new');T.done={};T.doneOn='';st.thMenu=false;await saveSettings();render();scrollTo(0,0);break}
- case 'themeDone':{const T=themeState();T.done[v]=!T.done[v];T.doneOn=settings.kids.every(k=>T.done[k.id])?ymd(today()):'';await saveSettings();render();break}
+ case 'thMenu':if(!st.parent)break;{st.thMenu=!st.thMenu;render();break}
+ case 'thLevel':if(!st.parent)break;{const T=themeState(),it=thItem(T.cur);if(it.l<3){T.learned[T.cur]=T.learned[T.cur]||ymd(today());T.cur=it.t+'-'+(it.l+1);T.done={};T.doneOn=''}st.thMenu=false;await saveSettings();render();scrollTo(0,0);break}
+ case 'thNew':if(!st.parent)break;{const T=themeState();if(T.doneOn)T.learned[T.cur]=T.doneOn;T.cur=thPick(T,'new');T.done={};T.doneOn='';st.thMenu=false;await saveSettings();render();scrollTo(0,0);break}
+ case 'themeDone':if(!st.parent)break;{const T=themeState();T.done[v]=!T.done[v];T.doneOn=settings.kids.every(k=>T.done[k.id])?ymd(today()):'';await saveSettings();render();break}
  case 'guideTog':st.guideOpen=!st.guideOpen;break;
  case 'setOpener':settings.opener=v;await saveSettings();render();break;
  case 'setVg':settings.vg=v;await saveSettings();pickVoice();render();say(v==='m'?'Hello! I am the boy voice.':'Hello! I am the girl voice.');break;
